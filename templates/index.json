@@ -8,89 +8,6 @@
  * ------------------------------------------------------------
  */{
   "sections": {
-    "hero_jVaWmY": {
-      "type": "hero",
-      "blocks": {
-        "text_YLPk4p": {
-          "type": "text",
-          "name": "t:names.heading",
-          "settings": {
-            "text": "<p>Browse our latest products</p>",
-            "text_color": "{{ settings.color_palette.background }}",
-            "width": "fit-content",
-            "max_width": "normal",
-            "alignment": "left",
-            "type_preset": "h2",
-            "font": "var(--font-body--family)",
-            "font_size": "1rem",
-            "line_height": "normal",
-            "letter_spacing": "normal",
-            "case": "none",
-            "wrap": "pretty",
-            "background": false,
-            "background_color": "#00000026",
-            "corner_radius": 0,
-            "padding-block-start": 0,
-            "padding-block-end": 0,
-            "padding-inline-start": 0,
-            "padding-inline-end": 0
-          },
-          "blocks": {}
-        },
-        "button_H9gpTf": {
-          "type": "button",
-          "name": "t:names.button",
-          "settings": {
-            "label": "Shop all",
-            "link": "shopify://collections/all",
-            "open_in_new_tab": false,
-            "style_class": "button-custom",
-            "custom_button_background": "rgba(0,0,0,0)",
-            "custom_button_text": "{{ settings.color_palette.background }}",
-            "custom_button_border": "{{ settings.color_palette.background }}",
-            "width": "fit-content",
-            "custom_width": 100,
-            "width_mobile": "fit-content",
-            "custom_width_mobile": 100
-          },
-          "blocks": {}
-        }
-      },
-      "block_order": [
-        "text_YLPk4p",
-        "button_H9gpTf"
-      ],
-      "name": "t:names.hero",
-      "settings": {
-        "media_type_1": "image",
-        "media_type_2": "image",
-        "stack_media_on_mobile": false,
-        "custom_mobile_media": false,
-        "media_type_1_mobile": "image",
-        "media_type_2_mobile": "image",
-        "open_in_new_tab": false,
-        "content_direction": "column",
-        "vertical_on_mobile": true,
-        "horizontal_alignment": "space-between",
-        "vertical_alignment": "flex-end",
-        "align_baseline": true,
-        "horizontal_alignment_flex_direction_column": "center",
-        "vertical_alignment_flex_direction_column": "flex-end",
-        "gap": 24,
-        "section_width": "page-width",
-        "section_height": "medium",
-        "section_height_custom": 50,
-        "background_color": "rgba(0,0,0,0)",
-        "toggle_overlay": true,
-        "overlay_color": "#12121266",
-        "overlay_style": "solid",
-        "gradient_direction": "to bottom",
-        "blurred_reflection": false,
-        "reflection_opacity": 75,
-        "padding-block-start": 100,
-        "padding-block-end": 72
-      }
-    },
     "product_list_fa6P9H": {
       "type": "product-list",
       "blocks": {
@@ -276,10 +193,145 @@
         "padding-block-start": 48,
         "padding-block-end": 48
       }
+    },
+    "dev_hero": {
+      "type": "dev-hero",
+      "name": "Hero",
+      "blocks": {
+        "moment_ride": {
+          "type": "moment",
+          "settings": {
+            "label": "The ride",
+            "eyebrow": "The first collection · 2026",
+            "title": "Elevated equestrian, for a life well lived.",
+            "accent_from": 2,
+            "copy": "Considered pieces shaped by a lifetime with horses. Made for the saddle, the stable and every place in between.",
+            "descriptor": "The pace of the field",
+            "video_asset": "dev-hero-ride.mp4"
+          }
+        },
+        "moment_ritual": {
+          "type": "moment",
+          "settings": {
+            "label": "The ritual",
+            "eyebrow": "Before the ride · 2026",
+            "title": "The quiet rituals matter most.",
+            "accent_from": 3,
+            "copy": "Thoughtful layers for early starts, familiar hands and the small preparations that make a day feel like your own.",
+            "descriptor": "Made for the moments before",
+            "video_asset": "dev-hero-ritual.mp4"
+          }
+        },
+        "moment_everyday": {
+          "type": "moment",
+          "settings": {
+            "label": "The everyday",
+            "eyebrow": "Beyond the stable · 2026",
+            "title": "Made for the life around the ride.",
+            "accent_from": 4,
+            "copy": "A considered wardrobe with the ease to follow you from the yard to the rest of the day, wherever it takes you.",
+            "descriptor": "For every place in between",
+            "video_asset": "dev-hero-everyday.mp4"
+          }
+        }
+      },
+      "block_order": [
+        "moment_ride",
+        "moment_ritual",
+        "moment_everyday"
+      ],
+      "settings": {
+        "cta_label": "Discover the collection",
+        "cta_link": "shopify://collections/all",
+        "topline_left": "Maison Cavallé / 2026",
+        "topline_right": "Designed for a life with horses",
+        "scroll_label": "Scroll to explore",
+        "tablist_label": "Explore Maison Cavallé moments",
+        "show_side_note": true,
+        "show_fit_card": true,
+        "fit_card_kicker": "The considered fit",
+        "fit_card_title": "<p>Choose your <em>usual size.</em></p>",
+        "fit_card_link_label": "View the guide",
+        "min_height": 760,
+        "min_height_mobile": 680,
+        "viewport_offset": 115,
+        "title_size_min": 4,
+        "title_size_max": 9,
+        "title_size_fluid": 80,
+        "title_leading": 84,
+        "title_tracking": 7,
+        "text_color": "#fbfaf7",
+        "meta_color": "#d3d5c9",
+        "accent_color": "{{ settings.color_palette.color7 }}",
+        "fallback_background": "#43463d",
+        "scrim_side": 76,
+        "scrim_bottom": 64,
+        "video_saturate": 68,
+        "video_contrast": 104,
+        "video_brightness": 86,
+        "grain_opacity": 15,
+        "autoplay": true,
+        "crossfade_duration": 1200,
+        "enable_pointer_depth": true,
+        "enable_scroll_depth": true
+      }
+    },
+    "dev_marquee": {
+      "type": "dev-marquee",
+      "name": "Marquee band",
+      "blocks": {
+        "phrase_1": {
+          "type": "phrase",
+          "settings": {
+            "text": "Born from a life with horses"
+          }
+        },
+        "phrase_2": {
+          "type": "phrase",
+          "settings": {
+            "text": "Fewer, better pieces"
+          }
+        },
+        "phrase_3": {
+          "type": "phrase",
+          "settings": {
+            "text": "Quiet confidence"
+          }
+        },
+        "phrase_4": {
+          "type": "phrase",
+          "settings": {
+            "text": "Made for every moment"
+          }
+        }
+      },
+      "block_order": [
+        "phrase_1",
+        "phrase_2",
+        "phrase_3",
+        "phrase_4"
+      ],
+      "settings": {
+        "font": "subheading",
+        "font_size": 10,
+        "letter_spacing": 13,
+        "text_case": "uppercase",
+        "background_color": "{{ settings.color_palette.color5 }}",
+        "text_color": "{{ settings.color_palette.background }}",
+        "separator": "✦",
+        "separator_color": "#d9dfbe",
+        "separator_size": 12,
+        "gap": 28,
+        "padding_block": 95,
+        "speed": 28,
+        "direction": "left",
+        "aria_label": "Maison Cavallé values"
+      }
     }
   },
   "order": [
-    "hero_jVaWmY",
+    "dev_hero",
+    "dev_marquee",
     "product_list_fa6P9H"
   ]
 }

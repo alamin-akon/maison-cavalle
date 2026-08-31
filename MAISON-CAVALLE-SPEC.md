@@ -221,8 +221,16 @@ Change the palette → the whole theme follows. That is the point.
 
 **Two families. Not three.**
 
-The prototype used DM Mono for every eyebrow, label, badge and button. That is
-dropped by decision — only Playfair Display and Work Sans are used.
+The prototype aliases its label face to the body face:
+
+```css
+--display: "Playfair Display";
+--sans:    "Work Sans";
+--mono:    var(--sans);
+```
+
+An earlier revision used DM Mono for eyebrows, labels, badges and buttons. It is
+gone — only Playfair Display and Work Sans are used.
 
 | Family | Styles | Role |
 |---|---|---|
@@ -264,10 +272,11 @@ token, so the whole set moves together if the decision changes again:
 Nothing is self-hosted. Both families come from Shopify's font picker, so no
 `@font-face`, no `.woff2` in `assets/`, and no licence question.
 
-> Prototype fidelity note: the prototype's labels were monospaced. In Work Sans
-> they read wider at the same size and tracking. If they look loose, tune
-> `--dev-button-tracking` and the per-section tracking settings rather than
-> reintroducing a third family.
+> Weight note: the prototype loads Playfair Display 500, 600 and 500 italic, and
+> Work Sans 400, 500 and 600. A Horizon font slot carries one weight, plus the
+> bold and italic variants it derives with `font_modify`. The 600 weight appears
+> only on the oversized "MC" watermarks, where the browser resolves it to the
+> bold face — invisible at that size and opacity. Everything else maps exactly.
 
 ### Type scale
 

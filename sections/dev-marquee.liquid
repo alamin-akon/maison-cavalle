@@ -1,0 +1,182 @@
+{% comment %}
+  Maison Cavallé — marquee band
+  Prototype source: maison-cavalle-main/styles.css → .marquee-band, .marquee-track
+                    maison-cavalle-main/app.js → renderHome
+  Reference: MAISON-CAVALLE-SPEC.md §1
+
+  The phrase list is rendered twice inside one track. The track then slides by
+  exactly -50%, so the second copy lands where the first started and the loop
+  has no seam. Phrases are blocks, so the list is editable.
+{% endcomment %}
+
+{% liquid
+  assign s = section.settings
+  assign phrases = section.blocks | where: 'type', 'phrase'
+%}
+
+{% if phrases.size > 0 %}
+  <div
+    class="dev-marquee"
+    style="
+      --dev-marquee-bg: {{ s.background_color | default: settings.color_palette.color5 }};
+      --dev-marquee-text: {{ s.text_color | default: settings.color_palette.background }};
+      --dev-marquee-separator: '{{ s.separator | replace: "'", "" | escape }}';
+      --dev-marquee-separator-color: {{ s.separator_color }};
+      --dev-marquee-font: var(--font-{{ s.font }}--family);
+      --dev-marquee-weight: var(--font-{{ s.font }}--weight);
+      --dev-marquee-size: {{ s.font_size }}px;
+      --dev-marquee-separator-size: {{ s.separator_size }}px;
+      --dev-marquee-tracking: {{ s.letter_spacing | divided_by: 100.0 }}em;
+      --dev-marquee-case: {{ s.text_case }};
+      --dev-marquee-gap: {{ s.gap | divided_by: 10.0 }}rem;
+      --dev-marquee-pad: {{ s.padding_block | divided_by: 100.0 }}rem;
+      --dev-marquee-speed: {{ s.speed }}s;
+      --dev-marquee-direction: {% if s.direction == 'right' %}reverse{% else %}normal{% endif %};
+    "
+  >
+    <div class="dev-marquee-track" aria-label="{{ s.aria_label }}">
+      {%- comment -%}
+        Rendered twice: the first pass is the readable content, the second is
+        the visual tail that makes the loop seamless and is hidden from
+        assistive technology.
+      {%- endcomment -%}
+      {%- for pass in (1..2) -%}
+        {%- for block in phrases -%}
+          <span
+            class="dev-marquee-phrase"
+            {% if pass == 2 %}aria-hidden="true"{% endif %}
+            {{ block.shopify_attributes }}
+          >{{ block.settings.text }}</span>
+        {%- endfor -%}
+      {%- endfor -%}
+    </div>
+  </div>
+{% endif %}
+
+{% stylesheet %}
+  .dev-marquee {
+    display: flex;
+    overflow: hidden;
+    color: var(--dev-marquee-text);
+    background: var(--dev-marquee-bg);
+    white-space: nowrap;
+  }
+
+  .dev-marquee-track {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: var(--dev-marquee-gap);
+    min-width: max-content;
+    padding-block: var(--dev-marquee-pad);
+    animation: dev-marquee var(--dev-marquee-speed) linear infinite;
+    animation-direction: var(--dev-marquee-direction);
+  }
+
+  .dev-marquee-phrase {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--dev-marquee-gap);
+    font-family: var(--dev-marquee-font);
+    font-size: var(--dev-marquee-size);
+    font-weight: var(--dev-marquee-weight);
+    letter-spacing: var(--dev-marquee-tracking);
+    text-transform: var(--dev-marquee-case);
+  }
+
+  /* Separator sits after every phrase, so the gap reads evenly around the loop. */
+  .dev-marquee-phrase::after {
+    content: var(--dev-marquee-separator, '✦');
+    color: var(--dev-marquee-separator-color);
+    font-size: var(--dev-marquee-separator-size);
+  }
+
+  @keyframes dev-marquee {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .dev-marquee-track {
+      animation: none;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Marquee band",
+  "tag": "section",
+  "class": "dev-marquee-section",
+  "max_blocks": 12,
+  "blocks": [
+    {
+      "type": "phrase",
+      "name": "Phrase",
+      "settings": [
+        { "type": "text", "id": "text", "label": "Text", "default": "Born from a life with horses" }
+      ]
+    }
+  ],
+  "settings": [
+    { "type": "header", "content": "Typography" },
+    {
+      "type": "select", "id": "font", "label": "Font",
+      "options": [
+        { "value": "body", "label": "Body" },
+        { "value": "subheading", "label": "Subheading" },
+        { "value": "heading", "label": "Heading" },
+        { "value": "accent", "label": "Accent" }
+      ],
+      "default": "subheading"
+    },
+    { "type": "range", "id": "font_size", "label": "Size", "min": 8, "max": 28, "step": 1, "unit": "px", "default": 10 },
+    { "type": "range", "id": "letter_spacing", "label": "Letter spacing", "min": 0, "max": 30, "step": 1, "unit": "%", "default": 13 },
+    {
+      "type": "select", "id": "text_case", "label": "Case",
+      "options": [
+        { "value": "none", "label": "Default" },
+        { "value": "uppercase", "label": "Uppercase" }
+      ],
+      "default": "uppercase"
+    },
+
+    { "type": "header", "content": "Colors" },
+    { "type": "color", "id": "background_color", "label": "Background", "default": "#737960" },
+    { "type": "color", "id": "text_color", "label": "Text", "default": "#fbfaf7" },
+    { "type": "text", "id": "separator", "label": "Separator character", "default": "✦" },
+    { "type": "color", "id": "separator_color", "label": "Separator color", "default": "#d9dfbe" },
+    { "type": "range", "id": "separator_size", "label": "Separator size", "min": 8, "max": 32, "step": 1, "unit": "px", "default": 12 },
+
+    { "type": "header", "content": "Layout" },
+    { "type": "range", "id": "gap", "label": "Space between phrases", "min": 5, "max": 80, "step": 1, "unit": "%", "default": 28, "info": "Tenths of a rem — 28 is 2.8rem." },
+    { "type": "range", "id": "padding_block", "label": "Vertical padding", "min": 0, "max": 400, "step": 5, "unit": "%", "default": 95, "info": "Hundredths of a rem — 95 is 0.95rem." },
+
+    { "type": "header", "content": "Motion" },
+    { "type": "range", "id": "speed", "label": "Loop duration", "min": 5, "max": 100, "step": 1, "unit": "s", "default": 28 },
+    {
+      "type": "select", "id": "direction", "label": "Direction",
+      "options": [
+        { "value": "left", "label": "Right to left" },
+        { "value": "right", "label": "Left to right" }
+      ],
+      "default": "left"
+    },
+
+    { "type": "header", "content": "Accessibility" },
+    { "type": "text", "id": "aria_label", "label": "Label for screen readers", "default": "Maison Cavallé values" }
+  ],
+  "presets": [
+    {
+      "name": "Marquee band",
+      "blocks": [
+        { "type": "phrase", "settings": { "text": "Born from a life with horses" } },
+        { "type": "phrase", "settings": { "text": "Fewer, better pieces" } },
+        { "type": "phrase", "settings": { "text": "Quiet confidence" } },
+        { "type": "phrase", "settings": { "text": "Made for every moment" } }
+      ]
+    }
+  ]
+}
+{% endschema %}
