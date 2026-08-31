@@ -1,0 +1,389 @@
+{% comment %}
+  Maison Cavallé — announcement bar
+  Prototype source: maison-cavalle-main/styles.css → .announcement-bar
+  Reference: MAISON-CAVALLE-SPEC.md §1 (naming), §2 (colour), §3 (type)
+
+  Every visual property is a theme setting. Nothing is hardcoded here.
+{% endcomment %}
+
+{% liquid
+  assign s = section.settings
+  assign tracking = s.letter_spacing | divided_by: 100.0
+  assign leading = s.line_height | divided_by: 100.0
+  assign font_family = 'var(--font-[font]--family)' | replace: '[font]', s.font
+  assign font_weight = 'var(--font-[font]--weight)' | replace: '[font]', s.font
+
+  assign background = s.background_color | default: settings.color_palette.foreground
+  assign text_color = s.text_color | default: settings.color_palette.color3
+  assign divider_color = s.divider_color | default: settings.color_palette.color2
+%}
+
+{% if s.text != blank %}
+  <dev-announcement-bar
+    class="dev-announcement-bar"
+    data-dev-section-id="{{ section.id }}"
+    {% if s.remember_dismissal %}
+      data-dev-remember-dismissal
+    {% endif %}
+    style="
+      --dev-announcement-bg: {{ background }};
+      --dev-announcement-text: {{ text_color }};
+      --dev-announcement-min-height: {{ s.min_height }}px;
+      --dev-announcement-pad-block-start: {{ s.padding_block_start }}px;
+      --dev-announcement-pad-block-end: {{ s.padding_block_end }}px;
+      --dev-announcement-pad-inline: {{ s.padding_inline }}px;
+      --dev-announcement-font: {{ font_family }};
+      --dev-announcement-font-weight: {{ font_weight }};
+      --dev-announcement-size: {{ s.font_size }}px;
+      --dev-announcement-size-mobile: {{ s.font_size_mobile }}px;
+      --dev-announcement-leading: {{ leading }};
+      --dev-announcement-tracking: {{ tracking }}em;
+      --dev-announcement-case: {{ s.text_case }};
+      --dev-announcement-align: {{ s.text_align }};
+      --dev-announcement-max-width: {% if s.section_width == 'page-width' %}var(--dev-content-max){% else %}100%{% endif %};
+      --dev-announcement-divider-width: {{ s.divider_width }}px;
+      --dev-announcement-divider-color: {{ divider_color }};
+      --dev-announcement-dismiss-size: {{ s.dismiss_size }}px;
+      --dev-announcement-dismiss-offset: {{ s.dismiss_offset }}px;
+    "
+  >
+    <div class="dev-announcement-bar-container">
+      {%- if s.link != blank -%}
+        <a class="dev-announcement-bar-link" href="{{ s.link }}">
+          <span class="dev-announcement-bar-text">{{ s.text }}</span>
+        </a>
+      {%- else -%}
+        <p class="dev-announcement-bar-text">{{ s.text }}</p>
+      {%- endif -%}
+    </div>
+
+    {%- if s.show_dismiss -%}
+      <button
+        class="dev-announcement-bar-dismiss"
+        type="button"
+        data-dev-announcement-dismiss
+        aria-label="{{ 'actions.close' | t }}"
+      >
+        <span aria-hidden="true">&times;</span>
+      </button>
+    {%- endif -%}
+  </dev-announcement-bar>
+
+  <script src="{{ 'dev-announcement-bar.js' | asset_url }}" type="module"></script>
+{% endif %}
+
+{% stylesheet %}
+  .dev-announcement-bar {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: var(--dev-announcement-min-height);
+    padding-block: var(--dev-announcement-pad-block-start) var(--dev-announcement-pad-block-end);
+    padding-inline: var(--dev-announcement-pad-inline);
+    color: var(--dev-announcement-text);
+    background: var(--dev-announcement-bg);
+    border-block-end: var(--dev-announcement-divider-width) solid var(--dev-announcement-divider-color);
+    font-family: var(--dev-announcement-font);
+    font-size: var(--dev-announcement-size);
+    font-weight: var(--dev-announcement-font-weight);
+    line-height: var(--dev-announcement-leading);
+    letter-spacing: var(--dev-announcement-tracking);
+    text-align: var(--dev-announcement-align);
+    text-transform: var(--dev-announcement-case);
+  }
+
+  .dev-announcement-bar[hidden] {
+    display: none;
+  }
+
+  /* Overrides the global container default: this bar is full-bleed unless the
+     merchant constrains it with the section width setting. */
+  .dev-announcement-bar-container {
+    width: min(100%, var(--dev-announcement-max-width));
+    margin-inline: auto;
+    padding-inline: 0;
+  }
+
+  .dev-announcement-bar-text {
+    margin: 0;
+  }
+
+  .dev-announcement-bar-link {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .dev-announcement-bar-link:hover .dev-announcement-bar-text {
+    text-decoration: underline;
+    text-underline-offset: 0.25em;
+  }
+
+  .dev-announcement-bar-dismiss {
+    position: absolute;
+    inset-inline-end: var(--dev-announcement-dismiss-offset);
+    inset-block-start: 50%;
+    padding: 0.1rem 0.35rem;
+    border: 0;
+    color: inherit;
+    background: transparent;
+    font-size: var(--dev-announcement-dismiss-size);
+    font-weight: 300;
+    line-height: 1;
+    cursor: pointer;
+    transform: translateY(-50%);
+  }
+
+  .dev-announcement-bar-dismiss:focus-visible {
+    outline: 1px solid currentcolor;
+    outline-offset: 2px;
+  }
+
+  @media screen and (max-width: 680px) {
+    .dev-announcement-bar {
+      font-size: var(--dev-announcement-size-mobile);
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Announcement bar",
+  "tag": "aside",
+  "class": "dev-announcement-bar-section",
+  "enabled_on": {
+    "groups": ["header"]
+  },
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "text",
+      "label": "Message",
+      "default": "Complimentary Australian shipping on orders over $150"
+    },
+    {
+      "type": "url",
+      "id": "link",
+      "label": "Link"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_dismiss",
+      "label": "Show dismiss button",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "remember_dismissal",
+      "label": "Keep dismissed for the rest of the visit",
+      "info": "Off matches the prototype — the bar returns on every page load.",
+      "default": false,
+      "visible_if": "{{ section.settings.show_dismiss }}"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "select",
+      "id": "font",
+      "label": "Font",
+      "options": [
+        { "value": "body", "label": "Body" },
+        { "value": "subheading", "label": "Subheading" },
+        { "value": "heading", "label": "Heading" },
+        { "value": "accent", "label": "Accent" }
+      ],
+      "default": "subheading"
+    },
+    {
+      "type": "range",
+      "id": "font_size",
+      "label": "Font size",
+      "min": 6,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "font_size_mobile",
+      "label": "Font size on mobile",
+      "min": 6,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "line_height",
+      "label": "Line height",
+      "min": 100,
+      "max": 200,
+      "step": 5,
+      "unit": "%",
+      "default": 130
+    },
+    {
+      "type": "range",
+      "id": "letter_spacing",
+      "label": "Letter spacing",
+      "min": 0,
+      "max": 30,
+      "step": 1,
+      "unit": "/100em",
+      "default": 7
+    },
+    {
+      "type": "select",
+      "id": "text_case",
+      "label": "Case",
+      "options": [
+        { "value": "none", "label": "Default" },
+        { "value": "uppercase", "label": "Uppercase" }
+      ],
+      "default": "uppercase"
+    },
+    {
+      "type": "select",
+      "id": "text_align",
+      "label": "Alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background",
+      "default": "#1e211d"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text",
+      "default": "#f3f0e8"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "Width",
+      "options": [
+        { "value": "full-width", "label": "Full" },
+        { "value": "page-width", "label": "Page" }
+      ],
+      "default": "full-width"
+    },
+    {
+      "type": "range",
+      "id": "min_height",
+      "label": "Minimum height",
+      "min": 20,
+      "max": 80,
+      "step": 1,
+      "unit": "px",
+      "default": 29
+    },
+    {
+      "type": "range",
+      "id": "padding_block_start",
+      "label": "Top padding",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "default": 7
+    },
+    {
+      "type": "range",
+      "id": "padding_block_end",
+      "label": "Bottom padding",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "default": 7
+    },
+    {
+      "type": "range",
+      "id": "padding_inline",
+      "label": "Side padding",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "Divider"
+    },
+    {
+      "type": "range",
+      "id": "divider_width",
+      "label": "Thickness",
+      "min": 0,
+      "max": 5,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "color",
+      "id": "divider_color",
+      "label": "Color",
+      "default": "#ded8ca",
+      "visible_if": "{{ section.settings.divider_width > 0 }}"
+    },
+    {
+      "type": "header",
+      "content": "Dismiss button",
+      "visible_if": "{{ section.settings.show_dismiss }}"
+    },
+    {
+      "type": "range",
+      "id": "dismiss_size",
+      "label": "Size",
+      "min": 12,
+      "max": 28,
+      "step": 1,
+      "unit": "px",
+      "default": 18,
+      "visible_if": "{{ section.settings.show_dismiss }}"
+    },
+    {
+      "type": "range",
+      "id": "dismiss_offset",
+      "label": "Distance from edge",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "default": 19,
+      "visible_if": "{{ section.settings.show_dismiss }}"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Announcement bar"
+    }
+  ]
+}
+{% endschema %}

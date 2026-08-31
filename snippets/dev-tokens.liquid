@@ -1,0 +1,46 @@
+{% doc %}
+  Emits the Maison Cavallé palette entries as CSS custom properties.
+
+  Horizon's own `color-palette` snippet only outputs `background` and
+  `foreground`; `color1`–`color7` exist in theme settings but never reach CSS.
+  This snippet exposes them so sections can reference palette colours by role
+  instead of hardcoding hex values.
+
+  Render from layout/theme.liquid after 'color-palette'.
+  Reference: MAISON-CAVALLE-SPEC.md §2
+{% enddoc %}
+
+{% liquid
+  assign paper = settings.color_palette.background
+  assign ink = settings.color_palette.foreground
+  assign ink_soft = settings.color_palette.color1
+  assign sand = settings.color_palette.color2
+  assign cream = settings.color_palette.color3
+  assign stone = settings.color_palette.color4
+  assign olive = settings.color_palette.color5
+  assign rust = settings.color_palette.color6
+  assign hero_accent = settings.color_palette.color7
+%}
+
+{% style %}
+  :root {
+    --dev-paper: {{ paper }};
+    --dev-paper-rgb: {{ paper.rgb }};
+    --dev-ink: {{ ink }};
+    --dev-ink-rgb: {{ ink.rgb }};
+    --dev-ink-soft: {{ ink_soft }};
+    --dev-ink-soft-rgb: {{ ink_soft.rgb }};
+    --dev-sand: {{ sand }};
+    --dev-sand-rgb: {{ sand.rgb }};
+    --dev-cream: {{ cream }};
+    --dev-cream-rgb: {{ cream.rgb }};
+    --dev-stone: {{ stone }};
+    --dev-stone-rgb: {{ stone.rgb }};
+    --dev-olive: {{ olive }};
+    --dev-olive-rgb: {{ olive.rgb }};
+    --dev-rust: {{ rust }};
+    --dev-rust-rgb: {{ rust.rgb }};
+    --dev-hero-accent: {{ hero_accent }};
+    --dev-hero-accent-rgb: {{ hero_accent.rgb }};
+  }
+{% endstyle %}

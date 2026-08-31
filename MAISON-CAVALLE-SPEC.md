@@ -137,6 +137,10 @@ transfers one-to-one:
 | Custom properties | Section-scoped vars are also `dev-` prefixed: `--dev-hero-min-height`. |
 | No inline `style=` | Except for Liquid-driven per-instance values, passed as CSS custom properties: `style="--dev-hero-min-height: {{ section.settings.height }}px"`. |
 | JS hooks | Behaviour targets `data-dev-*` attributes, never a `dev-` class. Classes are for styling only. |
+| Modified Horizon sections | When a Horizon section is modified rather than replaced (e.g. `header.liquid`), add `dev-{name}` to its root and reach its internal classes only through that scope: `.dev-header .menu-list__link`. Never restyle `.menu-list__link` on its own. |
+| Dynamic values | `{% stylesheet %}` blocks do not run Liquid. Every setting-driven value passes through an inline `style="--dev-*: …"` on the section root. |
+| Ranges | Shopify range `step` must be divisible by `0.1`. For finer values use whole numbers with a `/100` unit and divide in Liquid. |
+| Translations | Only use locale keys that already exist. A new key must be added to all 33 locale files or theme check fails. |
 
 ### Container defaults (`assets/dev-base.css`)
 
@@ -602,14 +606,20 @@ Other border widths:
 
 ## 8. Build order
 
-1. `git init` + commit clean Horizon baseline
-2. `assets/dev-base.css` — tokens, `@font-face`, container defaults, utilities
-3. `config/settings_data.json` — palette, typography, buttons, radii (§2, §3, §4, §6)
-4. Verify in Theme Editor that every value round-trips
-5. Header + footer
-6. Homepage sections, in prototype order
-7. Product + collection templates
-8. Content pages (story, journal, faq, shipping, size guide)
+| # | Step | Status |
+|---|---|---|
+| 1 | `git init` + clean Horizon baseline | done |
+| 2 | `assets/dev-base.css` + `snippets/dev-tokens.liquid` + self-hosted DM Mono | done |
+| 3 | `config/settings_data.json` — palette, typography, buttons, radii (§2, §3, §4, §6) | done |
+| 4 | `sections/dev-announcement-bar.liquid` | done |
+| 5 | `sections/header.liquid` — `dev-header` scope + 26 settings | done |
+| 6 | Verify in Theme Editor that every value round-trips | pending |
+| 7 | Footer | |
+| 8 | Homepage sections, in prototype order | |
+| 9 | Product + collection templates | |
+| 10 | Content pages (story, journal, faq, shipping, size guide) | |
 
-Steps 3–4 come before any section work. Sections are written against tokens
+Steps 2–3 come before any section work. Sections are written against tokens
 that must already exist.
+
+Run `shopify theme check` after every step. It must stay at zero offenses.
