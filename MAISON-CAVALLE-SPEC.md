@@ -139,7 +139,9 @@ transfers one-to-one:
 | JS hooks | Behaviour targets `data-dev-*` attributes, never a `dev-` class. Classes are for styling only. |
 | Modified Horizon sections | When a Horizon section is modified rather than replaced (e.g. `header.liquid`), add `dev-{name}` to its root and reach its internal classes only through that scope: `.dev-header .menu-list__link`. Never restyle `.menu-list__link` on its own. |
 | Dynamic values | `{% stylesheet %}` blocks do not run Liquid. Every setting-driven value passes through an inline `style="--dev-*: …"` on the section root. |
-| Ranges | Shopify range `step` must be divisible by `0.1`. For finer values use whole numbers with a `/100` unit and divide in Liquid. |
+| Ranges | Four server rules, only the first of which `theme check` catches: `step` divisible by `0.1`; `unit` at most **3 characters**; at most **101 steps** (`(max - min) / step + 1`); `default` on the step grid. For fractional values use whole numbers with a `%` unit and divide by 100 in Liquid. |
+| Validate before pushing | `theme check` does not enforce the schema rules above — the server rejects the upload instead, and a section that fails to upload makes `header-group.json` fail too ("does not refer to an existing section file"). Run the schema validator as well as `theme check`. |
+| Pushing JSON | `shopify theme dev` does **not** re-sync `sections/*-group.json`, `templates/*.json` or `config/settings_data.json` after it starts — it protects Theme Editor edits. Changes to those files need `shopify theme push`, or a restart of `theme dev`. Liquid and assets hot-sync normally. |
 | Translations | Only use locale keys that already exist. A new key must be added to all 33 locale files or theme check fails. |
 
 ### Container defaults (`assets/dev-base.css`)
@@ -612,7 +614,7 @@ Other border widths:
 | 2 | `assets/dev-base.css` + `snippets/dev-tokens.liquid` + self-hosted DM Mono | done |
 | 3 | `config/settings_data.json` — palette, typography, buttons, radii (§2, §3, §4, §6) | done |
 | 4 | `sections/dev-announcement-bar.liquid` | done |
-| 5 | `sections/header.liquid` — `dev-header` scope + 26 settings | done |
+| 5 | `sections/dev-header.liquid` — own section, 44 settings; Horizon's `header.liquid` left untouched | done |
 | 6 | Verify in Theme Editor that every value round-trips | pending |
 | 7 | Footer | |
 | 8 | Homepage sections, in prototype order | |

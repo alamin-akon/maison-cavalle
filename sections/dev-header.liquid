@@ -1,0 +1,888 @@
+{% comment %}
+  Maison Cavallé — header
+  Prototype source: maison-cavalle-main/index.html → .site-header
+                    maison-cavalle-main/styles.css → .site-header, .header-inner,
+                    .desktop-nav, .icon-button, .header-wordmark, .mobile-menu
+  Reference: MAISON-CAVALLE-SPEC.md §1
+
+  Layout and styling are the prototype's. Behaviour reuses Horizon's own
+  globally rendered components rather than reimplementing them:
+    - cart drawer  → on:click="#cart-drawer/toggle"   (layout/theme.liquid)
+    - search modal → on:click="#search-modal/showDialog" (layout/theme.liquid)
+  Only the mobile navigation drawer is ours, because the prototype's drawer is
+  a distinct design.
+{% endcomment %}
+
+{% liquid
+  assign s = section.settings
+  assign menu = linklists[s.menu]
+
+  assign logo_alt = 'accessibility.home_logo_alt' | t: store_name: shop.name
+
+  assign height_scrolled = s.height_scrolled
+  assign logo_height_scrolled = s.logo_height_scrolled
+  unless s.shrink_on_scroll
+    assign height_scrolled = s.height
+    assign logo_height_scrolled = s.logo_height
+  endunless
+%}
+
+<dev-header
+  class="dev-header"
+  {% if s.enable_sticky %}
+    data-dev-sticky
+  {% endif %}
+  {% if s.hide_labels_tablet %}
+    data-dev-hide-labels-tablet
+  {% endif %}
+  {% if s.hide_account_mobile %}
+    data-dev-hide-account-mobile
+  {% endif %}
+  style="
+    --dev-header-bg: {{ s.background_color | default: settings.color_palette.background }};
+    --dev-header-bg-rgb: {{ s.background_color.rgb | default: settings.color_palette.background.rgb }};
+    --dev-header-text: {{ s.text_color | default: settings.color_palette.foreground }};
+    --dev-header-blur: {{ s.backdrop_blur }}px;
+    --dev-header-saturate: {{ s.backdrop_saturate | divided_by: 100.0 }};
+    --dev-header-bg-opacity-top: {{ s.bg_opacity_top | divided_by: 100.0 }};
+    --dev-header-bg-opacity-bottom: {{ s.bg_opacity_bottom | divided_by: 100.0 }};
+    --dev-header-bg-opacity-scrolled: {{ s.bg_opacity_scrolled | divided_by: 100.0 }};
+    --dev-header-border-opacity: {{ s.border_opacity | divided_by: 100.0 }};
+    --dev-header-height: {{ s.height }}px;
+    --dev-header-height-mobile: {{ s.height_mobile }}px;
+    --dev-header-height-scrolled: {{ height_scrolled }}px;
+    --dev-header-logo-width: {{ s.logo_width }}px;
+    --dev-header-logo-height: {{ s.logo_height }}px;
+    --dev-header-logo-height-scrolled: {{ logo_height_scrolled }}px;
+    --dev-header-logo-width-mobile: {{ s.logo_width_mobile }}px;
+    --dev-header-logo-height-mobile: {{ s.logo_height_mobile }}px;
+    --dev-header-nav-size: {{ s.nav_font_size }}px;
+    --dev-header-nav-tracking: {{ s.nav_tracking | divided_by: 100.0 }}em;
+    --dev-header-nav-gap: {{ s.nav_gap }}px;
+    --dev-header-nav-hover: {{ s.nav_hover_color | default: settings.color_palette.color5 }};
+    --dev-header-nav-dot: {{ s.nav_dot_color | default: settings.color_palette.color6 }};
+    --dev-header-nav-dot-rgb: {{ s.nav_dot_color.rgb | default: settings.color_palette.color6.rgb }};
+    --dev-header-label-size: {{ s.label_size }}px;
+    --dev-header-label-tracking: {{ s.label_tracking | divided_by: 100.0 }}em;
+    --dev-header-icon-size: {{ s.icon_size }}px;
+    --dev-header-icon-stroke: {{ s.icon_stroke_width | divided_by: 100.0 }};
+    --dev-header-badge-size: {{ s.cart_badge_size }}px;
+    --dev-header-badge-bg: {{ s.cart_badge_color | default: settings.color_palette.foreground }};
+    --dev-header-badge-hover-bg: {{ s.cart_badge_hover_color | default: settings.color_palette.color6 }};
+    --dev-header-drawer-bg: {{ s.drawer_background_color | default: settings.color_palette.color3 }};
+    --dev-header-drawer-width: {{ s.drawer_width }}px;
+    {% unless s.enable_reveal %}--dev-header-reveal-name: none; --dev-header-logo-reveal-name: none;{% endunless %}
+    {% unless s.enable_glint %}--dev-header-glint-name: none;{% endunless %}
+  "
+>
+  <div class="dev-header-container">
+    {%- comment -%} Mobile only — opens the navigation drawer. {%- endcomment -%}
+    <button
+      class="dev-header-icon-button dev-header-menu-trigger"
+      type="button"
+      data-dev-menu-trigger
+      aria-expanded="false"
+      aria-controls="dev-header-drawer"
+    >
+      <span class="dev-header-menu-icon" aria-hidden="true"><i></i><i></i></span>
+      <span class="dev-header-menu-label">{{ 'accessibility.menu' | t }}</span>
+    </button>
+
+    {%- if menu != blank and menu.links.size > 0 -%}
+      <nav class="dev-header-nav" aria-label="{{ 'accessibility.menu' | t | default: shop.name }}">
+        {%- for link in menu.links -%}
+          <a
+            class="dev-header-nav-link{% if link.active %} is-active{% endif %}"
+            href="{{ link.url }}"
+          >
+            {{- link.title -}}
+          </a>
+        {%- endfor -%}
+      </nav>
+    {%- endif -%}
+
+    <a class="dev-header-wordmark" href="{{ routes.root_url }}">
+      {%- if settings.logo != blank -%}
+        {{
+          settings.logo
+          | image_url: width: 620
+          | image_tag: class: 'dev-header-logo', alt: logo_alt, loading: 'eager', fetchpriority: 'high'
+        }}
+      {%- else -%}
+        {%- comment -%}
+          No logo uploaded: fall back to the wordmark shipped in the theme's own
+          assets, so the logo travels with the theme code. See SPEC §2.
+        {%- endcomment -%}
+        <img
+          class="dev-header-logo"
+          src="{{ 'dev-logo.svg' | asset_url }}"
+          alt="{{ logo_alt }}"
+          width="620"
+          height="354"
+          loading="eager"
+          fetchpriority="high"
+        >
+      {%- endif -%}
+    </a>
+
+    <div class="dev-header-actions">
+      {%- if s.show_search -%}
+        <button
+          class="dev-header-icon-button dev-header-search-trigger"
+          type="button"
+          on:click="#search-modal/showDialog"
+          aria-haspopup="dialog"
+          aria-label="{{ 'content.search_input_label' | t }}"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <circle cx="10.8" cy="10.8" r="6.2"></circle>
+            <path d="m16 16 4.2 4.2"></path>
+          </svg>
+          <span class="dev-header-action-label">{{ 'content.search' | t }}</span>
+        </button>
+      {%- endif -%}
+
+      {%- if s.show_account and shop.customer_accounts_enabled -%}
+        <a
+          class="dev-header-icon-button dev-header-account-trigger"
+          href="{{ routes.account_url }}"
+          aria-label="{{ 'content.account_title' | t }}"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <circle cx="12" cy="8" r="3.2"></circle>
+            <path d="M5.8 20c.7-3.3 2.7-5 6.2-5s5.5 1.7 6.2 5"></path>
+          </svg>
+          <span class="dev-header-action-label">{{ 'content.account_title' | t }}</span>
+        </a>
+      {%- endif -%}
+
+      {%- if s.show_cart -%}
+        {%- capture cart_inner -%}
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M5.4 8.5h13.2l1 11H4.4l1-11Z"></path>
+            <path d="M8.5 9V6.8a3.5 3.5 0 0 1 7 0V9"></path>
+          </svg>
+          <span class="dev-header-action-label">{{ 'content.cart_title' | t }}</span>
+          <span class="dev-header-cart-count">{{ cart.item_count }}</span>
+        {%- endcapture -%}
+
+        {%- if settings.cart_type == 'drawer' and template.name != 'cart' -%}
+          <button
+            class="dev-header-icon-button dev-header-cart-trigger"
+            type="button"
+            on:click="#cart-drawer/toggle"
+            aria-haspopup="dialog"
+            aria-expanded="false"
+            aria-controls="cart-drawer"
+            aria-label="{{ 'accessibility.cart' | t }}"
+          >
+            {{ cart_inner }}
+          </button>
+        {%- else -%}
+          <a
+            class="dev-header-icon-button dev-header-cart-trigger"
+            href="{{ routes.cart_url }}"
+            aria-label="{{ 'accessibility.cart' | t }}"
+          >
+            {{ cart_inner }}
+          </a>
+        {%- endif -%}
+      {%- endif -%}
+    </div>
+  </div>
+
+  {%- comment -%} Mobile navigation drawer — the prototype's own design. {%- endcomment -%}
+  <div class="dev-header-backdrop" data-dev-drawer-backdrop hidden></div>
+
+  <aside
+    class="dev-header-drawer"
+    id="dev-header-drawer"
+    data-dev-drawer
+    aria-label="{{ 'accessibility.menu' | t | default: shop.name }}"
+    aria-hidden="true"
+    inert
+  >
+    <div class="dev-header-drawer-head">
+      <button class="dev-header-drawer-back" type="button" data-dev-drawer-close>
+        <span aria-hidden="true">&larr;</span> {{ 'actions.close' | t }}
+      </button>
+      <span class="dev-eyebrow">{{ shop.name }}</span>
+    </div>
+
+    {%- if s.drawer_eyebrow != blank -%}
+      <div class="dev-header-drawer-intro">
+        <span class="dev-eyebrow">{{ s.drawer_eyebrow }}</span>
+        {%- if menu != blank -%}
+          <span>{{ menu.links.size }} {{ s.drawer_count_label }}</span>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    {%- if menu != blank and menu.links.size > 0 -%}
+      <nav class="dev-header-drawer-nav">
+        {%- for link in menu.links -%}
+          <a class="dev-header-drawer-link" href="{{ link.url }}">
+            {{ link.title }} <span aria-hidden="true">&#8599;</span>
+          </a>
+        {%- endfor -%}
+      </nav>
+    {%- endif -%}
+
+    {%- if s.drawer_footer_left != blank or s.drawer_footer_right != blank -%}
+      <div class="dev-header-drawer-footer">
+        <span>{{ s.drawer_footer_left }}</span>
+        <span>{{ s.drawer_footer_right }}</span>
+      </div>
+    {%- endif -%}
+  </aside>
+</dev-header>
+
+<script src="{{ 'dev-header.js' | asset_url }}" type="module"></script>
+
+{% stylesheet %}
+  .dev-header {
+    position: relative;
+    z-index: 10;
+    display: block;
+    isolation: isolate;
+    color: var(--dev-header-text);
+    background: linear-gradient(
+      180deg,
+      rgb(var(--dev-header-bg-rgb) / var(--dev-header-bg-opacity-top)),
+      rgb(var(--dev-header-bg-rgb) / var(--dev-header-bg-opacity-bottom))
+    );
+    border-block-end: 1px solid rgb(var(--color-foreground-rgb) / var(--dev-header-border-opacity));
+    box-shadow: 0 8px 24px rgb(var(--color-foreground-rgb) / 0.04);
+    backdrop-filter: blur(var(--dev-header-blur)) saturate(var(--dev-header-saturate));
+    -webkit-backdrop-filter: blur(var(--dev-header-blur)) saturate(var(--dev-header-saturate));
+    animation: var(--dev-header-reveal-name, dev-header-reveal) 0.8s var(--dev-ease) both;
+    transition: background 0.35s var(--dev-ease), border-color 0.35s var(--dev-ease),
+      box-shadow 0.35s var(--dev-ease);
+  }
+
+  .dev-header[data-dev-sticky] {
+    position: sticky;
+    top: 0;
+  }
+
+  .dev-header.is-scrolled {
+    background: rgb(var(--dev-header-bg-rgb) / var(--dev-header-bg-opacity-scrolled));
+    box-shadow: 0 10px 28px rgb(var(--color-foreground-rgb) / 0.08);
+  }
+
+  /* One-off light sweep across the header on first paint. */
+  .dev-header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background: linear-gradient(105deg, transparent 35%, rgb(255 255 255 / 0.55) 50%, transparent 65%);
+    pointer-events: none;
+    transform: translateX(-120%);
+    animation: var(--dev-header-glint-name, dev-header-glint) 1.4s 0.25s var(--dev-ease) both;
+  }
+
+  .dev-header-container {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: center;
+    gap: 1rem;
+    min-height: var(--dev-header-height);
+    padding-block: 0.75rem;
+    transition: min-height 0.35s var(--dev-ease), padding 0.35s var(--dev-ease);
+  }
+
+  .dev-header.is-scrolled .dev-header-container {
+    min-height: var(--dev-header-height-scrolled);
+    padding-block: 0.4rem;
+  }
+
+  /* --- Desktop navigation --- */
+  .dev-header-nav {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+    gap: var(--dev-header-nav-gap);
+  }
+
+  .dev-header-nav-link {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 0.05rem;
+    color: inherit;
+    font-family: var(--dev-font-mono);
+    font-size: var(--dev-header-nav-size);
+    line-height: 1;
+    letter-spacing: var(--dev-header-nav-tracking);
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: color 0.3s var(--dev-ease), transform 0.3s var(--dev-ease);
+  }
+
+  /* Dot that appears to the left of a hovered link. */
+  .dev-header-nav-link::before {
+    content: '';
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline-start: -0.65rem;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--dev-header-nav-dot);
+    transform: translateY(-50%) scale(0);
+    transition: transform 0.3s var(--dev-ease);
+  }
+
+  /* Underline that sweeps in from the left. */
+  .dev-header-nav-link::after {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    inset-block-end: 0.15rem;
+    height: 1px;
+    background: currentcolor;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s var(--dev-ease);
+  }
+
+  .dev-header-nav-link:hover,
+  .dev-header-nav-link:focus-visible {
+    color: var(--dev-header-nav-hover);
+    transform: translateY(-2px);
+  }
+
+  .dev-header-nav-link:hover::before,
+  .dev-header-nav-link:focus-visible::before {
+    transform: translateY(-50%) scale(1);
+  }
+
+  .dev-header-nav-link:hover::after,
+  .dev-header-nav-link:focus-visible::after {
+    transform: scaleX(1);
+  }
+
+  /* --- Logo --- */
+  .dev-header-wordmark {
+    position: relative;
+    justify-self: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: min(var(--dev-header-logo-width), 24vw);
+    height: var(--dev-header-logo-height);
+    overflow: visible;
+    animation: var(--dev-header-logo-reveal-name, dev-header-logo-reveal) 0.85s 0.08s var(--dev-ease) both;
+    transition: transform 0.4s var(--dev-ease), height 0.35s var(--dev-ease);
+  }
+
+  .dev-header-wordmark:hover,
+  .dev-header-wordmark:focus-visible {
+    transform: translateY(-2px);
+  }
+
+  .dev-header-logo {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transition: transform 0.5s var(--dev-ease);
+  }
+
+  .dev-header-wordmark:hover .dev-header-logo,
+  .dev-header-wordmark:focus-visible .dev-header-logo {
+    transform: scale(1.035);
+  }
+
+  .dev-header.is-scrolled .dev-header-wordmark {
+    height: var(--dev-header-logo-height-scrolled);
+  }
+
+  /* --- Actions --- */
+  .dev-header-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    min-width: 0;
+    gap: clamp(0.75rem, 1.7vw, 1.5rem);
+  }
+
+  .dev-header-icon-button {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.48rem;
+    padding: 0.4rem 0;
+    color: inherit;
+    border: 0;
+    background: transparent;
+    text-decoration: none;
+    cursor: pointer;
+    transition: color 0.3s var(--dev-ease), transform 0.35s var(--dev-ease);
+  }
+
+  /* Pill that fades in behind a hovered action. */
+  .dev-header-icon-button::before {
+    content: '';
+    position: absolute;
+    inset: 0.1rem -0.35rem;
+    z-index: 0;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    background: rgb(var(--dev-olive-rgb) / 0);
+    pointer-events: none;
+    transform: scale(0.85);
+    transition: border-color 0.3s var(--dev-ease), background-color 0.3s var(--dev-ease),
+      transform 0.35s var(--dev-ease);
+  }
+
+  .dev-header-icon-button > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  .dev-header-icon-button svg {
+    width: var(--dev-header-icon-size);
+    height: var(--dev-header-icon-size);
+    fill: none;
+    stroke: currentcolor;
+    stroke-width: var(--dev-header-icon-stroke);
+    transition: transform 0.35s var(--dev-ease);
+  }
+
+  .dev-header-icon-button:hover,
+  .dev-header-icon-button:focus-visible {
+    color: var(--dev-header-nav-hover);
+    transform: translateY(-2px);
+  }
+
+  .dev-header-icon-button:hover::before,
+  .dev-header-icon-button:focus-visible::before {
+    border-color: rgb(var(--dev-olive-rgb) / 0.35);
+    background: rgb(var(--dev-olive-rgb) / 0.07);
+    transform: scale(1);
+  }
+
+  .dev-header-icon-button:hover svg,
+  .dev-header-icon-button:focus-visible svg {
+    transform: scale(1.08) rotate(-6deg);
+  }
+
+  .dev-header-action-label,
+  .dev-header-menu-label {
+    font-family: var(--dev-font-mono);
+    font-size: var(--dev-header-label-size);
+    line-height: 1;
+    letter-spacing: var(--dev-header-label-tracking);
+    text-transform: uppercase;
+  }
+
+  /* --- Cart count --- */
+  .dev-header-cart-trigger {
+    position: relative;
+  }
+
+  .dev-header-cart-count {
+    display: inline-grid;
+    place-items: center;
+    min-width: var(--dev-header-badge-size);
+    height: var(--dev-header-badge-size);
+    margin-inline-start: -0.25rem;
+    padding-inline: 0.2rem;
+    color: var(--dev-header-bg);
+    background: var(--dev-header-badge-bg);
+    border-radius: 50%;
+    font-family: var(--dev-font-mono);
+    font-size: 9px;
+    line-height: 1;
+    transition: background-color 0.3s var(--dev-ease), transform 0.3s var(--dev-ease);
+  }
+
+  .dev-header-cart-trigger:hover .dev-header-cart-count,
+  .dev-header-cart-trigger:focus-visible .dev-header-cart-count {
+    background: var(--dev-header-badge-hover-bg);
+    transform: translate(1px, -2px);
+  }
+
+  /* --- Mobile menu trigger --- */
+  .dev-header-menu-trigger {
+    display: none;
+  }
+
+  .dev-header-menu-icon {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    width: 17px;
+  }
+
+  .dev-header-menu-icon i {
+    display: block;
+    width: 100%;
+    height: 1px;
+    background: currentcolor;
+    transition: transform 0.25s var(--dev-ease);
+  }
+
+  .dev-header-menu-trigger[aria-expanded='true'] .dev-header-menu-icon i:first-child {
+    transform: translateY(2.5px) rotate(45deg);
+  }
+
+  .dev-header-menu-trigger[aria-expanded='true'] .dev-header-menu-icon i:last-child {
+    transform: translateY(-2.5px) rotate(-45deg);
+  }
+
+  /* --- Mobile drawer --- */
+  .dev-header-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 20;
+    background: rgb(15 17 14 / 0.48);
+    opacity: 0;
+    transition: opacity 0.4s var(--dev-ease);
+  }
+
+  .dev-header-backdrop.is-visible {
+    opacity: 1;
+  }
+
+  .dev-header-backdrop[hidden] {
+    display: none;
+  }
+
+  .dev-header-drawer {
+    position: fixed;
+    inset-block: 0;
+    inset-inline-start: 0;
+    z-index: 30;
+    isolation: isolate;
+    overflow: hidden;
+    width: min(var(--dev-header-drawer-width), 91vw);
+    padding: 1.5rem var(--dev-page-pad);
+    color: var(--color-foreground);
+    background: var(--dev-header-drawer-bg);
+    box-shadow: 0 0 40px rgb(15 17 14 / 0.14);
+    transform: translateX(-105%);
+    transition: transform 0.45s var(--dev-ease);
+  }
+
+  .dev-header-drawer.is-open {
+    transform: translateX(0);
+  }
+
+  /* Oversized monogram watermark behind the drawer content. */
+  .dev-header-drawer::before {
+    content: 'MC';
+    position: absolute;
+    inset-inline-end: -0.08em;
+    inset-block-end: -0.08em;
+    z-index: -1;
+    color: rgb(var(--dev-olive-rgb) / 0.13);
+    font-family: var(--dev-font-display);
+    font-size: clamp(14rem, 53vw, 25rem);
+    font-weight: 600;
+    line-height: 0.72;
+    letter-spacing: -0.16em;
+    pointer-events: none;
+  }
+
+  .dev-header-drawer-head {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-block-end: 1rem;
+    border-block-end: 1px solid var(--dev-line);
+  }
+
+  .dev-header-drawer-head .dev-eyebrow {
+    color: var(--dev-olive);
+  }
+
+  .dev-header-drawer-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.35rem 0;
+    border: 0;
+    color: inherit;
+    background: transparent;
+    font-family: var(--dev-font-mono);
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  .dev-header-drawer-back span {
+    font-size: 16px;
+    transition: transform 0.3s var(--dev-ease);
+  }
+
+  .dev-header-drawer-back:hover span,
+  .dev-header-drawer-back:focus-visible span {
+    transform: translateX(-3px);
+  }
+
+  .dev-header-drawer-intro {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-block-start: clamp(2.3rem, 10vw, 4rem);
+    padding-block-end: 0.85rem;
+    border-block-end: 1px solid var(--dev-line);
+    color: var(--dev-stone);
+    font-family: var(--dev-font-mono);
+    font-size: 8px;
+    letter-spacing: 0.11em;
+    text-transform: uppercase;
+  }
+
+  .dev-header-drawer-intro .dev-eyebrow {
+    color: var(--dev-olive);
+  }
+
+  .dev-header-drawer-nav {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 1fr;
+    padding-block-start: 0.35rem;
+  }
+
+  .dev-header-drawer-link {
+    display: flex;
+    justify-content: space-between;
+    padding-block: 1rem;
+    border-block-end: 1px solid var(--dev-line);
+    color: inherit;
+    font-family: var(--dev-font-display);
+    font-size: 28px;
+    text-decoration: none;
+  }
+
+  .dev-header-drawer-link span {
+    font-family: var(--dev-font-sans);
+    font-size: 17px;
+  }
+
+  .dev-header-drawer-back:focus-visible,
+  .dev-header-drawer-link:focus-visible {
+    outline: 2px solid var(--dev-rust);
+    outline-offset: 4px;
+  }
+
+  .dev-header-drawer-footer {
+    position: absolute;
+    inset-inline: var(--dev-page-pad);
+    inset-block-end: 2.5rem;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-block-start: 1.3rem;
+    border-block-start: 1px solid var(--dev-line);
+    font-family: var(--dev-font-mono);
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  @keyframes dev-header-reveal {
+    from {
+      opacity: 0;
+      transform: translateY(-14px);
+    }
+
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes dev-header-logo-reveal {
+    from {
+      opacity: 0;
+      transform: translateY(-8px) scale(0.96);
+    }
+
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes dev-header-glint {
+    0%,
+    55% {
+      opacity: 0;
+      transform: translateX(-120%);
+    }
+
+    65% {
+      opacity: 1;
+    }
+
+    100% {
+      opacity: 0;
+      transform: translateX(120%);
+    }
+  }
+
+  @media screen and (max-width: 900px) {
+    .dev-header-nav {
+      gap: 1rem;
+    }
+
+    .dev-header[data-dev-hide-labels-tablet] .dev-header-action-label {
+      display: none;
+    }
+  }
+
+  @media screen and (max-width: 680px) {
+    .dev-header-container {
+      grid-template-columns: minmax(34px, 1fr) auto minmax(0, 1fr);
+      gap: 0.5rem;
+      min-height: var(--dev-header-height-mobile);
+      padding-block: 0.65rem;
+    }
+
+    .dev-header-nav {
+      display: none;
+    }
+
+    .dev-header[data-dev-hide-account-mobile] .dev-header-account-trigger {
+      display: none;
+    }
+
+    .dev-header-menu-trigger {
+      display: inline-flex;
+      justify-content: flex-start;
+      min-width: 34px;
+    }
+
+    .dev-header-actions {
+      gap: 0.55rem;
+    }
+
+    .dev-header-search-trigger,
+    .dev-header-cart-trigger {
+      justify-content: center;
+      min-width: 34px;
+    }
+
+    .dev-header-search-trigger svg,
+    .dev-header-cart-trigger svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .dev-header-wordmark {
+      width: min(var(--dev-header-logo-width-mobile), 46vw);
+      height: var(--dev-header-logo-height-mobile);
+    }
+
+    .dev-header-drawer {
+      width: 100%;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .dev-header,
+    .dev-header::before,
+    .dev-header-wordmark {
+      animation: none;
+    }
+
+    .dev-header-nav-link,
+    .dev-header-nav-link::before,
+    .dev-header-nav-link::after,
+    .dev-header-icon-button,
+    .dev-header-icon-button::before,
+    .dev-header-icon-button svg,
+    .dev-header-drawer,
+    .dev-header-backdrop {
+      transition: none;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Header",
+  "tag": "header",
+  "class": "dev-header-section",
+  "enabled_on": {
+    "groups": ["header"]
+  },
+  "settings": [
+    { "type": "header", "content": "Navigation" },
+    { "type": "link_list", "id": "menu", "label": "Menu", "default": "main-menu" },
+    { "type": "range", "id": "nav_font_size", "label": "Link size", "min": 8, "max": 20, "step": 1, "unit": "px", "default": 10 },
+    { "type": "range", "id": "nav_tracking", "label": "Link letter spacing", "min": 0, "max": 30, "step": 1, "unit": "%", "default": 10 },
+    { "type": "range", "id": "nav_gap", "label": "Space between links", "min": 8, "max": 60, "step": 1, "unit": "px", "default": 40 },
+    { "type": "color", "id": "nav_hover_color", "label": "Hover color", "default": "#737960" },
+    { "type": "color", "id": "nav_dot_color", "label": "Hover dot color", "default": "#98634b" },
+
+    { "type": "header", "content": "Logo" },
+    { "type": "paragraph", "content": "Upload a logo in Theme settings. With none uploaded, the wordmark bundled in the theme assets is used." },
+    { "type": "range", "id": "logo_width", "label": "Width", "min": 100, "max": 400, "step": 5, "unit": "px", "default": 250 },
+    { "type": "range", "id": "logo_height", "label": "Height", "min": 30, "max": 140, "step": 2, "unit": "px", "default": 78 },
+    { "type": "range", "id": "logo_width_mobile", "label": "Width on mobile", "min": 80, "max": 300, "step": 5, "unit": "px", "default": 170 },
+    { "type": "range", "id": "logo_height_mobile", "label": "Height on mobile", "min": 30, "max": 100, "step": 1, "unit": "px", "default": 58 },
+
+    { "type": "header", "content": "Actions" },
+    { "type": "checkbox", "id": "show_search", "label": "Show search", "default": true },
+    { "type": "checkbox", "id": "show_account", "label": "Show account", "default": true },
+    { "type": "checkbox", "id": "show_cart", "label": "Show bag", "default": true },
+    { "type": "range", "id": "label_size", "label": "Label size", "min": 8, "max": 20, "step": 1, "unit": "px", "default": 10 },
+    { "type": "range", "id": "label_tracking", "label": "Label letter spacing", "min": 0, "max": 30, "step": 1, "unit": "%", "default": 10 },
+    { "type": "checkbox", "id": "hide_labels_tablet", "label": "Hide labels below 900px", "default": true },
+    { "type": "checkbox", "id": "hide_account_mobile", "label": "Hide account below 680px", "default": true },
+    { "type": "range", "id": "icon_size", "label": "Icon size", "min": 12, "max": 32, "step": 1, "unit": "px", "default": 17 },
+    { "type": "range", "id": "icon_stroke_width", "label": "Icon stroke width", "min": 100, "max": 300, "step": 5, "unit": "%", "default": 135 },
+    { "type": "range", "id": "cart_badge_size", "label": "Bag count size", "min": 12, "max": 26, "step": 1, "unit": "px", "default": 15 },
+    { "type": "color", "id": "cart_badge_color", "label": "Bag count background", "default": "#1e211d" },
+    { "type": "color", "id": "cart_badge_hover_color", "label": "Bag count hover background", "default": "#98634b" },
+
+    { "type": "header", "content": "Height" },
+    { "type": "range", "id": "height", "label": "Height", "min": 50, "max": 140, "step": 1, "unit": "px", "default": 86 },
+    { "type": "range", "id": "height_mobile", "label": "Height on mobile", "min": 40, "max": 120, "step": 1, "unit": "px", "default": 70 },
+    { "type": "checkbox", "id": "shrink_on_scroll", "label": "Shrink when scrolled", "default": true },
+    { "type": "range", "id": "height_scrolled", "label": "Height when scrolled", "min": 40, "max": 120, "step": 1, "unit": "px", "default": 58, "visible_if": "{{ section.settings.shrink_on_scroll }}" },
+    { "type": "range", "id": "logo_height_scrolled", "label": "Logo height when scrolled", "min": 30, "max": 120, "step": 1, "unit": "px", "default": 50, "visible_if": "{{ section.settings.shrink_on_scroll }}" },
+
+    { "type": "header", "content": "Surface" },
+    { "type": "checkbox", "id": "enable_sticky", "label": "Stick to top when scrolling", "default": true },
+    { "type": "color", "id": "background_color", "label": "Background", "default": "#fbfaf7" },
+    { "type": "color", "id": "text_color", "label": "Text", "default": "#1e211d" },
+    { "type": "range", "id": "backdrop_blur", "label": "Backdrop blur", "min": 0, "max": 40, "step": 1, "unit": "px", "default": 18 },
+    { "type": "range", "id": "backdrop_saturate", "label": "Backdrop saturation", "min": 100, "max": 200, "step": 5, "unit": "%", "default": 115 },
+    { "type": "range", "id": "bg_opacity_top", "label": "Background opacity (top)", "min": 0, "max": 100, "step": 1, "unit": "%", "default": 84 },
+    { "type": "range", "id": "bg_opacity_bottom", "label": "Background opacity (bottom)", "min": 0, "max": 100, "step": 1, "unit": "%", "default": 72 },
+    { "type": "range", "id": "bg_opacity_scrolled", "label": "Background opacity when scrolled", "min": 0, "max": 100, "step": 1, "unit": "%", "default": 80 },
+    { "type": "range", "id": "border_opacity", "label": "Bottom border opacity", "min": 0, "max": 100, "step": 1, "unit": "%", "default": 12 },
+
+    { "type": "header", "content": "Mobile drawer" },
+    { "type": "range", "id": "drawer_width", "label": "Width", "min": 280, "max": 600, "step": 10, "unit": "px", "default": 420 },
+    { "type": "color", "id": "drawer_background_color", "label": "Background", "default": "#f3f0e8" },
+    { "type": "text", "id": "drawer_eyebrow", "label": "Eyebrow", "default": "Explore the Maison" },
+    { "type": "text", "id": "drawer_count_label", "label": "Count label", "default": "destinations" },
+    { "type": "text", "id": "drawer_footer_left", "label": "Footer left", "default": "MC / 2026" },
+    { "type": "text", "id": "drawer_footer_right", "label": "Footer right", "default": "Fewer, better pieces." },
+
+    { "type": "header", "content": "Motion" },
+    { "type": "checkbox", "id": "enable_reveal", "label": "Reveal header on load", "default": true },
+    { "type": "checkbox", "id": "enable_glint", "label": "Light sweep on load", "default": true }
+  ]
+}
+{% endschema %}
