@@ -219,79 +219,55 @@ Change the palette → the whole theme follows. That is the point.
 
 ## 3. Typography → global settings
 
-The prototype uses **exactly 3 font families**. Not more, not fewer.
+**Two families. Not three.**
 
-| Family | Prototype var | Uses | Weights needed |
-|---|---|---|---|
-| Playfair Display | `--display` | 78 | 500, 600, 500 italic |
-| Work Sans | `--sans` | 64 | 400, 500, 600 |
-| DM Mono | `--mono` | **128** | 400, 500 |
+The prototype used DM Mono for every eyebrow, label, badge and button. That is
+dropped by decision — only Playfair Display and Work Sans are used.
 
-DM Mono is the most-used family in the prototype — every eyebrow, button
-label, badge, price tag and metadata line.
-
-### Horizon has 4 font slots, we have 3 families
-
-| Horizon slot | Family | Why |
+| Family | Styles | Role |
 |---|---|---|
-| Body | Work Sans | Paragraphs, product copy |
-| Heading | Playfair Display | h1–h4, display headlines |
-| Accent | Playfair Display | Same family; italic applied via CSS |
-| Subheading | **DM Mono** | h5/h6, eyebrows, labels, buttons |
+| Playfair Display | 500 normal, 500 italic | Display headlines; italic for accent words |
+| Work Sans | 400, 500 | Body copy; 500 uppercase for labels and buttons |
+
+### Horizon's four slots
+
+| Horizon slot | Family | Used by |
+|---|---|---|
+| Body | Work Sans 400 | Paragraphs, product copy |
+| Subheading | Work Sans 500 | h5/h6, eyebrows, labels, buttons, badges |
+| Heading | Playfair Display 500 | h1–h4 |
+| Accent | Playfair Display 500 *italic* | Accent words inside headlines |
 
 ```json
 "type_body_font":       "work_sans_n4",
+"type_subheading_font": "work_sans_n5",
 "type_heading_font":    "playfair_display_n5",
-"type_accent_font":     "playfair_display_n5",
-"type_subheading_font": "work_sans_n5"
+"type_accent_font":     "playfair_display_i5"
 ```
 
-### DM Mono — not in Shopify's font picker
+Because Accent is a real italic variant, Horizon downloads the italic face —
+the h1/h2 "Font: Heading | Accent" toggle switches roman to italic with no CSS.
 
-`font_picker` cannot select DM Mono, so `type_subheading_font` is set to a
-placeholder (`work_sans_n5`) and the family is overridden at the CSS
-variable level. Self-host it:
+### The label face
 
-1. Download DM Mono 400 + 500 from Google Fonts as `.woff2`.
-2. Place in `assets/`:
-   - `assets/dm-mono-400.woff2`
-   - `assets/dm-mono-500.woff2`
-3. Declare in `assets/dev-base.css`:
-
-```css
-@font-face {
-  font-family: "DM Mono";
-  src: url("dm-mono-400.woff2") format("woff2");
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "DM Mono";
-  src: url("dm-mono-500.woff2") format("woff2");
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
-```
-
-4. Override the Horizon subheading token so every h5/h6/label picks it up:
+Uppercase metadata (eyebrows, buttons, action labels, badges, prices) reads one
+token, so the whole set moves together if the decision changes again:
 
 ```css
 :root {
-  --font-subheading--family: "DM Mono", ui-monospace, monospace;
-  --font-subheading--weight: 500;
-  --dev-font-mono: var(--font-subheading--family);
+  --dev-font-label: var(--font-subheading--family);   /* Work Sans 500 */
+  --dev-font-display: var(--font-heading--family);    /* Playfair Display */
+  --dev-font-sans: var(--font-body--family);          /* Work Sans */
 }
 ```
 
-> `assets/*.woff2` is served from Shopify's CDN via `asset_url`, so the font
-> travels with the theme code to the client store. No Files upload needed.
-> Confirm the licence permits self-hosting (DM Mono is SIL OFL — it does).
->
-> Before doing any of this, open the picker and search "DM Mono" once. If
-> Shopify has added it, use `dm_mono_n4` for `type_subheading_font` and
-> delete steps 1–4 entirely.
+Nothing is self-hosted. Both families come from Shopify's font picker, so no
+`@font-face`, no `.woff2` in `assets/`, and no licence question.
+
+> Prototype fidelity note: the prototype's labels were monospaced. In Work Sans
+> they read wider at the same size and tracking. If they look loose, tune
+> `--dev-button-tracking` and the per-section tracking settings rather than
+> reintroducing a third family.
 
 ### Type scale
 
