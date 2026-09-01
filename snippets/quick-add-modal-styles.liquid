@@ -52,6 +52,10 @@
       border-radius: 0;
       overflow: clip;
       height: fit-content;
+
+      /* Bottom sheet touches the physical bottom edge (viewport-fit=cover); keep the
+         buy buttons above the home indicator while the background fills the safe area */
+      padding-block-end: var(--safe-area-inset-bottom);
     }
   }
 

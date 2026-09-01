@@ -13,13 +13,9 @@ body {
 }
 
 :root {
-  --hover-shadow-color: var(--color-shadow);
   --hover-transition-duration: 0.25s;
   --hover-transition-timing: ease-out;
-  --surface-transition-duration: 0.3s;
-  --surface-transition-timing: var(--ease-out-quad);
   --submenu-animation-speed: 360ms;
-  --submenu-animation-easing: cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 
 html {
@@ -112,9 +108,6 @@ select {
 
 .product-card__content {
   position: relative;
-}
-
-.product-card__content {
   cursor: pointer;
 }
 
@@ -261,12 +254,14 @@ p:empty {
   flex-grow: 1;
 }
 
-/* Set up page widths & margins */
+/* Set up page widths & margins. Gutters grow to the device safe-area insets (viewport-fit=cover)
+   so section backgrounds bleed edge-to-edge while content stays clear of the notch; taking the
+   larger of both insets keeps the centered page grid symmetric. */
 .page-width-wide,
 .page-width-normal,
 .page-width-narrow,
 .page-width-content {
-  --page-margin: 16px;
+  --page-margin: max(16px, var(--safe-area-inset-left, 0px), var(--safe-area-inset-right, 0px));
 }
 
 @media screen and (min-width: 750px) {
@@ -274,7 +269,7 @@ p:empty {
   .page-width-normal,
   .page-width-narrow,
   .page-width-content {
-    --page-margin: 40px;
+    --page-margin: max(40px, var(--safe-area-inset-left, 0px), var(--safe-area-inset-right, 0px));
   }
 }
 
@@ -289,8 +284,7 @@ p:empty {
   --page-width: calc(var(--page-content-width) + (var(--page-margin) * 2));
 }
 
-.page-width-narrow,
-.page-width-content {
+.page-width-narrow {
   /* NOTE: This results in a page width of 1400px because of how we set up margins with grid */
   --page-content-width: var(--narrow-page-width);
   --page-width: calc(var(--page-content-width) + (var(--page-margin) * 2));
@@ -371,11 +365,6 @@ p:empty {
   .section--mobile-full-width > * {
     grid-column: 1 / -1;
   }
-}
-
-/* Some page-width sections should still extend all the way to the right edge of the page, e.g. collection carousel */
-.section--page-width.section--full-width-right > * {
-  grid-column: 2 / 4;
 }
 
 /* For full-width sections with margin, content still spans full width but with space on the sides */
@@ -497,17 +486,8 @@ p:empty {
   }
 }
 
-.flex {
-  display: flex;
-  gap: var(--gap-md);
-}
-
 .flip-x {
   scale: -1 1;
-}
-
-.flip-y {
-  scale: 1 -1;
 }
 
 .list-unstyled {
@@ -552,12 +532,6 @@ p:empty {
 
 .justify-right {
   justify-content: right;
-}
-
-.title--aligned-center {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
 }
 
 .svg-wrapper {
@@ -1012,8 +986,10 @@ summary:hover {
 /* Animate the UI elements in only after the view transition is complete */
 .close-button {
   position: fixed;
-  top: var(--margin-lg);
-  right: var(--margin-lg);
+
+  /* Keep the fixed close button clear of the status bar and right-side notch (viewport-fit=cover) */
+  top: max(var(--margin-lg), var(--safe-area-inset-top, 0px));
+  right: max(var(--margin-lg), var(--safe-area-inset-right, 0px));
   width: var(--minimum-touch-target);
   height: var(--minimum-touch-target);
   z-index: var(--layer-flat);
@@ -1106,10 +1082,7 @@ summary:hover {
   --margin-inline: 0px;
   --margin-inline-start: var(--margin-inline, 0px);
   --margin-inline-end: var(--margin-inline, 0px);
-}
 
-.spacing-style,
-.inherit-spacing {
   padding-block: calc(var(--padding-block-start) + var(--section-top-offset, 0px)) var(--padding-block-end);
   padding-inline: var(--padding-inline-start) var(--padding-inline-end);
   margin-block: var(--margin-block-start) var(--margin-block-end);
@@ -1486,24 +1459,6 @@ input[type='radio'] {
   cursor: not-allowed;
 }
 
-/* Flexbox for labels wrapping radio buttons or checkboxes */
-label:has(input[type='radio']),
-label:has(input[type='checkbox']) {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--padding-2xs);
-  cursor: pointer;
-}
-
-label:has(input[type='radio']:disabled),
-label:has(input[type='checkbox']:disabled) {
-  cursor: not-allowed;
-}
-
-/* ------------------------------------------------------------------------------ */
-
-/* ------------------------------------------------------------------------------ */
-
 /* Animation declarations - to be kept at the bottom of the file for ease of find */
 @keyframes grow {
   0% {
@@ -1701,11 +1656,8 @@ label:has(input[type='checkbox']:disabled) {
 
 /* Slideshow Arrow Hover Animation - must stay in base.css for proper CSS cascade */
 
-:not(.media-gallery--carousel)
-  > :is(slideshow-component:hover, slideshow-component:focus-within):not(:has(slideshow-controls:hover))
-  > slideshow-container
-  > slideshow-arrows
-  .slideshow-control {
+slideshow-container[animate-arrows]:hover > slideshow-arrows .slideshow-control,
+slideshow-component:focus-within > slideshow-container[animate-arrows] > slideshow-arrows .slideshow-control {
   animation: arrowsSlideIn var(--animation-speed) var(--animation-easing) forwards;
 }
 
@@ -1731,10 +1683,6 @@ label:has(input[type='checkbox']:disabled) {
   align-items: var(--horizontal-alignment);
   gap: var(--gap);
   width: 100%;
-}
-
-.section-resource-list__content:empty {
-  display: none;
 }
 
 .section-resource-list__header:is(:empty, :has(.group-block-content:empty)),
@@ -1829,12 +1777,6 @@ label:has(input[type='checkbox']:disabled) {
   background-color: rgb(var(--color-foreground-rgb) / var(--opacity-60));
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  html {
-    scroll-behavior: smooth;
-  }
-}
-
 /* Prevent iOS zoom on input focus by ensuring minimum 16px font size on mobile */
 @media screen and (max-width: 1200px) {
   input,
@@ -1875,7 +1817,7 @@ main > .shopify-section:first-child .section:not(.disable-section-top-offset) {
     --section-top-offset: calc(var(--header-height) * var(--transparent-header-offset-boolean));
 
     /* Any nested sections should not be offset */
-    :is(.spacing-style, .inherit-spacing) {
+    .spacing-style {
       --section-top-offset: 0px;
     }
   }

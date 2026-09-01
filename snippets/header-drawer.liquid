@@ -883,7 +883,12 @@
     z-index: var(--layer-menu-drawer);
     left: 0;
     top: 0;
-    padding: 0;
+
+    /* Left-anchored drawer spans the full physical viewport (viewport-fit=cover); keep its
+       content clear of the status bar, left-side notch, and home indicator. Subtract the
+       designed menu gutter so link text aligns with the page / hamburger, not inset twice. */
+    padding: var(--safe-area-inset-top) 0 var(--safe-area-inset-bottom)
+      max(0px, calc(var(--safe-area-inset-left) - var(--drawer-padding)));
     background-color: var(--color-background);
     overflow: auto;
     display: flex;
@@ -1288,6 +1293,11 @@
     top: 0;
     height: 100dvh;
     left: 0;
+
+    /* Submenus are absolutely positioned so they bypass the drawer's safe-area padding;
+       apply the same insets directly */
+    padding: var(--safe-area-inset-top) 0 var(--safe-area-inset-bottom)
+      max(0px, calc(var(--safe-area-inset-left) - var(--drawer-padding)));
     background-color: var(--color-background);
     z-index: var(--layer-flat);
     transform: translateX(-5%);

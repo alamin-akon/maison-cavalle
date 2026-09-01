@@ -110,6 +110,7 @@
           "blocks": {}
         }
       },
+      "disabled": true,
       "settings": {
         "logo_position": "left",
         "menu_position": "left",
@@ -154,11 +155,62 @@
         "collection_inverse_logo": false,
         "text_color_transparent_collection": ""
       }
+    },
+    "dev_header_8JBVWV": {
+      "type": "dev-header",
+      "name": "Header",
+      "settings": {
+        "menu": "main-menu",
+        "nav_font_size": 10,
+        "nav_tracking": 10,
+        "nav_gap": 40,
+        "nav_hover_color": "#737960",
+        "nav_dot_color": "#98634b",
+        "logo_width": 250,
+        "logo_height": 78,
+        "logo_width_mobile": 170,
+        "logo_height_mobile": 58,
+        "show_search": true,
+        "show_account": true,
+        "show_cart": true,
+        "label_size": 10,
+        "label_tracking": 10,
+        "hide_labels_tablet": true,
+        "hide_account_mobile": true,
+        "icon_size": 17,
+        "icon_stroke_width": 135,
+        "cart_badge_size": 15,
+        "cart_badge_color": "#1e211d",
+        "cart_badge_hover_color": "#98634b",
+        "height": 86,
+        "height_mobile": 70,
+        "shrink_on_scroll": true,
+        "height_scrolled": 58,
+        "logo_height_scrolled": 50,
+        "enable_sticky": true,
+        "background_color": "#fbfaf7",
+        "text_color": "#1e211d",
+        "backdrop_blur": 18,
+        "backdrop_saturate": 115,
+        "bg_opacity_top": 84,
+        "bg_opacity_bottom": 72,
+        "bg_opacity_scrolled": 80,
+        "border_opacity": 12,
+        "drawer_width": 420,
+        "drawer_background_color": "#f3f0e8",
+        "drawer_eyebrow": "Explore the Maison",
+        "drawer_count_label": "destinations",
+        "drawer_footer_left": "MC / 2026",
+        "drawer_footer_right": "Fewer, better pieces.",
+        "enable_reveal": true,
+        "enable_glint": true
+      }
     }
   },
   "order": [
     "header_announcements_9jGBFp",
     "dev_announcement_bar_f4kTfc",
-    "header_section"
+    "header_section",
+    "dev_header_8JBVWV"
   ]
 }

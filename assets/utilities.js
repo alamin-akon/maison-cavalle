@@ -861,7 +861,9 @@ function updateHeaderHeights() {
 
   if (headerTopRow) {
     window.requestAnimationFrame(function () {
-      header.style.setProperty('--top-row-height', `${headerTopRow.offsetHeight}px`);
+      // Must stay fractional: the underlays use this as a gradient stop, and a rounded value
+      // can land above the row's real bottom edge, painting a hairline under the header.
+      header.style.setProperty('--top-row-height', `${headerTopRow.getBoundingClientRect().height}px`);
     });
   }
 }
