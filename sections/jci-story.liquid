@@ -135,7 +135,7 @@
         <div class="jci-story-actions">
           {%- if s.link_label != blank -%}
             <a class="jci-text-link jci-story-link" href="{{ s.link_url | default: routes.root_url }}">
-              {{ s.link_label }} <span class="jci-story-link-icon" aria-hidden="true">&#8599;</span>
+              {{ s.link_label }} {% render 'jci-action-arrow' %}
             </a>
           {%- endif -%}
           {%- if s.scroll_note != blank -%}
@@ -407,15 +407,6 @@
     margin-top: 2rem;
   }
 
-  .jci-story-link-icon {
-    font-size: 14px;
-    transition: transform 0.3s var(--jci-ease);
-  }
-
-  .jci-story-link:hover .jci-story-link-icon {
-    transform: translate(3px, -3px);
-  }
-
   .jci-story-scroll-note {
     display: inline-flex;
     align-items: center;
@@ -673,10 +664,6 @@
     .jci-story,
     .jci-story-film,
     .jci-story-frame,
-    .jci-story-link-icon {
-      transition: none;
-    }
-
     .jci-story-scroll-note-icon {
       animation: none;
     }

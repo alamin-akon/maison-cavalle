@@ -222,7 +222,7 @@
       <nav class="jci-header-drawer-nav">
         {%- for link in menu.links -%}
           <a class="jci-header-drawer-link" href="{{ link.url }}">
-            {{ link.title }} <span aria-hidden="true">&#8599;</span>
+            {{ link.title }} {% render 'jci-action-arrow', class: 'jci-header-drawer-arrow' %}
           </a>
         {%- endfor -%}
       </nav>
@@ -656,6 +656,14 @@
     display: grid;
     grid-template-columns: 1fr;
     padding-block-start: 0.35rem;
+  }
+
+  /* The drawer link is 28px display type; the arrow stays at label size. */
+  .jci-header-drawer-arrow {
+    flex: 0 0 16px;
+    width: 16px;
+    height: 16px;
+    align-self: center;
   }
 
   .jci-header-drawer-link {

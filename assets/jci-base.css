@@ -109,7 +109,8 @@
   text-transform: uppercase;
 }
 
-/* Underlined mono link with the ↗ glyph. styles.css:120 — `font: 14px`. */
+/* Underlined mono link. styles.css:120 — `font: 14px`. The arrow is the
+   jci-action-arrow snippet, rendered inline by whoever uses the link. */
 .jci-text-link {
   display: inline-flex;
   align-items: center;
@@ -124,13 +125,22 @@
   text-transform: uppercase;
 }
 
-.jci-text-link:not(:has(> span))::after {
-  content: "↗";
-  font-size: 14px;
+/* Action arrow (styles.css:121–122). The prototype replaced its "↗" glyph
+   with this icon; sized in em so it tracks whatever text it sits beside. */
+.jci-action-arrow {
+  display: inline-block;
+  flex: 0 0 1em;
+  width: 1em;
+  height: 1em;
+  fill: currentcolor;
+  vertical-align: -0.12em;
   transition: transform 0.3s var(--jci-ease);
 }
 
-.jci-text-link:not(:has(> span)):hover::after {
+/* The arrow answers its link's hover, so this one descendant rule is the whole
+   interaction — there is no class on the arrow that knows the link is hovered. */
+.jci-text-link:hover .jci-action-arrow,
+.jci-button:hover .jci-action-arrow {
   transform: translate(3px, -3px);
 }
 
@@ -197,7 +207,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .jci-text-link::after {
+  .jci-action-arrow {
     transition: none;
   }
 }

@@ -149,7 +149,7 @@
 
         {%- if s.cta_label != blank -%}
           <a class="jci-button jci-button--light jci-hero-cta" href="{{ s.cta_link | default: routes.all_products_collection_url }}">
-            {{ s.cta_label }} <span aria-hidden="true">&#8599;</span>
+            {{ s.cta_label }} {% render 'jci-action-arrow' %}
           </a>
         {%- endif -%}
       </div>
@@ -170,7 +170,7 @@
         <strong class="jci-hero-fit-card-title">{{ s.fit_card_title }}</strong>
         {%- if s.fit_card_link_label != blank -%}
           <span class="jci-hero-fit-card-link">
-            {{ s.fit_card_link_label }} <b aria-hidden="true">&#8599;</b>
+            {{ s.fit_card_link_label }} {% render 'jci-action-arrow', class: 'jci-hero-fit-card-arrow' %}
           </span>
         {%- endif -%}
       </a>
@@ -329,6 +329,13 @@
     font-size: 12px;
     letter-spacing: 0.1em;
     text-transform: uppercase;
+  }
+
+  /* The card's label is 12px; the prototype keeps its arrow at 14. */
+  .jci-hero-fit-card-arrow {
+    flex: 0 0 14px;
+    width: 14px;
+    height: 14px;
   }
 
   /* --- Copy --- */

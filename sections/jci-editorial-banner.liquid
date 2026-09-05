@@ -294,7 +294,7 @@
 
       {%- if s.cta_label != blank -%}
         <a class="jci-button jci-button--light jci-editorial-banner-cta" href="{{ s.cta_url | default: routes.all_products_collection_url }}">
-          {{ s.cta_label }} <span aria-hidden="true">&#8599;</span>
+          {{ s.cta_label }} {% render 'jci-action-arrow' %}
         </a>
       {%- endif -%}
     </div>

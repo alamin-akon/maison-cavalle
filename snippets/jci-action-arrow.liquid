@@ -1,0 +1,25 @@
+{% comment %}
+  Maison Cavallé — action arrow
+  Prototype source: maison-cavalle-main/app.js → ACTION_ARROW_SVG,
+                    replaceActionArrowGlyphs
+                    maison-cavalle-main/styles.css → .action-arrow (121–122)
+
+  The prototype swapped its "↗" text glyph for this icon and walks the DOM at
+  runtime replacing every occurrence. Liquid can render it in place instead, so
+  there is no glyph to replace and no flash of the wrong character.
+
+  Accepts:
+    class - extra class for a context that sizes the arrow itself
+{% endcomment %}
+<svg
+  class="jci-action-arrow{% if class != blank %} {{ class }}{% endif %}"
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 512 512"
+  aria-hidden="true"
+  focusable="false"
+>
+  <path
+    d="M512 21.805v331.202c0 12.042-9.763 21.805-21.805 21.805s-21.805-9.763-21.805-21.805V74.451L37.225 505.615c-4.259 4.257-9.838 6.386-15.419 6.386s-11.16-2.129-15.419-6.386c-8.516-8.516-8.516-22.323 0-30.839L437.553 43.61h-278.56c-12.042 0-21.805-9.763-21.805-21.805S146.951 0 158.993 0h331.202C502.237-.001 512 9.763 512 21.805"
+    fill="currentColor"
+  ></path>
+</svg>
