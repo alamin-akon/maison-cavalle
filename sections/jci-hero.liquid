@@ -19,33 +19,33 @@
   assign total = moments.size
 %}
 
-<dev-hero
-  class="dev-hero"
-  data-dev-hero
-  {% if s.enable_pointer_depth %}data-dev-pointer-depth{% endif %}
-  {% if s.enable_scroll_depth %}data-dev-scroll-depth{% endif %}
-  {% if s.autoplay %}data-dev-autoplay{% endif %}
+<jci-hero
+  class="jci-hero"
+  data-jci-hero
+  {% if s.enable_pointer_depth %}data-jci-pointer-depth{% endif %}
+  {% if s.enable_scroll_depth %}data-jci-scroll-depth{% endif %}
+  {% if s.autoplay %}data-jci-autoplay{% endif %}
   style="
-    --dev-hero-min-height: {{ s.min_height }}px;
-    --dev-hero-min-height-mobile: {{ s.min_height_mobile }}px;
-    --dev-hero-offset: {{ s.viewport_offset }}px;
-    --dev-hero-text: {{ s.text_color }};
-    --dev-hero-accent: {{ s.accent_color }};
-    --dev-hero-meta: {{ s.meta_color }};
-    --dev-hero-fallback-bg: {{ s.fallback_background }};
-    --dev-hero-scrim-side: {{ s.scrim_side | divided_by: 100.0 }};
-    --dev-hero-scrim-bottom: {{ s.scrim_bottom | divided_by: 100.0 }};
-    --dev-hero-video-saturate: {{ s.video_saturate | divided_by: 100.0 }};
-    --dev-hero-video-contrast: {{ s.video_contrast | divided_by: 100.0 }};
-    --dev-hero-video-brightness: {{ s.video_brightness | divided_by: 100.0 }};
-    --dev-hero-grain-opacity: {{ s.grain_opacity | divided_by: 100.0 }};
-    --dev-hero-title-size: clamp({{ s.title_size_min }}rem, {{ s.title_size_fluid | divided_by: 10.0 }}vw, {{ s.title_size_max }}rem);
-    --dev-hero-title-leading: {{ s.title_leading | divided_by: 100.0 }};
-    --dev-hero-title-tracking: -{{ s.title_tracking | divided_by: 100.0 }}em;
-    --dev-hero-crossfade: {{ s.crossfade_duration }}ms;
+    --jci-hero-min-height: {{ s.min_height }}px;
+    --jci-hero-min-height-mobile: {{ s.min_height_mobile }}px;
+    --jci-hero-offset: {{ s.viewport_offset }}px;
+    --jci-hero-text: {{ s.text_color }};
+    --jci-hero-accent: {{ s.accent_color }};
+    --jci-hero-meta: {{ s.meta_color }};
+    --jci-hero-fallback-bg: {{ s.fallback_background }};
+    --jci-hero-scrim-side: {{ s.scrim_side | divided_by: 100.0 }};
+    --jci-hero-scrim-bottom: {{ s.scrim_bottom | divided_by: 100.0 }};
+    --jci-hero-video-saturate: {{ s.video_saturate | divided_by: 100.0 }};
+    --jci-hero-video-contrast: {{ s.video_contrast | divided_by: 100.0 }};
+    --jci-hero-video-brightness: {{ s.video_brightness | divided_by: 100.0 }};
+    --jci-hero-grain-opacity: {{ s.grain_opacity | divided_by: 100.0 }};
+    --jci-hero-title-size: clamp({{ s.title_size_min }}rem, {{ s.title_size_fluid | divided_by: 10.0 }}vw, {{ s.title_size_max }}rem);
+    --jci-hero-title-leading: {{ s.title_leading | divided_by: 100.0 }};
+    --jci-hero-title-tracking: -{{ s.title_tracking | divided_by: 100.0 }}em;
+    --jci-hero-crossfade: {{ s.crossfade_duration }}ms;
   "
 >
-  <div class="dev-hero-media" data-dev-hero-media aria-hidden="true">
+  <div class="jci-hero-media" data-jci-hero-media aria-hidden="true">
     {%- for block in moments -%}
       {%- assign video = block.settings.video -%}
       {%- assign video_asset = block.settings.video_asset | strip -%}
@@ -60,9 +60,9 @@
       {%- endif -%}
       {%- if video_asset != blank or video != blank -%}
         <video
-          class="dev-hero-video{% if forloop.first %} is-active{% endif %}"
-          data-dev-hero-video
-          data-dev-hero-video-index="{{ forloop.index0 }}"
+          class="jci-hero-video{% if forloop.first %} is-active{% endif %}"
+          data-jci-hero-video
+          data-jci-hero-video-index="{{ forloop.index0 }}"
           muted
           playsinline
           preload="{% if forloop.first %}auto{% else %}metadata{% endif %}"
@@ -85,9 +85,9 @@
       {%- elsif poster_src != blank -%}
         {%- comment -%} No video yet — show the still so the layout is judgeable. {%- endcomment -%}
         <img
-          class="dev-hero-video{% if forloop.first %} is-active{% endif %}"
-          data-dev-hero-video
-          data-dev-hero-video-index="{{ forloop.index0 }}"
+          class="jci-hero-video{% if forloop.first %} is-active{% endif %}"
+          data-jci-hero-video
+          data-jci-hero-video-index="{{ forloop.index0 }}"
           src="{{ poster_src }}"
           alt=""
           width="{{ poster.width | default: 1800 }}"
@@ -96,24 +96,24 @@
         >
       {%- endif -%}
     {%- endfor -%}
-    <span class="dev-hero-grain"></span>
+    <span class="jci-hero-grain"></span>
   </div>
 
-  <div class="dev-hero-container">
-    <div class="dev-hero-topline">
+  <div class="jci-hero-container">
+    <div class="jci-hero-topline">
       {%- if s.topline_left != blank -%}
-        <p class="dev-eyebrow dev-hero-topline-eyebrow">{{ s.topline_left }}</p>
+        <p class="jci-eyebrow jci-hero-topline-eyebrow">{{ s.topline_left }}</p>
       {%- endif -%}
       {%- if s.topline_right != blank -%}
-        <span class="dev-hero-topline-note">{{ s.topline_right }}</span>
+        <span class="jci-hero-topline-note">{{ s.topline_right }}</span>
       {%- endif -%}
     </div>
 
-    <div class="dev-hero-grid">
+    <div class="jci-hero-grid">
       <div
-        class="dev-hero-copy"
-        id="dev-hero-panel"
-        data-dev-hero-panel
+        class="jci-hero-copy"
+        id="jci-hero-panel"
+        data-jci-hero-panel
         role="tabpanel"
         aria-live="polite"
       >
@@ -121,84 +121,84 @@
           {%- if forloop.first -%}
             {%- assign b = block.settings -%}
             {%- if b.eyebrow != blank -%}
-              <p class="dev-eyebrow dev-hero-copy-eyebrow" data-dev-hero-eyebrow>{{ b.eyebrow }}</p>
+              <p class="jci-eyebrow jci-hero-copy-eyebrow" data-jci-hero-eyebrow>{{ b.eyebrow }}</p>
             {%- endif -%}
 
-            <h1 class="dev-hero-title" id="dev-hero-title" data-dev-hero-title>
+            <h1 class="jci-hero-title" id="jci-hero-title" data-jci-hero-title>
               {%- assign words = b.title | strip | split: ' ' -%}
               {%- for word in words -%}
                 <span
-                  class="dev-hero-title-word"
-                  {% if forloop.index0 >= b.accent_from %}data-dev-hero-accent="true"{% endif %}
-                  style="--dev-word-index: {{ forloop.index0 }}"
+                  class="jci-hero-title-word"
+                  {% if forloop.index0 >= b.accent_from %}data-jci-hero-accent="true"{% endif %}
+                  style="--jci-word-index: {{ forloop.index0 }}"
                 >{{ word }}</span>
               {%- endfor -%}
             </h1>
 
             {%- if b.copy != blank -%}
-              <p class="dev-hero-text" data-dev-hero-copy>{{ b.copy }}</p>
+              <p class="jci-hero-text" data-jci-hero-copy>{{ b.copy }}</p>
             {%- endif -%}
           {%- endif -%}
         {%- endfor -%}
 
         {%- if s.cta_label != blank -%}
-          <a class="dev-button dev-button--light dev-hero-cta" href="{{ s.cta_link | default: routes.all_products_collection_url }}">
+          <a class="jci-button jci-button--light jci-hero-cta" href="{{ s.cta_link | default: routes.all_products_collection_url }}">
             {{ s.cta_label }} <span aria-hidden="true">&#8599;</span>
           </a>
         {%- endif -%}
       </div>
 
       {%- if s.show_side_note -%}
-        <div class="dev-hero-side-note">
-          <span class="dev-hero-side-note-dot" aria-hidden="true"></span>
-          <span data-dev-hero-descriptor>{{ moments.first.settings.descriptor }}</span>
+        <div class="jci-hero-side-note">
+          <span class="jci-hero-side-note-dot" aria-hidden="true"></span>
+          <span data-jci-hero-descriptor>{{ moments.first.settings.descriptor }}</span>
         </div>
       {%- endif -%}
     </div>
 
     {%- if s.show_fit_card and s.fit_card_title != blank -%}
-      <a class="dev-hero-fit-card" href="{{ s.fit_card_link }}">
+      <a class="jci-hero-fit-card" href="{{ s.fit_card_link }}">
         {%- if s.fit_card_kicker != blank -%}
-          <span class="dev-hero-fit-card-kicker">{{ s.fit_card_kicker }}</span>
+          <span class="jci-hero-fit-card-kicker">{{ s.fit_card_kicker }}</span>
         {%- endif -%}
-        <strong class="dev-hero-fit-card-title">{{ s.fit_card_title }}</strong>
+        <strong class="jci-hero-fit-card-title">{{ s.fit_card_title }}</strong>
         {%- if s.fit_card_link_label != blank -%}
-          <span class="dev-hero-fit-card-link">
+          <span class="jci-hero-fit-card-link">
             {{ s.fit_card_link_label }} <b aria-hidden="true">&#8599;</b>
           </span>
         {%- endif -%}
       </a>
     {%- endif -%}
 
-    <div class="dev-hero-bottomline">
+    <div class="jci-hero-bottomline">
       {%- if s.scroll_label != blank -%}
-        <div class="dev-hero-scroll">
+        <div class="jci-hero-scroll">
           {{ s.scroll_label }} <span aria-hidden="true">&#8595;</span>
         </div>
       {%- endif -%}
 
       {%- if total > 1 -%}
-        <div class="dev-hero-moment-nav" role="tablist" aria-label="{{ s.tablist_label }}">
+        <div class="jci-hero-moment-nav" role="tablist" aria-label="{{ s.tablist_label }}">
           {%- for block in moments -%}
             <button
-              class="dev-hero-moment{% if forloop.first %} is-active{% endif %}"
+              class="jci-hero-moment{% if forloop.first %} is-active{% endif %}"
               type="button"
               role="tab"
-              data-dev-hero-slide="{{ forloop.index0 }}"
+              data-jci-hero-slide="{{ forloop.index0 }}"
               aria-selected="{% if forloop.first %}true{% else %}false{% endif %}"
-              aria-controls="dev-hero-panel"
+              aria-controls="jci-hero-panel"
               tabindex="{% if forloop.first %}0{% else %}-1{% endif %}"
               {{ block.shopify_attributes }}
             >
-              <span class="dev-hero-moment-number">{{ forloop.index | prepend: '0' | slice: -2, 2 }}</span>
-              <span class="dev-hero-moment-label">{{ block.settings.label }}</span>
-              <span class="dev-hero-moment-line" aria-hidden="true"><i></i></span>
+              <span class="jci-hero-moment-number">{{ forloop.index | prepend: '0' | slice: -2, 2 }}</span>
+              <span class="jci-hero-moment-label">{{ block.settings.label }}</span>
+              <span class="jci-hero-moment-line" aria-hidden="true"><i></i></span>
             </button>
           {%- endfor -%}
         </div>
 
-        <div class="dev-hero-index">
-          <span data-dev-hero-index>01</span>
+        <div class="jci-hero-index">
+          <span data-jci-hero-index>01</span>
           <i aria-hidden="true"></i>
           <span>{{ total | prepend: '0' | slice: -2, 2 }}</span>
         </div>
@@ -207,7 +207,7 @@
   </div>
 
   {%- comment -%} Slide copy for the moments the JS swaps in. {%- endcomment -%}
-  <script type="application/json" data-dev-hero-moments>
+  <script type="application/json" data-jci-hero-moments>
     [
       {%- for block in moments -%}
         {
@@ -220,53 +220,53 @@
       {%- endfor -%}
     ]
   </script>
-</dev-hero>
+</jci-hero>
 
-<script src="{{ 'dev-hero.js' | asset_url }}" type="module"></script>
+<script src="{{ 'jci-hero.js' | asset_url }}" type="module"></script>
 
 {% stylesheet %}
-  .dev-hero {
+  .jci-hero {
     position: relative;
     display: block;
-    min-height: max(var(--dev-hero-min-height), calc(100svh - var(--dev-hero-offset)));
+    min-height: max(var(--jci-hero-min-height), calc(100svh - var(--jci-hero-offset)));
     overflow: hidden;
     isolation: isolate;
-    color: var(--dev-hero-text);
-    background: var(--dev-hero-fallback-bg);
+    color: var(--jci-hero-text);
+    background: var(--jci-hero-fallback-bg);
   }
 
   /* Two scrims: one across, one up from the base, so the copy stays legible. */
-  .dev-hero::after {
+  .jci-hero::after {
     content: '';
     position: absolute;
     inset: 0;
     z-index: -1;
     background: linear-gradient(
         90deg,
-        rgb(17 21 17 / var(--dev-hero-scrim-side)),
-        rgb(17 21 17 / calc(var(--dev-hero-scrim-side) * 0.26)) 68%,
-        rgb(17 21 17 / calc(var(--dev-hero-scrim-side) * 0.16))
+        rgb(17 21 17 / var(--jci-hero-scrim-side)),
+        rgb(17 21 17 / calc(var(--jci-hero-scrim-side) * 0.26)) 68%,
+        rgb(17 21 17 / calc(var(--jci-hero-scrim-side) * 0.16))
       ),
-      linear-gradient(0deg, rgb(17 21 17 / var(--dev-hero-scrim-bottom)), transparent 52%);
+      linear-gradient(0deg, rgb(17 21 17 / var(--jci-hero-scrim-bottom)), transparent 52%);
     pointer-events: none;
   }
 
-  .dev-hero-media {
+  .jci-hero-media {
     position: absolute;
     inset: -2%;
     z-index: -2;
-    background: var(--dev-hero-fallback-bg);
+    background: var(--jci-hero-fallback-bg);
     transform: translate3d(
-        var(--dev-hero-shift-x, 0px),
-        calc(var(--dev-hero-shift-y, 0px) + var(--dev-hero-scroll-y, 0px)),
+        var(--jci-hero-shift-x, 0px),
+        calc(var(--jci-hero-shift-y, 0px) + var(--jci-hero-scroll-y, 0px)),
         0
       )
       scale(1.03);
-    transition: transform 0.45s var(--dev-ease);
+    transition: transform 0.45s var(--jci-ease);
     will-change: transform;
   }
 
-  .dev-hero-video {
+  .jci-hero-video {
     display: block;
     position: absolute;
     inset: 0;
@@ -275,58 +275,58 @@
     object-fit: cover;
     object-position: center;
     opacity: 0;
-    filter: saturate(var(--dev-hero-video-saturate)) contrast(var(--dev-hero-video-contrast))
-      brightness(var(--dev-hero-video-brightness));
-    transition: opacity var(--dev-hero-crossfade) var(--dev-ease);
+    filter: saturate(var(--jci-hero-video-saturate)) contrast(var(--jci-hero-video-contrast))
+      brightness(var(--jci-hero-video-brightness));
+    transition: opacity var(--jci-hero-crossfade) var(--jci-ease);
   }
 
-  .dev-hero-video.is-active {
+  .jci-hero-video.is-active {
     opacity: 1;
   }
 
-  .dev-hero-grain {
+  .jci-hero-grain {
     position: absolute;
     inset: 0;
-    opacity: var(--dev-hero-grain-opacity);
+    opacity: var(--jci-hero-grain-opacity);
     background-image: radial-gradient(rgb(251 250 247 / 0.4) 0.5px, transparent 0.7px);
     background-size: 4px 4px;
     mix-blend-mode: soft-light;
     pointer-events: none;
   }
 
-  .dev-hero-container {
+  .jci-hero-container {
     position: relative;
     z-index: 1;
     display: flex;
     flex-direction: column;
-    min-height: max(var(--dev-hero-min-height), calc(100svh - var(--dev-hero-offset)));
+    min-height: max(var(--jci-hero-min-height), calc(100svh - var(--jci-hero-offset)));
     padding-block: clamp(1.4rem, 3vw, 3rem) clamp(1.3rem, 2.8vw, 2.7rem);
   }
 
   /* --- Top rule --- */
-  .dev-hero-topline {
+  .jci-hero-topline {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
     padding-block-end: 1.15rem;
     border-block-end: 1px solid rgb(251 250 247 / 0.3);
-    color: var(--dev-hero-meta);
+    color: var(--jci-hero-meta);
   }
 
-  .dev-hero-topline-eyebrow {
-    color: var(--dev-hero-meta);
+  .jci-hero-topline-eyebrow {
+    color: var(--jci-hero-meta);
   }
 
-  .dev-hero-topline-note {
-    font-family: var(--dev-font-label);
+  .jci-hero-topline-note {
+    font-family: var(--jci-font-label);
     font-size: 9px;
     letter-spacing: 0.1em;
     text-transform: uppercase;
   }
 
   /* --- Copy --- */
-  .dev-hero-grid {
+  .jci-hero-grid {
     flex: 1;
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(180px, 0.34fr);
@@ -335,88 +335,88 @@
     padding-block: clamp(4.5rem, 8vw, 8rem) clamp(3rem, 5vw, 5rem);
   }
 
-  .dev-hero-copy {
+  .jci-hero-copy {
     max-width: 740px;
   }
 
-  .dev-hero-copy > * {
-    transition: opacity 0.4s var(--dev-ease), transform 0.4s var(--dev-ease);
+  .jci-hero-copy > * {
+    transition: opacity 0.4s var(--jci-ease), transform 0.4s var(--jci-ease);
   }
 
-  .dev-hero-copy.is-changing > * {
+  .jci-hero-copy.is-changing > * {
     opacity: 0;
     transform: translateY(0.65rem);
   }
 
-  .dev-hero-copy-eyebrow {
+  .jci-hero-copy-eyebrow {
     margin-block-end: 1.35rem;
-    color: var(--dev-hero-meta);
+    color: var(--jci-hero-meta);
   }
 
-  .dev-hero-title {
+  .jci-hero-title {
     max-width: 740px;
     margin: 0 0 1.65rem;
-    font-family: var(--dev-font-display);
-    font-size: var(--dev-hero-title-size);
+    font-family: var(--jci-font-display);
+    font-size: var(--jci-hero-title-size);
     font-weight: 500;
-    line-height: var(--dev-hero-title-leading);
-    letter-spacing: var(--dev-hero-title-tracking);
+    line-height: var(--jci-hero-title-leading);
+    letter-spacing: var(--jci-hero-title-tracking);
     text-wrap: balance;
   }
 
   /* Each word lifts in, staggered by its index. */
-  .dev-hero-title-word {
+  .jci-hero-title-word {
     display: inline-block;
     opacity: 0;
     transform: translateY(0.32em) rotate(1.5deg);
-    animation: dev-hero-word-in 0.75s calc(var(--dev-word-index) * 45ms) var(--dev-ease) both;
+    animation: jci-hero-word-in 0.75s calc(var(--jci-word-index) * 45ms) var(--jci-ease) both;
   }
 
-  .dev-hero-title-word[data-dev-hero-accent='true'] {
-    color: var(--dev-hero-accent);
+  .jci-hero-title-word[data-jci-hero-accent='true'] {
+    color: var(--jci-hero-accent);
     font-style: italic;
   }
 
-  .dev-hero-text {
+  .jci-hero-text {
     max-width: 405px;
     margin: 0 0 2.1rem;
-    color: var(--dev-hero-meta);
-    font-family: var(--dev-font-sans);
-    font-size: var(--dev-subtitle-size);
-    line-height: var(--dev-subtitle-leading);
+    color: var(--jci-hero-meta);
+    font-family: var(--jci-font-sans);
+    font-size: var(--jci-subtitle-size);
+    line-height: var(--jci-subtitle-leading);
   }
 
-  .dev-hero-cta {
+  .jci-hero-cta {
     min-width: 205px;
-    transition: color 0.3s, background 0.3s, border-color 0.3s, box-shadow 0.35s var(--dev-ease),
-      transform 0.35s var(--dev-ease);
+    transition: color 0.3s, background 0.3s, border-color 0.3s, box-shadow 0.35s var(--jci-ease),
+      transform 0.35s var(--jci-ease);
   }
 
-  .dev-hero-cta span {
-    transition: transform 0.35s var(--dev-ease);
+  .jci-hero-cta span {
+    transition: transform 0.35s var(--jci-ease);
   }
 
-  .dev-hero-cta:hover,
-  .dev-hero-cta:focus-visible {
+  .jci-hero-cta:hover,
+  .jci-hero-cta:focus-visible {
     transform: translateY(-4px);
     box-shadow: 9px 10px 0 rgb(251 250 247 / 0.16);
   }
 
-  .dev-hero-cta:hover span,
-  .dev-hero-cta:focus-visible span {
+  .jci-hero-cta:hover span,
+  .jci-hero-cta:focus-visible span {
     transform: translate(4px, -3px);
   }
 
   /* --- Vertical descriptor --- */
-  .dev-hero-side-note {
+  .jci-hero-side-note {
     display: flex;
     align-items: center;
     align-self: end;
     justify-self: end;
     gap: 0.6rem;
     margin-block-end: 1rem;
-    color: var(--dev-hero-meta);
-    font-family: var(--dev-font-label);
+    color: var(--jci-hero-meta);
+    font-family: var(--jci-font-label);
     font-size: 9px;
     letter-spacing: 0.1em;
     text-transform: uppercase;
@@ -424,16 +424,16 @@
     transform: rotate(180deg);
   }
 
-  .dev-hero-side-note-dot {
+  .jci-hero-side-note-dot {
     width: 7px;
     height: 7px;
     border: 1px solid currentcolor;
     border-radius: 50%;
-    animation: dev-hero-dot-pulse 2.2s ease-in-out infinite;
+    animation: jci-hero-dot-pulse 2.2s ease-in-out infinite;
   }
 
   /* --- Fit card --- */
-  .dev-hero-fit-card {
+  .jci-hero-fit-card {
     position: absolute;
     inset-inline-end: clamp(2rem, 4vw, 4rem);
     inset-block-end: clamp(6rem, 11vw, 9rem);
@@ -451,71 +451,71 @@
     text-decoration: none;
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    transition: color 0.35s var(--dev-ease), background 0.35s var(--dev-ease),
-      transform 0.35s var(--dev-ease), box-shadow 0.35s var(--dev-ease);
+    transition: color 0.35s var(--jci-ease), background 0.35s var(--jci-ease),
+      transform 0.35s var(--jci-ease), box-shadow 0.35s var(--jci-ease);
   }
 
-  .dev-hero-fit-card:hover,
-  .dev-hero-fit-card:focus-visible {
+  .jci-hero-fit-card:hover,
+  .jci-hero-fit-card:focus-visible {
     color: var(--color-background);
     background: rgb(var(--color-foreground-rgb) / 0.84);
     transform: translateY(-6px);
     box-shadow: 14px 16px 0 rgb(251 250 247 / 0.2);
   }
 
-  .dev-hero-fit-card-kicker {
+  .jci-hero-fit-card-kicker {
     margin-block-end: 0.9rem;
-    color: var(--dev-olive);
-    font-family: var(--dev-font-label);
+    color: var(--jci-olive);
+    font-family: var(--jci-font-label);
     font-size: 9px;
     letter-spacing: 0.12em;
     text-transform: uppercase;
   }
 
-  .dev-hero-fit-card:hover .dev-hero-fit-card-kicker,
-  .dev-hero-fit-card:focus-visible .dev-hero-fit-card-kicker {
-    color: var(--dev-hero-accent);
+  .jci-hero-fit-card:hover .jci-hero-fit-card-kicker,
+  .jci-hero-fit-card:focus-visible .jci-hero-fit-card-kicker {
+    color: var(--jci-hero-accent);
   }
 
-  .dev-hero-fit-card-title {
-    font-family: var(--dev-font-display);
+  .jci-hero-fit-card-title {
+    font-family: var(--jci-font-display);
     font-size: 28px;
     font-weight: 500;
     line-height: 0.94;
     letter-spacing: -0.045em;
   }
 
-  .dev-hero-fit-card-title em {
-    color: var(--dev-olive);
+  .jci-hero-fit-card-title em {
+    color: var(--jci-olive);
     font-style: italic;
   }
 
-  .dev-hero-fit-card-link {
+  .jci-hero-fit-card-link {
     display: inline-flex;
     align-items: center;
     gap: 0.45rem;
     margin-block-start: 1.4rem;
     padding-block-end: 0.3rem;
     border-block-end: 1px solid currentcolor;
-    font-family: var(--dev-font-label);
+    font-family: var(--jci-font-label);
     font-size: 9px;
     letter-spacing: 0.1em;
     text-transform: uppercase;
   }
 
-  .dev-hero-fit-card-link b {
+  .jci-hero-fit-card-link b {
     font-size: 14px;
     font-weight: 400;
-    transition: transform 0.3s var(--dev-ease);
+    transition: transform 0.3s var(--jci-ease);
   }
 
-  .dev-hero-fit-card:hover .dev-hero-fit-card-link b,
-  .dev-hero-fit-card:focus-visible .dev-hero-fit-card-link b {
+  .jci-hero-fit-card:hover .jci-hero-fit-card-link b,
+  .jci-hero-fit-card:focus-visible .jci-hero-fit-card-link b {
     transform: translate(3px, -3px);
   }
 
   /* --- Bottom rule --- */
-  .dev-hero-bottomline {
+  .jci-hero-bottomline {
     display: grid;
     grid-template-columns: minmax(130px, 0.48fr) minmax(0, 2fr) auto;
     gap: clamp(1.2rem, 3vw, 3.5rem);
@@ -524,31 +524,31 @@
     border-block-start: 1px solid rgb(251 250 247 / 0.3);
   }
 
-  .dev-hero-scroll {
+  .jci-hero-scroll {
     display: inline-flex;
     align-items: center;
     gap: 0.65rem;
-    color: var(--dev-hero-meta);
-    font-family: var(--dev-font-label);
+    color: var(--jci-hero-meta);
+    font-family: var(--jci-font-label);
     font-size: 9px;
     letter-spacing: 0.11em;
     text-transform: uppercase;
     white-space: nowrap;
   }
 
-  .dev-hero-scroll span {
+  .jci-hero-scroll span {
     font-size: 16px;
-    animation: dev-hero-scroll-nudge 1.8s ease-in-out infinite;
+    animation: jci-hero-scroll-nudge 1.8s ease-in-out infinite;
   }
 
-  .dev-hero-moment-nav {
+  .jci-hero-moment-nav {
     display: grid;
     grid-auto-flow: column;
     grid-auto-columns: minmax(0, 1fr);
     gap: clamp(0.7rem, 2vw, 2rem);
   }
 
-  .dev-hero-moment {
+  .jci-hero-moment {
     display: grid;
     grid-template-columns: auto 1fr;
     grid-template-rows: auto 2px;
@@ -560,29 +560,29 @@
     background: transparent;
     text-align: left;
     cursor: pointer;
-    transition: color 0.3s var(--dev-ease);
+    transition: color 0.3s var(--jci-ease);
   }
 
-  .dev-hero-moment:hover,
-  .dev-hero-moment:focus-visible,
-  .dev-hero-moment.is-active {
-    color: var(--dev-hero-text);
+  .jci-hero-moment:hover,
+  .jci-hero-moment:focus-visible,
+  .jci-hero-moment.is-active {
+    color: var(--jci-hero-text);
   }
 
-  .dev-hero-moment:focus-visible {
-    outline: 1px solid var(--dev-hero-text);
+  .jci-hero-moment:focus-visible {
+    outline: 1px solid var(--jci-hero-text);
     outline-offset: 6px;
   }
 
-  .dev-hero-moment-number {
-    color: var(--dev-hero-meta);
-    font-family: var(--dev-font-label);
+  .jci-hero-moment-number {
+    color: var(--jci-hero-meta);
+    font-family: var(--jci-font-label);
     font-size: 9px;
   }
 
-  .dev-hero-moment-label {
+  .jci-hero-moment-label {
     overflow: hidden;
-    font-family: var(--dev-font-label);
+    font-family: var(--jci-font-label);
     font-size: 9px;
     letter-spacing: 0.1em;
     text-overflow: ellipsis;
@@ -591,42 +591,42 @@
   }
 
   /* Progress rule that fills while its moment plays. */
-  .dev-hero-moment-line {
+  .jci-hero-moment-line {
     grid-column: 1 / -1;
     display: block;
     overflow: hidden;
     background: rgb(251 250 247 / 0.26);
   }
 
-  .dev-hero-moment-line i {
+  .jci-hero-moment-line i {
     display: block;
     width: 0;
     height: 100%;
-    background: var(--dev-hero-accent);
-    transition: width 0.7s var(--dev-ease);
+    background: var(--jci-hero-accent);
+    transition: width 0.7s var(--jci-ease);
   }
 
-  .dev-hero-moment.is-active .dev-hero-moment-line i {
+  .jci-hero-moment.is-active .jci-hero-moment-line i {
     width: 100%;
   }
 
-  .dev-hero-index {
+  .jci-hero-index {
     display: flex;
     align-items: center;
     gap: 0.55rem;
-    color: var(--dev-hero-meta);
-    font-family: var(--dev-font-label);
+    color: var(--jci-hero-meta);
+    font-family: var(--jci-font-label);
     font-size: 10px;
     white-space: nowrap;
   }
 
-  .dev-hero-index i {
+  .jci-hero-index i {
     width: 32px;
     height: 1px;
     background: currentcolor;
   }
 
-  @keyframes dev-hero-word-in {
+  @keyframes jci-hero-word-in {
     from {
       opacity: 0;
       transform: translateY(0.32em) rotate(1.5deg);
@@ -638,7 +638,7 @@
     }
   }
 
-  @keyframes dev-hero-dot-pulse {
+  @keyframes jci-hero-dot-pulse {
     0%,
     100% {
       box-shadow: 0 0 0 0 rgb(220 226 199 / 0);
@@ -649,7 +649,7 @@
     }
   }
 
-  @keyframes dev-hero-scroll-nudge {
+  @keyframes jci-hero-scroll-nudge {
     0%,
     100% {
       transform: translateY(0);
@@ -661,117 +661,117 @@
   }
 
   @media screen and (max-width: 900px) {
-    .dev-hero {
-      --dev-hero-title-size: clamp(3.4rem, 8vw, 6.5rem);
+    .jci-hero {
+      --jci-hero-title-size: clamp(3.4rem, 8vw, 6.5rem);
     }
 
-    .dev-hero-grid {
+    .jci-hero-grid {
       grid-template-columns: minmax(0, 1fr) minmax(130px, 0.24fr);
       gap: 2rem;
     }
 
-    .dev-hero-bottomline {
+    .jci-hero-bottomline {
       grid-template-columns: minmax(100px, 0.38fr) minmax(0, 2fr) auto;
       gap: 1rem;
     }
 
-    .dev-hero-fit-card {
+    .jci-hero-fit-card {
       display: none;
     }
   }
 
   @media screen and (max-width: 680px) {
-    .dev-hero {
-      --dev-hero-title-size: clamp(3rem, 12vw, 4.5rem);
+    .jci-hero {
+      --jci-hero-title-size: clamp(3rem, 12vw, 4.5rem);
     }
 
-    .dev-hero,
-    .dev-hero-container {
-      min-height: max(var(--dev-hero-min-height-mobile), calc(100svh - var(--dev-hero-offset)));
+    .jci-hero,
+    .jci-hero-container {
+      min-height: max(var(--jci-hero-min-height-mobile), calc(100svh - var(--jci-hero-offset)));
     }
 
-    .dev-hero-container {
+    .jci-hero-container {
       padding-block: 1rem 1.3rem;
     }
 
-    .dev-hero-topline {
+    .jci-hero-topline {
       padding-block-end: 0.9rem;
     }
 
-    .dev-hero-topline-note {
+    .jci-hero-topline-note {
       display: none;
     }
 
-    .dev-hero-grid {
+    .jci-hero-grid {
       display: flex;
       flex: 1;
       align-items: flex-end;
       padding-block: 5rem 2.6rem;
     }
 
-    .dev-hero-copy {
+    .jci-hero-copy {
       max-width: 100%;
     }
 
-    .dev-hero-copy-eyebrow {
+    .jci-hero-copy-eyebrow {
       margin-block-end: 1rem;
     }
 
-    .dev-hero-title {
+    .jci-hero-title {
       max-width: 520px;
       margin-block-end: 1.3rem;
     }
 
-    .dev-hero-text {
+    .jci-hero-text {
       max-width: 360px;
       margin-block-end: 1.7rem;
     }
 
-    .dev-hero-side-note {
+    .jci-hero-side-note {
       display: none;
     }
 
-    .dev-hero-bottomline {
+    .jci-hero-bottomline {
       display: grid;
       grid-template-columns: 1fr auto;
       gap: 1rem;
       padding-block-start: 0.9rem;
     }
 
-    .dev-hero-scroll {
+    .jci-hero-scroll {
       display: none;
     }
 
-    .dev-hero-moment-nav {
+    .jci-hero-moment-nav {
       grid-column: 1 / -1;
       grid-row: 1;
       gap: 0.7rem;
     }
 
-    .dev-hero-index {
+    .jci-hero-index {
       grid-column: 2;
       grid-row: 2;
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .dev-hero-title-word {
+    .jci-hero-title-word {
       opacity: 1;
       transform: none;
       animation: none;
     }
 
-    .dev-hero-media,
-    .dev-hero-video,
-    .dev-hero-copy > *,
-    .dev-hero-cta,
-    .dev-hero-moment,
-    .dev-hero-moment-line i {
+    .jci-hero-media,
+    .jci-hero-video,
+    .jci-hero-copy > *,
+    .jci-hero-cta,
+    .jci-hero-moment,
+    .jci-hero-moment-line i {
       transition: none;
     }
 
-    .dev-hero-side-note-dot,
-    .dev-hero-scroll span {
+    .jci-hero-side-note-dot,
+    .jci-hero-scroll span {
       animation: none;
     }
   }
@@ -781,7 +781,7 @@
 {
   "name": "Hero",
   "tag": "section",
-  "class": "dev-hero-section",
+  "class": "jci-hero-section",
   "max_blocks": 6,
   "blocks": [
     {
@@ -789,9 +789,9 @@
       "name": "Moment",
       "settings": [
         { "type": "text", "id": "label", "label": "Tab label", "default": "The ride" },
-        { "type": "text", "id": "video_asset", "label": "Video file in theme assets", "info": "Filename only, e.g. dev-hero-ride.mp4. Takes priority over the Files upload below." },
+        { "type": "text", "id": "video_asset", "label": "Video file in theme assets", "info": "Filename only, e.g. jci-hero-ride.mp4. Takes priority over the Files upload below." },
         { "type": "video", "id": "video", "label": "Video from Files", "info": "Used only when no asset filename is set above." },
-        { "type": "text", "id": "poster_asset", "label": "Poster file in theme assets", "info": "Filename only, e.g. dev-hero-ride-poster.webp. Takes priority over the picker below." },
+        { "type": "text", "id": "poster_asset", "label": "Poster file in theme assets", "info": "Filename only, e.g. jci-hero-ride-poster.webp. Takes priority over the picker below." },
         { "type": "image_picker", "id": "poster", "label": "Poster image", "info": "Shown before the video plays, and on its own if no video is set." },
         { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "The first collection · 2026" },
         { "type": "text", "id": "title", "label": "Headline", "default": "Elevated equestrian, for a life well lived." },

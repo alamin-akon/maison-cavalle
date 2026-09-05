@@ -19,129 +19,129 @@
 %}
 
 {% if s.text != blank %}
-  <dev-announcement-bar
-    class="dev-announcement-bar"
-    data-dev-section-id="{{ section.id }}"
+  <jci-announcement-bar
+    class="jci-announcement-bar"
+    data-jci-section-id="{{ section.id }}"
     {% if s.remember_dismissal %}
-      data-dev-remember-dismissal
+      data-jci-remember-dismissal
     {% endif %}
     style="
-      --dev-announcement-bg: {{ background }};
-      --dev-announcement-text: {{ text_color }};
-      --dev-announcement-min-height: {{ s.min_height }}px;
-      --dev-announcement-pad-block-start: {{ s.padding_block_start }}px;
-      --dev-announcement-pad-block-end: {{ s.padding_block_end }}px;
-      --dev-announcement-pad-inline: {{ s.padding_inline }}px;
-      --dev-announcement-font: {{ font_family }};
-      --dev-announcement-font-weight: {{ font_weight }};
-      --dev-announcement-size: {{ s.font_size }}px;
-      --dev-announcement-size-mobile: {{ s.font_size_mobile }}px;
-      --dev-announcement-leading: {{ leading }};
-      --dev-announcement-tracking: {{ tracking }}em;
-      --dev-announcement-case: {{ s.text_case }};
-      --dev-announcement-align: {{ s.text_align }};
-      --dev-announcement-max-width: {% if s.section_width == 'page-width' %}var(--dev-content-max){% else %}100%{% endif %};
-      --dev-announcement-divider-width: {{ s.divider_width }}px;
-      --dev-announcement-divider-color: {{ divider_color }};
-      --dev-announcement-dismiss-size: {{ s.dismiss_size }}px;
-      --dev-announcement-dismiss-offset: {{ s.dismiss_offset }}px;
+      --jci-announcement-bg: {{ background }};
+      --jci-announcement-text: {{ text_color }};
+      --jci-announcement-min-height: {{ s.min_height }}px;
+      --jci-announcement-pad-block-start: {{ s.padding_block_start }}px;
+      --jci-announcement-pad-block-end: {{ s.padding_block_end }}px;
+      --jci-announcement-pad-inline: {{ s.padding_inline }}px;
+      --jci-announcement-font: {{ font_family }};
+      --jci-announcement-font-weight: {{ font_weight }};
+      --jci-announcement-size: {{ s.font_size }}px;
+      --jci-announcement-size-mobile: {{ s.font_size_mobile }}px;
+      --jci-announcement-leading: {{ leading }};
+      --jci-announcement-tracking: {{ tracking }}em;
+      --jci-announcement-case: {{ s.text_case }};
+      --jci-announcement-align: {{ s.text_align }};
+      --jci-announcement-max-width: {% if s.section_width == 'page-width' %}var(--jci-content-max){% else %}100%{% endif %};
+      --jci-announcement-divider-width: {{ s.divider_width }}px;
+      --jci-announcement-divider-color: {{ divider_color }};
+      --jci-announcement-dismiss-size: {{ s.dismiss_size }}px;
+      --jci-announcement-dismiss-offset: {{ s.dismiss_offset }}px;
     "
   >
-    <div class="dev-announcement-bar-container">
+    <div class="jci-announcement-bar-container">
       {%- if s.link != blank -%}
-        <a class="dev-announcement-bar-link" href="{{ s.link }}">
-          <span class="dev-announcement-bar-text">{{ s.text }}</span>
+        <a class="jci-announcement-bar-link" href="{{ s.link }}">
+          <span class="jci-announcement-bar-text">{{ s.text }}</span>
         </a>
       {%- else -%}
-        <p class="dev-announcement-bar-text">{{ s.text }}</p>
+        <p class="jci-announcement-bar-text">{{ s.text }}</p>
       {%- endif -%}
     </div>
 
     {%- if s.show_dismiss -%}
       <button
-        class="dev-announcement-bar-dismiss"
+        class="jci-announcement-bar-dismiss"
         type="button"
-        data-dev-announcement-dismiss
+        data-jci-announcement-dismiss
         aria-label="{{ 'actions.close' | t }}"
       >
         <span aria-hidden="true">&times;</span>
       </button>
     {%- endif -%}
-  </dev-announcement-bar>
+  </jci-announcement-bar>
 
-  <script src="{{ 'dev-announcement-bar.js' | asset_url }}" type="module"></script>
+  <script src="{{ 'jci-announcement-bar.js' | asset_url }}" type="module"></script>
 {% endif %}
 
 {% stylesheet %}
-  .dev-announcement-bar {
+  .jci-announcement-bar {
     position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: var(--dev-announcement-min-height);
-    padding-block: var(--dev-announcement-pad-block-start) var(--dev-announcement-pad-block-end);
-    padding-inline: var(--dev-announcement-pad-inline);
-    color: var(--dev-announcement-text);
-    background: var(--dev-announcement-bg);
-    border-block-end: var(--dev-announcement-divider-width) solid var(--dev-announcement-divider-color);
-    font-family: var(--dev-announcement-font);
-    font-size: var(--dev-announcement-size);
-    font-weight: var(--dev-announcement-font-weight);
-    line-height: var(--dev-announcement-leading);
-    letter-spacing: var(--dev-announcement-tracking);
-    text-align: var(--dev-announcement-align);
-    text-transform: var(--dev-announcement-case);
+    min-height: var(--jci-announcement-min-height);
+    padding-block: var(--jci-announcement-pad-block-start) var(--jci-announcement-pad-block-end);
+    padding-inline: var(--jci-announcement-pad-inline);
+    color: var(--jci-announcement-text);
+    background: var(--jci-announcement-bg);
+    border-block-end: var(--jci-announcement-divider-width) solid var(--jci-announcement-divider-color);
+    font-family: var(--jci-announcement-font);
+    font-size: var(--jci-announcement-size);
+    font-weight: var(--jci-announcement-font-weight);
+    line-height: var(--jci-announcement-leading);
+    letter-spacing: var(--jci-announcement-tracking);
+    text-align: var(--jci-announcement-align);
+    text-transform: var(--jci-announcement-case);
   }
 
-  .dev-announcement-bar[hidden] {
+  .jci-announcement-bar[hidden] {
     display: none;
   }
 
   /* Overrides the global container default: this bar is full-bleed unless the
      merchant constrains it with the section width setting. */
-  .dev-announcement-bar-container {
-    width: min(100%, var(--dev-announcement-max-width));
+  .jci-announcement-bar-container {
+    width: min(100%, var(--jci-announcement-max-width));
     margin-inline: auto;
     padding-inline: 0;
   }
 
-  .dev-announcement-bar-text {
+  .jci-announcement-bar-text {
     margin: 0;
   }
 
-  .dev-announcement-bar-link {
+  .jci-announcement-bar-link {
     color: inherit;
     text-decoration: none;
   }
 
-  .dev-announcement-bar-link:hover .dev-announcement-bar-text {
+  .jci-announcement-bar-link:hover .jci-announcement-bar-text {
     text-decoration: underline;
     text-underline-offset: 0.25em;
   }
 
-  .dev-announcement-bar-dismiss {
+  .jci-announcement-bar-dismiss {
     position: absolute;
-    inset-inline-end: var(--dev-announcement-dismiss-offset);
+    inset-inline-end: var(--jci-announcement-dismiss-offset);
     inset-block-start: 50%;
     padding: 0.1rem 0.35rem;
     border: 0;
     color: inherit;
     background: transparent;
-    font-size: var(--dev-announcement-dismiss-size);
+    font-size: var(--jci-announcement-dismiss-size);
     font-weight: 300;
     line-height: 1;
     cursor: pointer;
     transform: translateY(-50%);
   }
 
-  .dev-announcement-bar-dismiss:focus-visible {
+  .jci-announcement-bar-dismiss:focus-visible {
     outline: 1px solid currentcolor;
     outline-offset: 2px;
   }
 
   @media screen and (max-width: 680px) {
-    .dev-announcement-bar {
-      font-size: var(--dev-announcement-size-mobile);
+    .jci-announcement-bar {
+      font-size: var(--jci-announcement-size-mobile);
     }
   }
 {% endstylesheet %}
@@ -150,7 +150,7 @@
 {
   "name": "Announcement bar",
   "tag": "aside",
-  "class": "dev-announcement-bar-section",
+  "class": "jci-announcement-bar-section",
   "enabled_on": {
     "groups": ["header"]
   },

@@ -29,8 +29,8 @@
       'color-palette' — it overrides tokens those two emit.
       See MAISON-CAVALLE-SPEC.md §3, §5.
     {%- endcomment -%}
-    {{ 'dev-base.css' | asset_url | stylesheet_tag }}
-    {%- render 'dev-tokens' -%}
+    {{ 'jci-base.css' | asset_url | stylesheet_tag }}
+    {%- render 'jci-tokens' -%}
 
     {% if request.design_mode %}
       {%- render 'theme-editor' -%}

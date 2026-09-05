@@ -10,14 +10,14 @@
  */
 const SCROLL_THRESHOLD = 8;
 
-class DevHeader extends HTMLElement {
+class JciHeader extends HTMLElement {
   #rafId = null;
 
   connectedCallback() {
-    this.trigger = this.querySelector('[data-dev-menu-trigger]');
-    this.drawer = this.querySelector('[data-dev-drawer]');
-    this.backdrop = this.querySelector('[data-dev-drawer-backdrop]');
-    this.closeButton = this.querySelector('[data-dev-drawer-close]');
+    this.trigger = this.querySelector('[data-jci-menu-trigger]');
+    this.drawer = this.querySelector('[data-jci-drawer]');
+    this.backdrop = this.querySelector('[data-jci-drawer-backdrop]');
+    this.closeButton = this.querySelector('[data-jci-drawer-close]');
 
     this.#syncScrollState();
     window.addEventListener('scroll', this.#handleScroll, { passive: true });
@@ -116,6 +116,6 @@ class DevHeader extends HTMLElement {
   }
 }
 
-if (!customElements.get('dev-header')) {
-  customElements.define('dev-header', DevHeader);
+if (!customElements.get('jci-header')) {
+  customElements.define('jci-header', JciHeader);
 }

@@ -2,12 +2,12 @@
  * Maison Cavallé — announcement bar.
  *
  * The prototype simply removes the bar from the DOM on dismiss, so it returns
- * on the next page load. `data-dev-remember-dismissal` opts into keeping it
+ * on the next page load. `data-jci-remember-dismissal` opts into keeping it
  * hidden for the rest of the session instead.
  */
-class DevAnnouncementBar extends HTMLElement {
+class JciAnnouncementBar extends HTMLElement {
   connectedCallback() {
-    this.dismissButton = this.querySelector('[data-dev-announcement-dismiss]');
+    this.dismissButton = this.querySelector('[data-jci-announcement-dismiss]');
     if (!this.dismissButton) return;
 
     if (this.remembersDismissal && this.#wasDismissed()) {
@@ -23,11 +23,11 @@ class DevAnnouncementBar extends HTMLElement {
   }
 
   get remembersDismissal() {
-    return this.hasAttribute('data-dev-remember-dismissal');
+    return this.hasAttribute('data-jci-remember-dismissal');
   }
 
   get #storageKey() {
-    return `dev-announcement-dismissed:${this.dataset.devSectionId ?? 'default'}`;
+    return `jci-announcement-dismissed:${this.dataset.jciSectionId ?? 'default'}`;
   }
 
   /* Storage throws in private-mode and blocked-cookie contexts. */
@@ -58,6 +58,6 @@ class DevAnnouncementBar extends HTMLElement {
   };
 }
 
-if (!customElements.get('dev-announcement-bar')) {
-  customElements.define('dev-announcement-bar', DevAnnouncementBar);
+if (!customElements.get('jci-announcement-bar')) {
+  customElements.define('jci-announcement-bar', JciAnnouncementBar);
 }

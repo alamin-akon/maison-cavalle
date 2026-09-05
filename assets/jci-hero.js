@@ -14,22 +14,22 @@ const POINTER_SHIFT_Y = 6;
 const SCROLL_FACTOR = 0.08;
 const SCROLL_MAX = 38;
 
-class DevHero extends HTMLElement {
+class JciHero extends HTMLElement {
   #index = 0;
   #titleSwapTimer = null;
   #scrollRafId = null;
   #hasRendered = false;
 
   connectedCallback() {
-    this.media = this.querySelector('[data-dev-hero-media]');
-    this.panel = this.querySelector('[data-dev-hero-panel]');
-    this.eyebrow = this.querySelector('[data-dev-hero-eyebrow]');
-    this.title = this.querySelector('[data-dev-hero-title]');
-    this.copy = this.querySelector('[data-dev-hero-copy]');
-    this.descriptor = this.querySelector('[data-dev-hero-descriptor]');
-    this.indexLabel = this.querySelector('[data-dev-hero-index]');
-    this.slides = [...this.querySelectorAll('[data-dev-hero-video]')];
-    this.tabs = [...this.querySelectorAll('[data-dev-hero-slide]')];
+    this.media = this.querySelector('[data-jci-hero-media]');
+    this.panel = this.querySelector('[data-jci-hero-panel]');
+    this.eyebrow = this.querySelector('[data-jci-hero-eyebrow]');
+    this.title = this.querySelector('[data-jci-hero-title]');
+    this.copy = this.querySelector('[data-jci-hero-copy]');
+    this.descriptor = this.querySelector('[data-jci-hero-descriptor]');
+    this.indexLabel = this.querySelector('[data-jci-hero-index]');
+    this.slides = [...this.querySelectorAll('[data-jci-hero-video]')];
+    this.tabs = [...this.querySelectorAll('[data-jci-hero-slide]')];
     this.moments = this.#readMoments();
 
     this.reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -48,12 +48,12 @@ class DevHero extends HTMLElement {
       tab.addEventListener('keydown', this.#handleTabKeydown);
     }
 
-    if (this.hasAttribute('data-dev-pointer-depth') && !this.reducedMotion) {
+    if (this.hasAttribute('data-jci-pointer-depth') && !this.reducedMotion) {
       this.addEventListener('pointermove', this.#handlePointerMove);
       this.addEventListener('pointerleave', this.#handlePointerLeave);
     }
 
-    if (this.hasAttribute('data-dev-scroll-depth') && !this.reducedMotion) {
+    if (this.hasAttribute('data-jci-scroll-depth') && !this.reducedMotion) {
       window.addEventListener('scroll', this.#handleScroll, { passive: true });
     }
 
@@ -67,7 +67,7 @@ class DevHero extends HTMLElement {
   }
 
   #readMoments() {
-    const node = this.querySelector('[data-dev-hero-moments]');
+    const node = this.querySelector('[data-jci-hero-moments]');
     if (!node) return [];
 
     try {
@@ -92,9 +92,9 @@ class DevHero extends HTMLElement {
     return words
       .map((word, i) => {
         const span = document.createElement('span');
-        span.className = 'dev-hero-title-word';
-        span.style.setProperty('--dev-word-index', String(i));
-        if (i >= accentFrom) span.dataset.devHeroAccent = 'true';
+        span.className = 'jci-hero-title-word';
+        span.style.setProperty('--jci-word-index', String(i));
+        if (i >= accentFrom) span.dataset.jciHeroAccent = 'true';
         span.textContent = word;
         return span.outerHTML;
       })
@@ -178,7 +178,7 @@ class DevHero extends HTMLElement {
   /* --- Events --- */
 
   #handleEnded = (event) => {
-    if (!this.hasAttribute('data-dev-autoplay')) return;
+    if (!this.hasAttribute('data-jci-autoplay')) return;
     if (this.slides.indexOf(event.currentTarget) !== this.#index) return;
     this.#show(this.#index + 1);
   };
@@ -191,7 +191,7 @@ class DevHero extends HTMLElement {
   };
 
   #handleTabClick = (event) => {
-    this.#show(Number(event.currentTarget.dataset.devHeroSlide));
+    this.#show(Number(event.currentTarget.dataset.jciHeroSlide));
   };
 
   #handleTabKeydown = (event) => {
@@ -215,13 +215,13 @@ class DevHero extends HTMLElement {
     const x = (event.clientX - rect.left) / rect.width - 0.5;
     const y = (event.clientY - rect.top) / rect.height - 0.5;
 
-    this.style.setProperty('--dev-hero-shift-x', `${(x * POINTER_SHIFT_X).toFixed(2)}px`);
-    this.style.setProperty('--dev-hero-shift-y', `${(y * POINTER_SHIFT_Y).toFixed(2)}px`);
+    this.style.setProperty('--jci-hero-shift-x', `${(x * POINTER_SHIFT_X).toFixed(2)}px`);
+    this.style.setProperty('--jci-hero-shift-y', `${(y * POINTER_SHIFT_Y).toFixed(2)}px`);
   };
 
   #handlePointerLeave = () => {
-    this.style.setProperty('--dev-hero-shift-x', '0px');
-    this.style.setProperty('--dev-hero-shift-y', '0px');
+    this.style.setProperty('--jci-hero-shift-x', '0px');
+    this.style.setProperty('--jci-hero-shift-y', '0px');
   };
 
   #handleScroll = () => {
@@ -230,11 +230,11 @@ class DevHero extends HTMLElement {
     this.#scrollRafId = requestAnimationFrame(() => {
       this.#scrollRafId = null;
       const drift = Math.min(window.scrollY * SCROLL_FACTOR, SCROLL_MAX);
-      this.style.setProperty('--dev-hero-scroll-y', `${drift}px`);
+      this.style.setProperty('--jci-hero-scroll-y', `${drift}px`);
     });
   };
 }
 
-if (!customElements.get('dev-hero')) {
-  customElements.define('dev-hero', DevHero);
+if (!customElements.get('jci-hero')) {
+  customElements.define('jci-hero', JciHero);
 }

@@ -61,101 +61,101 @@ container structure follow §1 and nothing else.
 Every custom section follows the same two-level shape:
 
 ```liquid
-<section class="dev-{name}" ...>
-  <div class="dev-{name}-container">
+<section class="jci-{name}" ...>
+  <div class="jci-{name}-container">
     <!-- content / blocks -->
   </div>
 </section>
 ```
 
-- `dev-{name}` — the **outer** element. Full-bleed. Owns background colour,
+- `jci-{name}` — the **outer** element. Full-bleed. Owns background colour,
   vertical padding, `overflow`, `isolation`.
-- `dev-{name}-container` — the **inner** element. Owns max-width and
+- `jci-{name}-container` — the **inner** element. Owns max-width and
   horizontal padding. Never sets its own background.
 
-### Every element carries `dev-`
+### Every element carries `jci-`
 
 Not just the section root and the container — **every element we author gets a
-`dev-` class**, down to the leaf nodes. Nothing is styled by tag selector,
-descendant chain, or `:nth-child`. If it has a style, it has a `dev-` class.
+`jci-` class**, down to the leaf nodes. Nothing is styled by tag selector,
+descendant chain, or `:nth-child`. If it has a style, it has a `jci-` class.
 
 ```
-dev-hero                             section root, full-bleed
-  dev-hero-media                     video layer
-    dev-hero-video
-    dev-hero-grain
-  dev-hero-container                 constrained wrapper
-    dev-hero-topline
-      dev-hero-eyebrow
-      dev-hero-meta
-    dev-hero-grid
-      dev-hero-copy
-        dev-hero-title
-          dev-hero-title-word
-        dev-hero-text
-        dev-hero-cta
-      dev-hero-side-note
-    dev-hero-bottomline
-      dev-hero-scroll
-      dev-hero-moment-nav
-        dev-hero-moment
-          dev-hero-moment-number
-          dev-hero-moment-label
-          dev-hero-moment-line
-      dev-hero-index
+jci-hero                             section root, full-bleed
+  jci-hero-media                     video layer
+    jci-hero-video
+    jci-hero-grain
+  jci-hero-container                 constrained wrapper
+    jci-hero-topline
+      jci-hero-eyebrow
+      jci-hero-meta
+    jci-hero-grid
+      jci-hero-copy
+        jci-hero-title
+          jci-hero-title-word
+        jci-hero-text
+        jci-hero-cta
+      jci-hero-side-note
+    jci-hero-bottomline
+      jci-hero-scroll
+      jci-hero-moment-nav
+        jci-hero-moment
+          jci-hero-moment-number
+          jci-hero-moment-label
+          jci-hero-moment-line
+      jci-hero-index
 ```
 
-Naming is mechanical: `dev-{section}-{element}-{part}`. No abbreviations, no
+Naming is mechanical: `jci-{section}-{element}-{part}`. No abbreviations, no
 BEM `__` / `--`, no invented prefixes.
 
-State classes use `is-` after the `dev-` name, matching the prototype:
-`dev-hero-moment is-active`, `dev-hero-copy is-changing`.
+State classes use `is-` after the `jci-` name, matching the prototype:
+`jci-hero-moment is-active`, `jci-hero-copy is-changing`.
 
 Prototype class → theme class is a direct rename, so any prototype rule
 transfers one-to-one:
 
 | Prototype | Theme |
 |---|---|
-| `.hero-copy` | `.dev-hero-copy` |
-| `.hero-moment-label` | `.dev-hero-moment-label` |
-| `.eyebrow` | `.dev-eyebrow` |
-| `.button` | `.dev-button` |
-| `.product-card` | `.dev-product-card` |
+| `.hero-copy` | `.jci-hero-copy` |
+| `.hero-moment-label` | `.jci-hero-moment-label` |
+| `.eyebrow` | `.jci-eyebrow` |
+| `.button` | `.jci-button` |
+| `.product-card` | `.jci-product-card` |
 
 ### Rules
 
 | Rule | Detail |
 |---|---|
-| Prefix | Every authored class starts `dev-`. No exceptions, at any depth. |
-| No bare tag styling | `.dev-hero-container h1 { }` is wrong. Give the h1 `class="dev-hero-title"`. |
+| Prefix | Every authored class starts `jci-`. No exceptions, at any depth. |
+| No bare tag styling | `.jci-hero-container h1 { }` is wrong. Give the h1 `class="jci-hero-title"`. |
 | No structural selectors | No `:nth-child`, `>` chains, or descendant-only rules for styling. One class, one rule. |
 | One container per section | Nested containers are not allowed. Full-bleed children break out with the `100vw` pattern (§5). |
-| No Horizon class overrides | Never restyle `.section`, `.page-width-*`, `.button` etc. globally. Scope everything under `dev-*`. |
-| File naming | `sections/dev-hero.liquid` → root class `dev-hero` → `assets/dev-hero.css`. All three names match. |
-| CSS location | One file per section: `assets/dev-hero.css`, loaded via the section schema's `stylesheet` attribute. Shared tokens/utilities live in `assets/dev-base.css`. |
-| Snippets | `snippets/dev-product-card.liquid`, root class `dev-product-card`. |
-| Custom properties | Section-scoped vars are also `dev-` prefixed: `--dev-hero-min-height`. |
-| No inline `style=` | Except for Liquid-driven per-instance values, passed as CSS custom properties: `style="--dev-hero-min-height: {{ section.settings.height }}px"`. |
-| JS hooks | Behaviour targets `data-dev-*` attributes, never a `dev-` class. Classes are for styling only. |
-| Modified Horizon sections | When a Horizon section is modified rather than replaced (e.g. `header.liquid`), add `dev-{name}` to its root and reach its internal classes only through that scope: `.dev-header .menu-list__link`. Never restyle `.menu-list__link` on its own. |
-| Dynamic values | `{% stylesheet %}` blocks do not run Liquid. Every setting-driven value passes through an inline `style="--dev-*: …"` on the section root. |
+| No Horizon class overrides | Never restyle `.section`, `.page-width-*`, `.button` etc. globally. Scope everything under `jci-*`. |
+| File naming | `sections/jci-hero.liquid` → root class `jci-hero` → `assets/jci-hero.css`. All three names match. |
+| CSS location | One file per section: `assets/jci-hero.css`, loaded via the section schema's `stylesheet` attribute. Shared tokens/utilities live in `assets/jci-base.css`. |
+| Snippets | `snippets/jci-product-card.liquid`, root class `jci-product-card`. |
+| Custom properties | Section-scoped vars are also `jci-` prefixed: `--jci-hero-min-height`. |
+| No inline `style=` | Except for Liquid-driven per-instance values, passed as CSS custom properties: `style="--jci-hero-min-height: {{ section.settings.height }}px"`. |
+| JS hooks | Behaviour targets `data-jci-*` attributes, never a `jci-` class. Classes are for styling only. |
+| Modified Horizon sections | When a Horizon section is modified rather than replaced (e.g. `header.liquid`), add `jci-{name}` to its root and reach its internal classes only through that scope: `.jci-header .menu-list__link`. Never restyle `.menu-list__link` on its own. |
+| Dynamic values | `{% stylesheet %}` blocks do not run Liquid. Every setting-driven value passes through an inline `style="--jci-*: …"` on the section root. |
 | Ranges | Four server rules, only the first of which `theme check` catches: `step` divisible by `0.1`; `unit` at most **3 characters**; at most **101 steps** (`(max - min) / step + 1`); `default` on the step grid. For fractional values use whole numbers with a `%` unit and divide by 100 in Liquid. |
 | Validate before pushing | `theme check` does not enforce the schema rules above — the server rejects the upload instead, and a section that fails to upload makes `header-group.json` fail too ("does not refer to an existing section file"). Run the schema validator as well as `theme check`. |
 | Pushing JSON | `shopify theme dev` does **not** re-sync `sections/*-group.json`, `templates/*.json` or `config/settings_data.json` after it starts — it protects Theme Editor edits. Changes to those files need `shopify theme push`, or a restart of `theme dev`. Liquid and assets hot-sync normally. |
 | Translations | Only use locale keys that already exist. A new key must be added to all 33 locale files or theme check fails. |
 
-### Container defaults (`assets/dev-base.css`)
+### Container defaults (`assets/jci-base.css`)
 
 ```css
-[class^="dev-"][class$="-container"],
-[class*=" dev-"][class$="-container"] {
-  width: min(100%, var(--dev-content-max));
+[class^="jci-"][class$="-container"],
+[class*=" jci-"][class$="-container"] {
+  width: min(100%, var(--jci-content-max));
   margin-inline: auto;
-  padding-inline: var(--dev-page-pad);
+  padding-inline: var(--jci-page-pad);
 }
 ```
 
-Every `dev-*-container` inherits this. A section only overrides it when the
+Every `jci-*-container` inherits this. A section only overrides it when the
 prototype genuinely differs.
 
 ---
@@ -181,7 +181,7 @@ default 4). Sections reference palette entries, never hex values.
 `--line` (`rgba(30,33,29,.16)`) is **not** a palette entry — it is derived:
 
 ```css
---dev-line: rgb(var(--color-foreground-rgb) / 0.16);
+--jci-line: rgb(var(--color-foreground-rgb) / 0.16);
 ```
 
 ### `settings_data.json` patch
@@ -263,9 +263,9 @@ token, so the whole set moves together if the decision changes again:
 
 ```css
 :root {
-  --dev-font-label: var(--font-subheading--family);   /* Work Sans 500 */
-  --dev-font-display: var(--font-heading--family);    /* Playfair Display */
-  --dev-font-sans: var(--font-body--family);          /* Work Sans */
+  --jci-font-label: var(--font-subheading--family);   /* Work Sans 500 */
+  --jci-font-display: var(--font-heading--family);    /* Playfair Display */
+  --jci-font-sans: var(--font-body--family);          /* Work Sans */
 }
 ```
 
@@ -320,13 +320,13 @@ Every size below is taken verbatim from `styles.css`. These are the target.
 | `h4` | `24px` | 24px | `24` — exact |
 | `h5` / label | `14px` | 14px | `14` — exact |
 | `h6` / eyebrow | `10–12px` | 12px | `12` — exact |
-| Eyebrow | `500 10px/1.2` mono, `.14em` | 10px | `.dev-eyebrow` utility |
-| Button | `10px/1` mono, `.13em` | 10px | `--dev-button-size` |
-| Text link | `10px` mono, `.12em` | 10px | `.dev-text-link` |
+| Eyebrow | `500 10px/1.2` mono, `.14em` | 10px | `.jci-eyebrow` utility |
+| Button | `10px/1` mono, `.13em` | 10px | `--jci-button-size` |
+| Text link | `10px` mono, `.12em` | 10px | `.jci-text-link` |
 
 All page heroes — home, collection, story, journal, faq — share
 `--hero-title-size`. Only the product page differs, so it gets
-`.dev-product-title` instead of relying on the global `h1`.
+`.jci-product-title` instead of relying on the global `h1`.
 
 **`144px` is not in Horizon's dropdown** (options jump `120 → 152`). The
 setting is `152` so the Theme Editor preview stays close, and the real value
@@ -340,24 +340,24 @@ configured size, which does not match the prototype either:
 | `h1` | `clamp(72px, …, 152px)` | `clamp(64px, 8vw, 144px)` |
 | `h2` | `clamp(36px, …, 72px)` | `clamp(38.4px, 5vw, 72px)` |
 
-Both are pinned exactly in `assets/dev-base.css`:
+Both are pinned exactly in `assets/jci-base.css`:
 
 ```css
 :root {
-  --dev-hero-title-size:    clamp(4rem, 8vw, 9rem);      /* 64 → 144 */
-  --dev-section-title-size: clamp(2.4rem, 5vw, 4.5rem);  /* 38.4 → 72 */
-  --font-h1--size: var(--dev-hero-title-size);
-  --font-h2--size: var(--dev-section-title-size);
+  --jci-hero-title-size:    clamp(4rem, 8vw, 9rem);      /* 64 → 144 */
+  --jci-section-title-size: clamp(2.4rem, 5vw, 4.5rem);  /* 38.4 → 72 */
+  --font-h1--size: var(--jci-hero-title-size);
+  --font-h2--size: var(--jci-section-title-size);
 }
 ```
 
 > Confirm the token name Horizon emits for each preset before relying on it;
-> if it differs, set the size on `.dev-*-title` classes instead.
+> if it differs, set the size on `.jci-*-title` classes instead.
 
 ### Values Horizon's dropdowns cannot express
 
 Three prototype values have no matching option. Override the underlying
-tokens once in `assets/dev-base.css` — do not scatter them per section:
+tokens once in `assets/jci-base.css` — do not scatter them per section:
 
 | Prototype | Horizon token default | Override to |
 |---|---|---|
@@ -376,7 +376,7 @@ the hero section override locally:
   --letter-spacing--heading-tight: -0.055em;
   --line-height--body-loose: 1.55;
 }
-.dev-hero-title {
+.jci-hero-title {
   line-height: 0.84;
   letter-spacing: -0.07em;
 }
@@ -387,8 +387,8 @@ the hero section override locally:
 Used everywhere. Define once, never re-declare:
 
 ```css
-.dev-eyebrow {
-  font: 500 10px/1.2 var(--dev-font-mono);
+.jci-eyebrow {
+  font: 500 10px/1.2 var(--jci-font-mono);
   letter-spacing: 0.14em;
   text-transform: uppercase;
 }
@@ -436,16 +436,16 @@ Colours already bind correctly and need no change:
 ### Button font
 
 `type_font_button_primary` only offers `body` / `accent` — neither is DM Mono.
-Override the token in `assets/dev-base.css`:
+Override the token in `assets/jci-base.css`:
 
 ```css
 :root {
-  --button-font-family-primary:   var(--dev-font-mono);
-  --button-font-family-secondary: var(--dev-font-mono);
-  --dev-button-min-height: 46px;
-  --dev-button-padding:    0.9rem 1.35rem;
-  --dev-button-tracking:   0.13em;
-  --dev-button-size:       10px;
+  --button-font-family-primary:   var(--jci-font-mono);
+  --button-font-family-secondary: var(--jci-font-mono);
+  --jci-button-min-height: 46px;
+  --jci-button-padding:    0.9rem 1.35rem;
+  --jci-button-tracking:   0.13em;
+  --jci-button-size:       10px;
 }
 ```
 
@@ -455,7 +455,7 @@ Override the token in `assets/dev-base.css`:
 |---|---|
 | `.button` (ink bg, paper text) | primary |
 | `.button-outline` (transparent, ink border) | secondary |
-| `.button-light` (paper bg, ink text) | secondary + `dev-button-light` modifier for dark sections |
+| `.button-light` (paper bg, ink text) | secondary + `jci-button-light` modifier for dark sections |
 
 ---
 
@@ -471,7 +471,7 @@ Keep `"page_width": "narrow"` and retune the token:
 ```css
 :root {
   --narrow-page-width: 100rem;   /* 1600px */
-  --dev-content-max:   var(--narrow-page-width);
+  --jci-content-max:   var(--narrow-page-width);
 }
 ```
 
@@ -479,8 +479,8 @@ Keep `"page_width": "narrow"` and retune the token:
 
 ```css
 :root {
-  --dev-page-pad:         clamp(1.25rem, 4vw, 4.25rem);
-  --dev-editorial-gutter: calc(var(--dev-page-pad) + clamp(0rem, 4vw, 4rem));
+  --jci-page-pad:         clamp(1.25rem, 4vw, 4.25rem);
+  --jci-editorial-gutter: calc(var(--jci-page-pad) + clamp(0rem, 4vw, 4rem));
 }
 ```
 
@@ -490,21 +490,21 @@ Prototype `.section` = `clamp(4.5rem, 9vw, 8.5rem)`. Standardise on three steps:
 
 ```css
 :root {
-  --dev-section-pad-sm: clamp(3rem, 6vw, 5.5rem);
-  --dev-section-pad:    clamp(4.5rem, 9vw, 8.5rem);
-  --dev-section-pad-lg: clamp(4.5rem, 8vw, 8rem);
+  --jci-section-pad-sm: clamp(3rem, 6vw, 5.5rem);
+  --jci-section-pad:    clamp(4.5rem, 9vw, 8.5rem);
+  --jci-section-pad-lg: clamp(4.5rem, 8vw, 8rem);
 }
-.dev-section { padding-block: var(--dev-section-pad); }
+.jci-section { padding-block: var(--jci-section-pad); }
 ```
 
-Every `dev-*` section uses one of these three. No ad-hoc clamp values.
+Every `jci-*` section uses one of these three. No ad-hoc clamp values.
 
 ### Full-bleed breakout
 
 For sections that must ignore the container (hero, marquee, editorial banner):
 
 ```css
-.dev-hero {
+.jci-hero {
   width: 100vw;
   margin-left: calc(50% - 50vw);
 }
@@ -522,7 +522,7 @@ Two only, matching the prototype. Do not introduce a third.
 ### Motion
 
 ```css
-:root { --dev-ease: cubic-bezier(.22, .61, .36, 1); }
+:root { --jci-ease: cubic-bezier(.22, .61, .36, 1); }
 @media (prefers-reduced-motion: reduce) { /* disable all transitions/autoplay */ }
 ```
 
@@ -576,13 +576,13 @@ Other border widths:
 |---|---|
 | Hex value inside a section's CSS | `var(--color-foreground)` / palette reference |
 | `font-family: "Playfair Display"` in a section | `var(--font-heading--family)` |
-| A new clamp for section padding | One of the three `--dev-section-pad-*` steps |
+| A new clamp for section padding | One of the three `--jci-section-pad-*` steps |
 | A 4th font family | The 3 approved families only |
 | A colour not in the palette | Opacity step off an existing palette colour |
-| Restyling `.button` globally | `dev-*` scoped modifier |
+| Restyling `.button` globally | `jci-*` scoped modifier |
 | A third breakpoint | 900px / 680px only |
-| A class without the `dev-` prefix | `dev-` on every authored element |
-| `.dev-hero-container h1 { }` | `.dev-hero-title { }` |
+| A class without the `jci-` prefix | `jci-` on every authored element |
+| `.jci-hero-container h1 { }` | `.jci-hero-title { }` |
 | `:nth-child`, `>` chains for styling | One class, one rule |
 | "Improving" the prototype unasked | Clone it, report the issue, wait (§0) |
 | Silently copying a prototype bug | Report it, then apply the decision (§0) |
@@ -596,15 +596,31 @@ Other border widths:
 | # | Step | Status |
 |---|---|---|
 | 1 | `git init` + clean Horizon baseline | done |
-| 2 | `assets/dev-base.css` + `snippets/dev-tokens.liquid` + self-hosted DM Mono | done |
+| 2 | `assets/jci-base.css` + `snippets/jci-tokens.liquid` | done |
 | 3 | `config/settings_data.json` — palette, typography, buttons, radii (§2, §3, §4, §6) | done |
-| 4 | `sections/dev-announcement-bar.liquid` | done |
-| 5 | `sections/dev-header.liquid` — own section, 44 settings; Horizon's `header.liquid` left untouched | done |
-| 6 | Verify in Theme Editor that every value round-trips | pending |
-| 7 | Footer | |
-| 8 | Homepage sections, in prototype order | |
+| 4 | `sections/jci-announcement-bar.liquid` | done |
+| 5 | `sections/jci-header.liquid` — own section, 44 settings; Horizon's `header.liquid` left untouched | done |
+| 6 | Homepage sections, in prototype order | in progress |
+| 6a | `sections/jci-hero.liquid` — three moments, video per moment | done |
+| 6b | `sections/jci-marquee.liquid` — phrase blocks | done |
+| 6c | `sections/jci-story.liquid` — copy + tilted film, all strings as settings | done |
+| 6d | `sections/jci-product-section.liquid` + `snippets/jci-product-card.liquid` | done |
+| 6e | `sections/jci-editorial-banner.liquid` — slide blocks, crossfade carousel | done |
+| 6f | Best sellers, testimonials, home FAQ, newsletter | |
+| 7 | Verify in Theme Editor that every value round-trips | pending |
+| 8 | Footer | |
 | 9 | Product + collection templates | |
 | 10 | Content pages (story, journal, faq, shipping, size guide) | |
+
+### Video
+
+Theme assets cap at **20 MB per file**, so the prototype's 4K/1440p clips are
+re-encoded before they land in `assets/`: H.264, capped at 1920px wide, CRF 30,
+audio stripped, `+faststart`. The four homepage clips go 76 MB → 17.7 MB.
+
+Every section that carries a clip offers both paths — a Shopify **Files**
+upload (no size cap, CDN-served) wins over an `assets/` filename, so a store
+can host the clip either way.
 
 Steps 2–3 come before any section work. Sections are written against tokens
 that must already exist.

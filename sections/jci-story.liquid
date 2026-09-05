@@ -1,0 +1,771 @@
+{% comment %}
+  Maison Cavallé — story
+  Prototype source: maison-cavalle-main/app.js → renderHome, .story-section markup
+                    maison-cavalle-main/styles.css → .story-* (lines 188–226, 1437, 1526–1533)
+                    maison-cavalle-main/app.js → activateMotion (reveal + data-tilt)
+  Reference: MAISON-CAVALLE-SPEC.md §1
+
+  Copy on the left, a framed film on the right that leans towards the pointer.
+  Every string is a setting so the whole section is editable from the Theme
+  Editor.
+
+  The film resolves in the order the hero uses: a Shopify Files upload wins,
+  then an assets/ filename, then the poster alone. Both paths are supported so
+  a clip can live wherever the store prefers.
+{% endcomment %}
+
+{% liquid
+  assign s = section.settings
+
+  assign poster_src = blank
+  if s.poster_asset != blank
+    assign poster_src = s.poster_asset | strip | asset_url
+  elsif s.poster != blank
+    assign poster_src = s.poster | image_url: width: 1400
+  elsif s.video != blank
+    assign poster_src = s.video.preview_image | image_url: width: 1400
+  endif
+
+  assign has_film = false
+  if s.video_asset != blank or s.video != blank
+    assign has_film = true
+  endif
+%}
+
+<jci-story
+  class="jci-story"
+  {% if s.enable_reveal %}data-jci-story-reveal{% endif %}
+  {% if s.enable_tilt %}data-jci-story-tilt-enabled{% endif %}
+  {% if s.anchor_id != blank %}id="{{ s.anchor_id | handleize }}"{% endif %}
+  style="
+    --jci-story-bg: {{ s.background_color | default: settings.color_palette.color3 }};
+    --jci-story-bg-rgb: {{ s.background_color.rgb | default: settings.color_palette.color3.rgb }};
+    --jci-story-wash-rgb: {{ s.wash_color.rgb | default: settings.color_palette.color5.rgb }};
+    --jci-story-wash-opacity: {{ s.wash_opacity | divided_by: 100.0 }};
+    --jci-story-heading: {{ s.heading_color | default: settings.color_palette.foreground }};
+    --jci-story-heading-rgb: {{ s.heading_color.rgb | default: settings.color_palette.foreground.rgb }};
+    --jci-story-accent: {{ s.accent_color | default: settings.color_palette.color5 }};
+    --jci-story-accent-rgb: {{ s.accent_color.rgb | default: settings.color_palette.color5.rgb }};
+    --jci-story-body: {{ s.body_color }};
+    --jci-story-meta: {{ s.meta_color }};
+    --jci-story-caption-meta: {{ s.caption_meta_color }};
+    --jci-story-mark-opacity: {{ s.watermark_opacity | divided_by: 100.0 }};
+    --jci-story-watermark: '{{ s.watermark | replace: "'", "" | escape }}';
+    --jci-story-rule: {{ s.rule_color | default: settings.color_palette.color6 }};
+    --jci-story-rule-rgb: {{ s.rule_color.rgb | default: settings.color_palette.color6.rgb }};
+    --jci-story-media-gap: {{ s.column_gap | divided_by: 10.0 }}rem;
+    --jci-story-copy-max: {{ s.copy_max_width }}px;
+    --jci-story-frame-min: {{ s.frame_min_height }}px;
+    --jci-story-film-saturate: {{ s.film_saturate | divided_by: 100.0 }};
+    --jci-story-film-contrast: {{ s.film_contrast | divided_by: 100.0 }};
+    --jci-story-pad: var(--jci-section-pad{% if s.padding_scale != 'normal' %}-{{ s.padding_scale }}{% endif %});
+  "
+>
+  <div class="jci-story-container jci-story-container--{{ s.background_width }}">
+    <div class="jci-story-copy">
+      {%- if s.kicker != blank -%}
+        <span class="jci-story-kicker">
+          <span class="jci-story-kicker-dot" aria-hidden="true"></span>
+          {{ s.kicker }}
+        </span>
+      {%- endif -%}
+
+      {%- if s.title_line_one != blank or s.title_line_two != blank -%}
+        <h2 class="jci-story-title">
+          {{- s.title_line_one -}}
+          {%- if s.title_line_one != blank and s.title_line_two != blank -%}<br>{%- endif -%}
+          {%- if s.title_line_two != blank -%}
+            <em class="jci-story-title-accent">{{ s.title_line_two }}</em>
+          {%- endif -%}
+        </h2>
+      {%- endif -%}
+
+      <div class="jci-story-brand-copy">
+        {%- comment -%}
+          Three separate settings rather than one rich text field: rich text
+          emits its own <p>, which would have to be reached by a descendant
+          selector. §1 allows neither.
+        {%- endcomment -%}
+        {%- for i in (1..3) -%}
+          {%- case i -%}
+            {%- when 1 -%}{%- assign paragraph = s.paragraph_one -%}
+            {%- when 2 -%}{%- assign paragraph = s.paragraph_two -%}
+            {%- when 3 -%}{%- assign paragraph = s.paragraph_three -%}
+          {%- endcase -%}
+          {%- if paragraph != blank -%}
+            <p class="jci-story-paragraph">{{ paragraph }}</p>
+          {%- endif -%}
+        {%- endfor -%}
+
+        {%- if s.belief_one != blank or s.belief_two != blank -%}
+          <div class="jci-story-belief">
+            {%- if s.belief_one != blank -%}
+              <p class="jci-story-belief-line">{{ s.belief_one }}</p>
+            {%- endif -%}
+            {%- if s.belief_two != blank -%}
+              <p class="jci-story-belief-line jci-story-belief-line--accent">{{ s.belief_two }}</p>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+
+        {%- if s.signoff_name != blank or s.signoff_tagline != blank -%}
+          <div class="jci-story-signoff">
+            {%- if s.signoff_name != blank -%}
+              <span class="jci-story-signoff-name">{{ s.signoff_name }}</span>
+            {%- endif -%}
+            {%- if s.signoff_tagline != blank -%}
+              <strong class="jci-story-signoff-tagline">{{ s.signoff_tagline }}</strong>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+      </div>
+
+      {%- if s.link_label != blank or s.scroll_note != blank -%}
+        <div class="jci-story-actions">
+          {%- if s.link_label != blank -%}
+            <a class="jci-text-link jci-story-link" href="{{ s.link_url | default: '#' }}">
+              {{ s.link_label }} <span class="jci-story-link-icon" aria-hidden="true">&#8599;</span>
+            </a>
+          {%- endif -%}
+          {%- if s.scroll_note != blank -%}
+            <span class="jci-story-scroll-note">
+              {{ s.scroll_note }} <span class="jci-story-scroll-note-icon" aria-hidden="true">&#8595;</span>
+            </span>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+    </div>
+
+    <div class="jci-story-visual">
+      <div class="jci-story-frame" data-jci-story-tilt>
+        <span class="jci-story-glow" aria-hidden="true"></span>
+
+        {%- if has_film -%}
+          <video
+            class="jci-story-film"
+            autoplay
+            muted
+            loop
+            playsinline
+            preload="metadata"
+            {% if poster_src != blank %}poster="{{ poster_src }}"{% endif %}
+            aria-label="{{ s.film_label }}"
+          >
+            {%- comment -%}
+              A Files upload wins so the clip can exceed the 20 MB asset cap.
+              An assets/ filename is the fallback, so the clip can travel with
+              the theme code instead.
+            {%- endcomment -%}
+            {%- if s.video != blank -%}
+              {%- for source in s.video.sources -%}
+                {%- if source.format == 'mp4' -%}
+                  <source src="{{ source.url }}" type="{{ source.mime_type }}">
+                {%- endif -%}
+              {%- endfor -%}
+            {%- else -%}
+              <source src="{{ s.video_asset | strip | asset_url }}" type="video/mp4">
+            {%- endif -%}
+          </video>
+        {%- elsif poster_src != blank -%}
+          {%- comment -%} No film yet — the still keeps the layout judgeable. {%- endcomment -%}
+          <img
+            class="jci-story-film"
+            src="{{ poster_src }}"
+            alt="{{ s.film_label }}"
+            width="{{ s.poster.width | default: 1400 }}"
+            height="{{ s.poster.height | default: 1489 }}"
+            loading="lazy"
+          >
+        {%- endif -%}
+
+        <span class="jci-story-overlay" aria-hidden="true"></span>
+
+        {%- if s.topline_left != blank or s.topline_right != blank -%}
+          <div class="jci-story-topline">
+            <span class="jci-story-topline-name">{{ s.topline_left }}</span>
+            <span class="jci-story-topline-index">{{ s.topline_right }}</span>
+          </div>
+        {%- endif -%}
+
+        {%- if s.mark != blank -%}
+          <span class="jci-story-mark" aria-hidden="true">{{ s.mark }}</span>
+        {%- endif -%}
+
+        {%- if s.caption_label != blank or s.caption_title != blank -%}
+          <div class="jci-story-caption">
+            {%- if s.caption_label != blank -%}
+              <span class="jci-story-caption-label">{{ s.caption_label }}</span>
+            {%- endif -%}
+            {%- if s.caption_title != blank -%}
+              <strong class="jci-story-caption-title">{{ s.caption_title }}</strong>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+      </div>
+
+      {%- if s.stat_value != blank -%}
+        <div class="jci-story-float-note">
+          <strong class="jci-story-float-note-value">
+            {{- s.stat_value -}}
+            {%- if s.stat_suffix != blank -%}
+              <span class="jci-story-float-note-suffix">{{ s.stat_suffix }}</span>
+            {%- endif -%}
+          </strong>
+          {%- if s.stat_label != blank -%}
+            <small class="jci-story-float-note-label">{{ s.stat_label }}</small>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+</jci-story>
+
+<script src="{{ 'jci-story.js' | asset_url }}" type="module"></script>
+
+{% stylesheet %}
+  .jci-story {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    padding-block: var(--jci-story-pad);
+    opacity: 1;
+  }
+
+  /* Reveal opts in from the section settings; without it the section is
+     painted normally so a no-JS visitor still sees the copy. */
+  .jci-story[data-jci-story-reveal] {
+    opacity: 0;
+    transform: translateY(22px);
+    transition:
+      opacity 0.75s var(--jci-ease),
+      transform 0.75s var(--jci-ease);
+  }
+
+  .jci-story[data-jci-story-reveal].is-revealed {
+    opacity: 1;
+    transform: none;
+  }
+
+  .jci-story-container {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 0.88fr) minmax(0, 1.12fr);
+    gap: var(--jci-story-media-gap);
+    align-items: center;
+    background:
+      radial-gradient(
+        circle at 92% 10%,
+        rgb(var(--jci-story-wash-rgb) / var(--jci-story-wash-opacity)),
+        transparent 25rem
+      ),
+      var(--jci-story-bg);
+  }
+
+  /* The prototype's cream block stops at the 1600px content width. Full width
+     is offered as the alternative, breaking out with the §5 pattern. */
+  .jci-story-container--full {
+    width: 100vw;
+    max-width: none;
+    margin-left: calc(50% - 50vw);
+  }
+
+  /* Oversized MC watermark, ghosted into the top-right corner. */
+  .jci-story-container::before {
+    content: var(--jci-story-watermark, "MC");
+    position: absolute;
+    top: 8%;
+    right: 5%;
+    color: rgb(var(--jci-story-heading-rgb) / var(--jci-story-mark-opacity));
+    font-family: var(--jci-font-display);
+    font-size: clamp(120px, 20vw, 290px);
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: -0.12em;
+    pointer-events: none;
+  }
+
+  /* -- Copy column ------------------------------------------------------- */
+
+  .jci-story-copy {
+    position: relative;
+    z-index: 1;
+    align-self: start;
+    max-width: var(--jci-story-copy-max);
+    padding-top: clamp(0.5rem, 2vw, 2rem);
+  }
+
+  .jci-story-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 1.7rem;
+    color: var(--jci-story-accent);
+    font-family: var(--jci-font-label);
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .jci-story-kicker-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--jci-story-rule);
+    box-shadow: 0 0 0 5px rgb(var(--jci-story-rule-rgb) / 0.12);
+  }
+
+  .jci-story-title {
+    max-width: 570px;
+    margin: 0 0 1.5rem;
+    color: var(--jci-story-heading);
+    font-family: var(--jci-font-display);
+    font-size: var(--jci-section-title-size);
+    font-weight: 500;
+    line-height: 0.92;
+    letter-spacing: -0.055em;
+  }
+
+  .jci-story-title-accent {
+    color: var(--jci-story-accent);
+    font-style: italic;
+  }
+
+  .jci-story-paragraph {
+    max-width: 530px;
+    margin: 0 0 1rem;
+    color: var(--jci-story-body);
+    font-family: var(--jci-font-sans);
+    font-size: var(--jci-subtitle-size);
+    line-height: var(--jci-subtitle-leading);
+  }
+
+  .jci-story-belief {
+    margin: 2rem 0;
+    padding: 1.3rem 0 1.3rem 1.2rem;
+    border-left: 1px solid var(--jci-story-rule);
+  }
+
+  .jci-story-belief-line {
+    max-width: 520px;
+    margin: 0;
+    color: var(--jci-story-heading);
+    font-family: var(--jci-font-display);
+    font-size: clamp(1.2rem, 1.7vw, 1.65rem);
+    font-weight: 500;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+
+  .jci-story-belief-line--accent {
+    margin-top: 0.65rem;
+    color: var(--jci-story-accent);
+  }
+
+  .jci-story-signoff {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    margin-top: 1.8rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--jci-line);
+    color: var(--jci-story-accent);
+  }
+
+  .jci-story-signoff-name {
+    font-family: var(--jci-font-label);
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .jci-story-signoff-tagline {
+    color: var(--jci-story-heading);
+    font-weight: 500;
+  }
+
+  .jci-story-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 2rem;
+    margin-top: 2rem;
+  }
+
+  .jci-story-link-icon {
+    font-size: 14px;
+    transition: transform 0.3s var(--jci-ease);
+  }
+
+  .jci-story-link:hover .jci-story-link-icon {
+    transform: translate(3px, -3px);
+  }
+
+  .jci-story-scroll-note {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    color: var(--jci-story-meta);
+    font-family: var(--jci-font-label);
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .jci-story-scroll-note-icon {
+    display: grid;
+    place-items: center;
+    width: 27px;
+    height: 27px;
+    border: 1px solid var(--jci-line);
+    border-radius: 50%;
+    animation: jci-story-bob 1.8s ease-in-out infinite;
+  }
+
+  @keyframes jci-story-bob {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+
+    50% {
+      transform: translateY(4px);
+    }
+  }
+
+  /* -- Film column ------------------------------------------------------- */
+
+  .jci-story-visual {
+    position: relative;
+    aspect-ratio: 0.94;
+    overflow: visible;
+    perspective: 1200px;
+  }
+
+  .jci-story-frame {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: var(--jci-story-frame-min);
+    overflow: hidden;
+    box-shadow:
+      20px 24px 0 rgb(var(--jci-story-heading-rgb) / 0.08),
+      0 24px 60px rgb(var(--jci-story-heading-rgb) / 0.13);
+    transform: rotateX(var(--jci-story-tilt-x, 0deg)) rotateY(var(--jci-story-tilt-y, 0deg));
+    transform-style: preserve-3d;
+    transition:
+      transform 0.6s var(--jci-ease),
+      box-shadow 0.6s var(--jci-ease);
+    will-change: transform;
+  }
+
+  /* Inset hairline, floated above the film. */
+  .jci-story-frame::before {
+    content: "";
+    position: absolute;
+    z-index: 2;
+    inset: 12px;
+    border: 1px solid rgb(var(--jci-story-bg-rgb) / 0.38);
+    pointer-events: none;
+  }
+
+  .jci-story-glow {
+    position: absolute;
+    z-index: 1;
+    inset: -20%;
+    background: radial-gradient(
+      circle at 70% 35%,
+      rgb(var(--jci-story-accent-rgb) / 0.2),
+      transparent 45%
+    );
+    mix-blend-mode: screen;
+    pointer-events: none;
+  }
+
+  .jci-story-film {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    filter: saturate(var(--jci-story-film-saturate)) contrast(var(--jci-story-film-contrast));
+    transition: transform 1.2s var(--jci-ease);
+  }
+
+  .jci-story.is-revealed .jci-story-film {
+    transform: scale(1.04);
+  }
+
+  .jci-story-overlay {
+    position: absolute;
+    z-index: 2;
+    inset: 0;
+    background: linear-gradient(
+      180deg,
+      rgb(var(--jci-story-heading-rgb) / 0.08),
+      transparent 48%,
+      rgb(var(--jci-story-heading-rgb) / 0.58)
+    );
+    pointer-events: none;
+  }
+
+  .jci-story-topline {
+    position: absolute;
+    z-index: 3;
+    top: 1.3rem;
+    right: 1.3rem;
+    left: 1.3rem;
+    display: flex;
+    justify-content: space-between;
+    color: rgb(var(--jci-story-bg-rgb) / 0.82);
+    font-family: var(--jci-font-label);
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .jci-story-mark {
+    position: absolute;
+    z-index: 3;
+    right: 1.3rem;
+    bottom: 1.2rem;
+    display: grid;
+    place-items: center;
+    width: 46px;
+    height: 46px;
+    border: 1px solid rgb(var(--jci-story-bg-rgb) / 0.75);
+    border-radius: 50%;
+    color: var(--jci-story-bg);
+    font-family: var(--jci-font-label);
+    font-size: 14px;
+    letter-spacing: 0.1em;
+  }
+
+  .jci-story-caption {
+    position: absolute;
+    z-index: 3;
+    bottom: 1.2rem;
+    left: 1.3rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    color: var(--jci-story-bg);
+  }
+
+  .jci-story-caption-label {
+    color: var(--jci-story-caption-meta);
+    font-family: var(--jci-font-label);
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .jci-story-caption-title {
+    max-width: 220px;
+    font-family: var(--jci-font-display);
+    font-size: 23px;
+    font-weight: 500;
+    line-height: 1.05;
+  }
+
+  .jci-story-float-note {
+    position: absolute;
+    z-index: 4;
+    right: -1.8rem;
+    bottom: 10%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 104px;
+    height: 104px;
+    border: 1px solid rgb(var(--jci-story-heading-rgb) / 0.24);
+    border-radius: 50%;
+    color: var(--jci-story-heading);
+    background: var(--jci-story-bg);
+    box-shadow: 0 14px 30px rgb(var(--jci-story-heading-rgb) / 0.12);
+    transform: translateZ(60px) rotate(8deg);
+  }
+
+  .jci-story-float-note-value {
+    font-family: var(--jci-font-display);
+    font-size: 31px;
+    font-weight: 500;
+    line-height: 1;
+  }
+
+  .jci-story-float-note-suffix {
+    color: var(--jci-story-rule);
+    font-size: 18px;
+  }
+
+  .jci-story-float-note-label {
+    max-width: 65px;
+    margin-top: 0.4rem;
+    color: var(--jci-story-meta);
+    font-family: var(--jci-font-label);
+    font-size: 12px;
+    line-height: 1.25;
+    letter-spacing: 0.08em;
+    text-align: center;
+    text-transform: uppercase;
+  }
+
+  /* -- Breakpoints (§5 — 900 and 680 only) ------------------------------- */
+
+  @media screen and (max-width: 900px) {
+    .jci-story-container {
+      gap: 3rem;
+    }
+  }
+
+  @media screen and (max-width: 680px) {
+    .jci-story-container {
+      display: flex;
+      flex-direction: column;
+      gap: 3.5rem;
+      align-items: stretch;
+    }
+
+    .jci-story-copy {
+      max-width: none;
+      padding-top: 0;
+    }
+
+    .jci-story-actions {
+      gap: 1.2rem;
+    }
+
+    .jci-story-visual {
+      width: calc(100% - 1rem);
+      align-self: flex-end;
+    }
+
+    .jci-story-frame {
+      min-height: 440px;
+    }
+
+    .jci-story-float-note {
+      right: -0.5rem;
+      bottom: 8%;
+      width: 92px;
+      height: 92px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .jci-story,
+    .jci-story-film,
+    .jci-story-frame,
+    .jci-story-link-icon {
+      transition: none;
+    }
+
+    .jci-story-scroll-note-icon {
+      animation: none;
+    }
+
+    .jci-story.is-revealed .jci-story-film {
+      transform: none;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Story",
+  "tag": "section",
+  "class": "jci-story-section",
+  "settings": [
+    { "type": "header", "content": "Kicker" },
+    { "type": "text", "id": "kicker", "label": "Kicker", "default": "A life shaped by horses" },
+
+    { "type": "header", "content": "Heading" },
+    { "type": "text", "id": "title_line_one", "label": "First line", "default": "Born from a life" },
+    { "type": "text", "id": "title_line_two", "label": "Second line (italic)", "default": "with horses." },
+
+    { "type": "header", "content": "Body copy" },
+    { "type": "textarea", "id": "paragraph_one", "label": "Paragraph 1", "default": "Maison Cavallé is a boutique equestrian label shaped by more than fifty years spent around horses." },
+    { "type": "textarea", "id": "paragraph_two", "label": "Paragraph 2", "default": "For us, equestrian style has never simply been about what you wear in the saddle. It is a way of life, one built on tradition, quiet confidence and an appreciation for things made well." },
+    { "type": "textarea", "id": "paragraph_three", "label": "Paragraph 3", "default": "Our collections bring that philosophy into a modern wardrobe, combining timeless equestrian influence with considered design, beautiful fabrics and an uncompromising approach to quality. Pieces that feel at home at the stables, at an event, or simply as part of everyday life." },
+
+    { "type": "header", "content": "Belief" },
+    { "type": "textarea", "id": "belief_one", "label": "First line", "default": "We don't believe in fast fashion or following every trend." },
+    { "type": "textarea", "id": "belief_two", "label": "Second line (accent)", "default": "We believe in creating fewer, better pieces, clothing you reach for season after season." },
+
+    { "type": "header", "content": "Sign-off" },
+    { "type": "text", "id": "signoff_name", "label": "Name", "default": "Maison Cavallé" },
+    { "type": "text", "id": "signoff_tagline", "label": "Tagline", "default": "Equestrian by heritage. Refined by design." },
+
+    { "type": "header", "content": "Actions" },
+    { "type": "text", "id": "link_label", "label": "Link label", "default": "Read our story" },
+    { "type": "url", "id": "link_url", "label": "Link" },
+    { "type": "text", "id": "scroll_note", "label": "Scroll note", "default": "Scroll to discover" },
+
+    { "type": "header", "content": "Film" },
+    { "type": "video", "id": "video", "label": "Video", "info": "An upload here wins over the asset filename below, and has no 20 MB limit." },
+    { "type": "text", "id": "video_asset", "label": "Video asset filename", "default": "jci-story-film.mp4", "info": "A file in assets/. Used only when no video is chosen above." },
+    { "type": "image_picker", "id": "poster", "label": "Poster image" },
+    { "type": "text", "id": "poster_asset", "label": "Poster asset filename", "default": "jci-lux-jacket-front-horse.webp", "info": "A file in assets/. Wins over the poster image above." },
+    { "type": "text", "id": "film_label", "label": "Label for screen readers", "default": "Maison Cavallé rider and horse story film" },
+    { "type": "range", "id": "film_saturate", "label": "Saturation", "min": 20, "max": 150, "step": 2, "unit": "%", "default": 68 },
+    { "type": "range", "id": "film_contrast", "label": "Contrast", "min": 50, "max": 150, "step": 1, "unit": "%", "default": 103 },
+
+    { "type": "header", "content": "Frame overlay" },
+    { "type": "text", "id": "topline_left", "label": "Top left", "default": "Maison Cavallé" },
+    { "type": "text", "id": "topline_right", "label": "Top right", "default": "01 / 03" },
+    { "type": "text", "id": "mark", "label": "Monogram", "default": "MC" },
+    { "type": "text", "id": "caption_label", "label": "Caption label", "default": "Heritage / Present" },
+    { "type": "text", "id": "caption_title", "label": "Caption title", "default": "A house shaped by horses." },
+
+    { "type": "header", "content": "Floating stat" },
+    { "type": "text", "id": "stat_value", "label": "Value", "default": "50" },
+    { "type": "text", "id": "stat_suffix", "label": "Suffix", "default": "+" },
+    { "type": "text", "id": "stat_label", "label": "Label", "default": "years with horses" },
+
+    { "type": "header", "content": "Colors", "info": "Left empty, each of these follows the theme colour palette." },
+    { "type": "color", "id": "background_color", "label": "Background" },
+    { "type": "color", "id": "wash_color", "label": "Corner wash" },
+    { "type": "range", "id": "wash_opacity", "label": "Corner wash opacity", "min": 0, "max": 100, "step": 1, "unit": "%", "default": 16 },
+    { "type": "color", "id": "heading_color", "label": "Heading" },
+    { "type": "color", "id": "accent_color", "label": "Accent" },
+    { "type": "color", "id": "rule_color", "label": "Rule and dot" },
+    { "type": "color", "id": "body_color", "label": "Body text", "default": "#595d53" },
+    { "type": "color", "id": "meta_color", "label": "Metadata", "default": "#73776c" },
+    { "type": "color", "id": "caption_meta_color", "label": "Caption metadata", "default": "#d3d5c9" },
+    { "type": "text", "id": "watermark", "label": "Background watermark", "default": "MC" },
+    { "type": "range", "id": "watermark_opacity", "label": "Watermark opacity", "min": 0, "max": 20, "step": 0.5, "unit": "%", "default": 5.5 },
+
+    { "type": "header", "content": "Layout" },
+    {
+      "type": "select", "id": "background_width", "label": "Background width",
+      "options": [
+        { "value": "content", "label": "Content width" },
+        { "value": "full", "label": "Full width" }
+      ],
+      "default": "content"
+    },
+    {
+      "type": "select", "id": "padding_scale", "label": "Vertical padding",
+      "options": [
+        { "value": "sm", "label": "Small" },
+        { "value": "normal", "label": "Normal" },
+        { "value": "lg", "label": "Large" }
+      ],
+      "default": "normal"
+    },
+    { "type": "range", "id": "column_gap", "label": "Column gap", "min": 10, "max": 120, "step": 2, "unit": "%", "default": 60, "info": "Tenths of a rem — 60 is 6rem." },
+    { "type": "range", "id": "copy_max_width", "label": "Copy width", "min": 380, "max": 760, "step": 10, "unit": "px", "default": 560 },
+    { "type": "range", "id": "frame_min_height", "label": "Frame minimum height", "min": 300, "max": 800, "step": 10, "unit": "px", "default": 450 },
+
+    { "type": "header", "content": "Motion" },
+    { "type": "checkbox", "id": "enable_reveal", "label": "Fade in on scroll", "default": true },
+    { "type": "checkbox", "id": "enable_tilt", "label": "Tilt frame towards pointer", "default": true },
+
+    { "type": "header", "content": "Anchor" },
+    { "type": "text", "id": "anchor_id", "label": "Anchor ID", "default": "story", "info": "Lets other links jump here with #story." }
+  ],
+  "presets": [{ "name": "Story" }]
+}
+{% endschema %}

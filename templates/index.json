@@ -9,199 +9,15 @@
  */
 {
   "sections": {
-    "product_list_fa6P9H": {
-      "type": "product-list",
-      "blocks": {
-        "static-header": {
-          "type": "_product-list-content",
-          "name": "t:names.header",
-          "static": true,
-          "settings": {
-            "content_direction": "row",
-            "vertical_on_mobile": false,
-            "horizontal_alignment": "space-between",
-            "vertical_alignment": "flex-end",
-            "align_baseline": true,
-            "horizontal_alignment_flex_direction_column": "flex-start",
-            "vertical_alignment_flex_direction_column": "center",
-            "gap": 12,
-            "width": "fill",
-            "custom_width": 100,
-            "width_mobile": "fill",
-            "custom_width_mobile": 100,
-            "height": "fit",
-            "custom_height": 100,
-            "background_media": "none",
-            "video_position": "cover",
-            "background_image_position": "cover",
-            "border": "none",
-            "border_width": 1,
-            "border_opacity": 100,
-            "border_radius": 0,
-            "padding-block-start": 0,
-            "padding-block-end": 0,
-            "padding-inline-start": 0,
-            "padding-inline-end": 0
-          },
-          "blocks": {
-            "product_list_text_YFtzcL": {
-              "type": "_product-list-text",
-              "name": "t:names.collection_title",
-              "settings": {
-                "text": "<h3>{{ closest.collection.title }}</h3>",
-                "width": "fit-content",
-                "max_width": "normal",
-                "alignment": "left",
-                "type_preset": "h4",
-                "font": "var(--font-body--family)",
-                "line_height": "normal",
-                "letter_spacing": "normal",
-                "case": "none",
-                "wrap": "pretty",
-                "background": false,
-                "background_color": "#00000026",
-                "corner_radius": 0,
-                "padding-block-start": 0,
-                "padding-block-end": 0,
-                "padding-inline-start": 0,
-                "padding-inline-end": 0
-              },
-              "blocks": {}
-            },
-            "product_list_button_MWeP9V": {
-              "type": "_product-list-button",
-              "name": "t:names.product_list_button",
-              "settings": {
-                "label": "View all",
-                "open_in_new_tab": false,
-                "style_class": "link",
-                "width": "fit-content",
-                "custom_width": 100,
-                "width_mobile": "fit-content",
-                "custom_width_mobile": 100
-              },
-              "blocks": {}
-            }
-          },
-          "block_order": [
-            "product_list_text_YFtzcL",
-            "product_list_button_MWeP9V"
-          ]
-        },
-        "static-product-card": {
-          "type": "_product-card",
-          "name": "t:names.product_card",
-          "static": true,
-          "settings": {
-            "product_card_gap": 4,
-            "border": "none",
-            "border_width": 1,
-            "border_opacity": 100,
-            "border_radius": 0,
-            "padding-block-start": 0,
-            "padding-block-end": 0,
-            "padding-inline-start": 0,
-            "padding-inline-end": 0
-          },
-          "blocks": {
-            "product_card_gallery_677WP3": {
-              "type": "_product-card-gallery",
-              "name": "t:names.product_card_media",
-              "settings": {
-                "image_ratio": "adapt",
-                "border": "none",
-                "border_width": 1,
-                "border_opacity": 100,
-                "border_radius": 0,
-                "padding-block-start": 0,
-                "padding-block-end": 0,
-                "padding-inline-start": 0,
-                "padding-inline-end": 0
-              },
-              "blocks": {}
-            },
-            "product_title_YXxMTj": {
-              "type": "product-title",
-              "name": "t:names.product_title",
-              "settings": {
-                "width": "100%",
-                "max_width": "normal",
-                "alignment": "left",
-                "type_preset": "rte",
-                "font": "var(--font-body--family)",
-                "font_size": "1rem",
-                "line_height": "normal",
-                "letter_spacing": "normal",
-                "case": "none",
-                "wrap": "pretty",
-                "background": false,
-                "background_color": "#00000026",
-                "corner_radius": 0,
-                "padding-block-start": 4,
-                "padding-block-end": 0,
-                "padding-inline-start": 0,
-                "padding-inline-end": 0
-              },
-              "blocks": {}
-            },
-            "price_JQzVV4": {
-              "type": "price",
-              "name": "t:names.product_price",
-              "settings": {
-                "show_sale_price_first": true,
-                "show_installments": false,
-                "show_tax_info": false,
-                "type_preset": "h6",
-                "width": "100%",
-                "alignment": "left",
-                "font": "var(--font-body--family)",
-                "font_size": "1rem",
-                "line_height": "normal",
-                "letter_spacing": "normal",
-                "case": "none",
-                "padding-block-start": 0,
-                "padding-block-end": 0,
-                "padding-inline-start": 0,
-                "padding-inline-end": 0
-              },
-              "blocks": {}
-            }
-          },
-          "block_order": [
-            "product_card_gallery_677WP3",
-            "product_title_YXxMTj",
-            "price_JQzVV4"
-          ]
-        }
-      },
-      "name": "t:names.product_list",
-      "settings": {
-        "collection": "all",
-        "layout_type": "grid",
-        "carousel_on_mobile": false,
-        "max_products": 8,
-        "columns": 4,
-        "mobile_columns": "2",
-        "mobile_card_size": "60cqw",
-        "columns_gap": 8,
-        "rows_gap": 24,
-        "icons_style": "arrow",
-        "icons_shape": "none",
-        "section_width": "page-width",
-        "horizontal_alignment": "flex-start",
-        "gap": 28,
-        "background_color": "{{ settings.color_palette.background }}",
-        "padding-block-start": 48,
-        "padding-block-end": 48
-      }
-    },
-    "dev_hero": {
-      "type": "dev-hero",
+    "jci_hero": {
+      "type": "jci-hero",
       "blocks": {
         "moment_ride": {
           "type": "moment",
           "settings": {
             "label": "The ride",
+            "video_asset": "",
+            "poster_asset": "",
             "eyebrow": "The first collection · 2026",
             "title": "Elevated equestrian, for a life well lived.",
             "accent_from": 2,
@@ -213,6 +29,8 @@
           "type": "moment",
           "settings": {
             "label": "The ritual",
+            "video_asset": "",
+            "poster_asset": "",
             "eyebrow": "Before the ride · 2026",
             "title": "The quiet rituals matter most.",
             "accent_from": 3,
@@ -224,6 +42,8 @@
           "type": "moment",
           "settings": {
             "label": "The everyday",
+            "video_asset": "",
+            "poster_asset": "",
             "eyebrow": "Beyond the stable · 2026",
             "title": "Made for the life around the ride.",
             "accent_from": 4,
@@ -250,6 +70,7 @@
         "fit_card_kicker": "The considered fit",
         "fit_card_title": "<p>Choose your <em>usual size.</em></p>",
         "fit_card_link_label": "View the guide",
+        "fit_card_link": "",
         "min_height": 760,
         "min_height_mobile": 680,
         "viewport_offset": 115,
@@ -274,8 +95,8 @@
         "enable_scroll_depth": true
       }
     },
-    "dev_marquee": {
-      "type": "dev-marquee",
+    "jci_marquee": {
+      "type": "jci-marquee",
       "blocks": {
         "phrase_1": {
           "type": "phrase",
@@ -325,11 +146,165 @@
         "direction": "left",
         "aria_label": "Maison Cavallé values"
       }
+    },
+    "jci_product_section_ya4nNw": {
+      "type": "jci-product-section",
+      "name": "Product section",
+      "settings": {
+        "eyebrow": "The opening collection",
+        "title_line_one": "Pieces to come",
+        "title_line_two": "back to.",
+        "intro": "Fewer, better pieces — made to be worn season after season.",
+        "collection": "frontpage",
+        "products_to_show": 4,
+        "columns": 4,
+        "image_index": 0,
+        "subtitle_metafield": "custom.subtitle",
+        "swatch_option": "Color",
+        "show_quick_add": true,
+        "badge_source": "sale",
+        "badge_text": "Sale",
+        "cta_label": "View all pieces",
+        "cta_url": "",
+        "background_color": "",
+        "heading_color": "",
+        "accent_color": "",
+        "media_background": "",
+        "intro_color": "#5f6259",
+        "subtitle_color": "#6d7066",
+        "padding_scale": "normal",
+        "image_ratio": 78,
+        "image_zoom": 35,
+        "placeholder_subtitle": "Choose a collection to show real products",
+        "anchor_id": "collection"
+      }
+    },
+    "jci_story_qPUAMy": {
+      "type": "jci-story",
+      "name": "Story",
+      "settings": {
+        "kicker": "A life shaped by horses",
+        "title_line_one": "Born from a life",
+        "title_line_two": "with horses.",
+        "paragraph_one": "Maison Cavallé is a boutique equestrian label shaped by more than fifty years spent around horses.",
+        "paragraph_two": "For us, equestrian style has never simply been about what you wear in the saddle. It is a way of life, one built on tradition, quiet confidence and an appreciation for things made well.",
+        "paragraph_three": "Our collections bring that philosophy into a modern wardrobe, combining timeless equestrian influence with considered design, beautiful fabrics and an uncompromising approach to quality. Pieces that feel at home at the stables, at an event, or simply as part of everyday life.",
+        "belief_one": "We don't believe in fast fashion or following every trend.",
+        "belief_two": "We believe in creating fewer, better pieces, clothing you reach for season after season.",
+        "signoff_name": "Maison Cavallé",
+        "signoff_tagline": "Equestrian by heritage. Refined by design.",
+        "link_label": "Read our story",
+        "link_url": "",
+        "scroll_note": "Scroll to discover",
+        "video_asset": "jci-story-film.mp4",
+        "poster_asset": "jci-lux-jacket-front-horse.webp",
+        "film_label": "Maison Cavallé rider and horse story film",
+        "film_saturate": 68,
+        "film_contrast": 103,
+        "topline_left": "Maison Cavallé",
+        "topline_right": "01 / 03",
+        "mark": "MC",
+        "caption_label": "Heritage / Present",
+        "caption_title": "A house shaped by horses.",
+        "stat_value": "50",
+        "stat_suffix": "+",
+        "stat_label": "years with horses",
+        "background_color": "",
+        "wash_color": "",
+        "wash_opacity": 16,
+        "heading_color": "",
+        "accent_color": "",
+        "rule_color": "",
+        "body_color": "#595d53",
+        "meta_color": "#73776c",
+        "caption_meta_color": "#d3d5c9",
+        "watermark": "MC",
+        "watermark_opacity": 5.5,
+        "background_width": "content",
+        "padding_scale": "normal",
+        "column_gap": 60,
+        "copy_max_width": 560,
+        "frame_min_height": 450,
+        "enable_reveal": true,
+        "enable_tilt": true,
+        "anchor_id": "story"
+      }
+    },
+    "jci_editorial_banner": {
+      "type": "jci-editorial-banner",
+      "blocks": {
+        "slide_stable": {
+          "type": "slide",
+          "settings": {
+            "image_main_asset": "jci-crest-cap-lifestyle.webp",
+            "image_alt_main": "Maison Cavallé Crest Cap in the stable",
+            "index_main": "01 / 02",
+            "image_secondary_asset": "jci-crest-cap-front-logo.webp",
+            "image_alt_secondary": "Maison Cavallé Crest Cap with embroidered logo",
+            "index_secondary": "02 / 02",
+            "note": "Stable / everyday"
+          }
+        },
+        "slide_motion": {
+          "type": "slide",
+          "settings": {
+            "image_main_asset": "jci-active-turtleneck-front.webp",
+            "image_alt_main": "Maison Cavallé Active Turtleneck Top, front view",
+            "index_main": "01 / 02",
+            "image_secondary_asset": "jci-active-turtleneck-back.webp",
+            "image_alt_secondary": "Maison Cavallé Active Turtleneck Top, back view",
+            "index_secondary": "02 / 02",
+            "note": "Ease / motion"
+          }
+        },
+        "slide_considered": {
+          "type": "slide",
+          "settings": {
+            "image_main_asset": "jci-msfd007-riding.webp",
+            "image_alt_main": "Maison Cavallé Contrast Collar Riding Polo in motion",
+            "index_main": "01 / 02",
+            "image_secondary_asset": "jci-msfd007-front.webp",
+            "image_alt_secondary": "Maison Cavallé Contrast Collar Riding Polo",
+            "index_secondary": "02 / 02",
+            "note": "Made / considered"
+          }
+        }
+      },
+      "block_order": [
+        "slide_stable",
+        "slide_motion",
+        "slide_considered"
+      ],
+      "settings": {
+        "eyebrow": "The Maison philosophy",
+        "title_line_one": "Made for the",
+        "title_line_two": "moments between.",
+        "body": "At the stable, at an event, or simply as part of everyday life. Quiet confidence, wherever the day takes you.",
+        "cta_label": "Shop the edit",
+        "wash_opacity": 20,
+        "eyebrow_color": "#d3d5c9",
+        "body_color": "#e3e0d7",
+        "frame_background": "#252a25",
+        "scrim_color": "#111511",
+        "background_width": "content",
+        "min_height_min": 540,
+        "min_height_max": 720,
+        "collage_width": 53,
+        "enable_reveal": true,
+        "autoplay": true,
+        "autoplay_interval": 5600,
+        "crossfade_duration": 800,
+        "carousel_label": "The Maison philosophy image story",
+        "controls_label": "Philosophy image controls",
+        "anchor_id": "journal"
+      }
     }
   },
   "order": [
-    "dev_hero",
-    "dev_marquee",
-    "product_list_fa6P9H"
+    "jci_hero",
+    "jci_marquee",
+    "jci_product_section_ya4nNw",
+    "jci_story_qPUAMy",
+    "jci_editorial_banner"
   ]
 }

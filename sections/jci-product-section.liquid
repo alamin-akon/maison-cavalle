@@ -1,0 +1,476 @@
+{% comment %}
+  Maison Cavallé — product section
+  Prototype source: maison-cavalle-main/app.js → renderHome, .product-section markup
+                    maison-cavalle-main/styles.css → .product-section, .product-grid,
+                    .section-header, .section-cta (lines 184–187, 289–310, 1505–1506, 1535–1542)
+  Reference: MAISON-CAVALLE-SPEC.md §1
+
+  A section header, a four-up grid of cards, and a centred link. The cards come
+  from snippets/jci-product-card.liquid so the collection template can reuse
+  exactly the same card later.
+{% endcomment %}
+
+{% liquid
+  assign s = section.settings
+  assign products = s.collection.products
+%}
+
+<section
+  class="jci-product-section"
+  {% if s.anchor_id != blank %}id="{{ s.anchor_id | handleize }}"{% endif %}
+  style="
+    --jci-product-section-bg: {{ s.background_color | default: settings.color_palette.background }};
+    --jci-product-section-bg-rgb: {{ s.background_color.rgb | default: settings.color_palette.background.rgb }};
+    --jci-product-section-heading: {{ s.heading_color | default: settings.color_palette.foreground }};
+    --jci-product-section-heading-rgb: {{ s.heading_color.rgb | default: settings.color_palette.foreground.rgb }};
+    --jci-product-section-accent: {{ s.accent_color | default: settings.color_palette.color5 }};
+    --jci-product-section-intro: {{ s.intro_color }};
+    --jci-product-card-subtitle-color: {{ s.subtitle_color }};
+    --jci-product-card-media-bg: {{ s.media_background | default: settings.color_palette.color2 }};
+    --jci-product-card-ratio: {{ s.image_ratio | divided_by: 100.0 }};
+    --jci-product-card-zoom: {{ s.image_zoom | divided_by: 1000.0 | plus: 1 }};
+    --jci-product-grid-columns: {{ s.columns }};
+    --jci-product-section-pad: var(--jci-section-pad{% if s.padding_scale != 'normal' %}-{{ s.padding_scale }}{% endif %});
+  "
+>
+  <div class="jci-product-section-container">
+    {%- if s.eyebrow != blank or s.title_line_one != blank or s.intro != blank -%}
+      <div class="jci-product-section-header">
+        <div class="jci-product-section-header-copy">
+          {%- if s.eyebrow != blank -%}
+            <p class="jci-eyebrow jci-product-section-eyebrow">{{ s.eyebrow }}</p>
+          {%- endif -%}
+
+          {%- if s.title_line_one != blank or s.title_line_two != blank -%}
+            <h2 class="jci-product-section-title">
+              {{- s.title_line_one -}}
+              {%- if s.title_line_one != blank and s.title_line_two != blank -%}<br>{%- endif -%}
+              {%- if s.title_line_two != blank -%}
+                <em class="jci-product-section-title-accent">{{ s.title_line_two }}</em>
+              {%- endif -%}
+            </h2>
+          {%- endif -%}
+        </div>
+
+        {%- if s.intro != blank -%}
+          <p class="jci-product-section-intro">{{ s.intro }}</p>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    {%- if products.size > 0 -%}
+      <div class="jci-product-grid">
+        {%- for product in products limit: s.products_to_show -%}
+          {%- liquid
+            assign lazy = true
+            if forloop.index0 < s.columns
+              assign lazy = false
+            endif
+          -%}
+          {% render 'jci-product-card',
+            product: product,
+            subtitle_key: s.subtitle_metafield,
+            badge_text: s.badge_text,
+            badge_source: s.badge_source,
+            swatch_option: s.swatch_option,
+            show_quick_add: s.show_quick_add,
+            image_index: s.image_index,
+            lazy: lazy
+          %}
+        {%- endfor -%}
+      </div>
+    {%- else -%}
+      {%- comment -%}
+        No collection chosen yet. Placeholder cards keep the grid judgeable in
+        the Theme Editor rather than collapsing the section to nothing.
+      {%- endcomment -%}
+      <div class="jci-product-grid">
+        {%- for i in (1..s.columns) -%}
+          <article class="jci-product-card">
+            <div class="jci-product-card-media">
+              {%- comment -%} Shopify ships product-apparel-1 … -4, so the index wraps. {%- endcomment -%}
+              {%- assign placeholder_index = forloop.index0 | modulo: 4 | plus: 1 -%}
+              {{ 'product-apparel-' | append: placeholder_index | placeholder_svg_tag: 'jci-product-card-image' }}
+            </div>
+            <div class="jci-product-card-info">
+              <div class="jci-product-card-details">
+                <h3 class="jci-product-card-title">{{ 'placeholders.product_title' | t }}</h3>
+                <p class="jci-product-card-subtitle">{{ s.placeholder_subtitle }}</p>
+              </div>
+              <span class="jci-product-card-price">{{ 1990 | money }}</span>
+            </div>
+          </article>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+
+    {%- if s.cta_label != blank -%}
+      <div class="jci-product-section-cta">
+        <a class="jci-text-link jci-product-section-cta-link" href="{{ s.cta_url | default: '#' }}">
+          {{ s.cta_label }}
+        </a>
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+
+{% stylesheet %}
+  .jci-product-section {
+    display: block;
+    padding-block: var(--jci-product-section-pad);
+    background: var(--jci-product-section-bg);
+  }
+
+  /* -- Section header ---------------------------------------------------- */
+
+  .jci-product-section-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 2rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .jci-product-section-eyebrow {
+    margin-bottom: 0.9rem;
+    color: var(--jci-product-section-accent);
+  }
+
+  .jci-product-section-title {
+    max-width: 530px;
+    margin: 0;
+    color: var(--jci-product-section-heading);
+    font-family: var(--jci-font-display);
+    font-size: var(--jci-section-title-size);
+    font-weight: 500;
+    line-height: 0.92;
+    letter-spacing: -0.055em;
+  }
+
+  .jci-product-section-title-accent {
+    color: var(--jci-product-section-accent);
+    font-style: italic;
+  }
+
+  .jci-product-section-intro {
+    max-width: 280px;
+    margin: 0;
+    color: var(--jci-product-section-intro);
+    font-family: var(--jci-font-sans);
+    font-size: var(--jci-subtitle-size);
+    line-height: var(--jci-subtitle-leading);
+  }
+
+  /* -- Grid -------------------------------------------------------------- */
+
+  .jci-product-grid {
+    display: grid;
+    grid-template-columns: repeat(var(--jci-product-grid-columns), 1fr);
+    gap: clamp(0.8rem, 2vw, 1.75rem);
+  }
+
+  .jci-product-card {
+    min-width: 0;
+  }
+
+  .jci-product-card-media {
+    position: relative;
+    margin-bottom: 1rem;
+    overflow: hidden;
+    aspect-ratio: var(--jci-product-card-ratio);
+    background: var(--jci-product-card-media-bg);
+  }
+
+  .jci-product-card-link {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .jci-product-card-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.7s var(--jci-ease);
+  }
+
+  .jci-product-card:hover .jci-product-card-image {
+    transform: scale(var(--jci-product-card-zoom));
+  }
+
+  .jci-product-card-badge {
+    position: absolute;
+    z-index: 1;
+    top: 0.8rem;
+    left: 0.8rem;
+    padding: 0.4rem 0.55rem;
+    color: var(--jci-product-section-bg);
+    background: var(--jci-product-section-heading);
+    font-family: var(--jci-font-label);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  /* -- Quick add --------------------------------------------------------- */
+
+  .jci-product-card-quick-add {
+    position: absolute;
+    right: 0.8rem;
+    bottom: 0.8rem;
+    left: 0.8rem;
+    opacity: 0;
+    transform: translateY(8px);
+    transition:
+      opacity 0.3s,
+      transform 0.3s var(--jci-ease);
+  }
+
+  .jci-product-card:hover .jci-product-card-quick-add,
+  .jci-product-card:focus-within .jci-product-card-quick-add {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .jci-product-card-quick-add-button {
+    display: block;
+    width: 100%;
+    min-height: 40px;
+    border: 0;
+    border-radius: 0;
+    color: var(--jci-product-section-heading);
+    background: rgb(var(--jci-product-section-bg-rgb) / 0.94);
+    font-family: var(--jci-font-label);
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-align: center;
+    text-decoration: none;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  .jci-product-card-quick-add-icon {
+    display: none;
+    fill: none;
+    stroke: currentcolor;
+    stroke-width: 1.5;
+  }
+
+  /* -- Info row ---------------------------------------------------------- */
+
+  .jci-product-card-info {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.8rem;
+  }
+
+  .jci-product-card-details {
+    min-width: 0;
+  }
+
+  .jci-product-card-title {
+    min-height: 2.3em;
+    margin: 0;
+    font-family: var(--jci-font-display);
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 1.15;
+  }
+
+  .jci-product-card-title-link {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .jci-product-card-subtitle {
+    min-height: 2.7em;
+    margin: 0.35rem 0 0;
+    color: var(--jci-product-card-subtitle-color);
+    font-family: var(--jci-font-sans);
+    font-size: var(--jci-subtitle-size);
+    line-height: var(--jci-subtitle-leading);
+  }
+
+  .jci-product-card-price {
+    font-family: var(--jci-font-label);
+    font-size: 14px;
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+
+  .jci-product-card-price-was {
+    margin-left: 0.4rem;
+    opacity: 0.55;
+  }
+
+  .jci-product-card-swatches {
+    display: flex;
+    gap: 0.35rem;
+    margin-top: 0.6rem;
+  }
+
+  .jci-product-card-swatch {
+    width: 10px;
+    height: 10px;
+    border: 1px solid rgb(var(--jci-product-section-heading-rgb) / 0.25);
+    border-radius: 50%;
+    background: var(--jci-product-card-swatch-color);
+  }
+
+  /* -- Footer link ------------------------------------------------------- */
+
+  .jci-product-section-cta {
+    display: flex;
+    justify-content: center;
+    margin-top: 3.7rem;
+  }
+
+  /* -- Breakpoints (§5 — 900 and 680 only) ------------------------------- */
+
+  @media screen and (max-width: 900px) {
+    .jci-product-section-header {
+      display: block;
+      margin-bottom: 1.8rem;
+    }
+
+    .jci-product-section-title {
+      margin-bottom: 1rem;
+    }
+
+    .jci-product-section-intro {
+      max-width: none;
+    }
+  }
+
+  @media screen and (max-width: 680px) {
+    .jci-product-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 2.3rem 0.7rem;
+    }
+
+    /* Hover cannot reveal the button on touch, so it sits out as a square. */
+    .jci-product-card-quick-add {
+      top: 0.6rem;
+      right: 0.6rem;
+      bottom: auto;
+      left: auto;
+      opacity: 1;
+      transform: none;
+    }
+
+    .jci-product-card-quick-add-button {
+      display: grid;
+      place-items: center;
+      width: 44px;
+      height: 44px;
+      min-height: 44px;
+      padding: 0;
+      border: 1px solid var(--jci-product-section-heading);
+      background: rgb(var(--jci-product-section-bg-rgb) / 0.96);
+    }
+
+    .jci-product-card-quick-add-text {
+      display: none;
+    }
+
+    .jci-product-card-quick-add-icon {
+      display: block;
+      width: 19px;
+      height: 19px;
+    }
+
+    .jci-product-card-info {
+      display: block;
+    }
+
+    .jci-product-card-title {
+      font-size: 15px;
+    }
+
+    .jci-product-card-price {
+      display: block;
+      margin-top: 0.5rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .jci-product-card-image,
+    .jci-product-card-quick-add {
+      transition: none;
+    }
+
+    .jci-product-card:hover .jci-product-card-image {
+      transform: none;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Product section",
+  "tag": "div",
+  "class": "jci-product-section-wrapper",
+  "settings": [
+    { "type": "header", "content": "Header" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "The opening collection" },
+    { "type": "text", "id": "title_line_one", "label": "Title first line", "default": "Pieces to come" },
+    { "type": "text", "id": "title_line_two", "label": "Title second line (italic)", "default": "back to." },
+    { "type": "textarea", "id": "intro", "label": "Intro", "default": "Fewer, better pieces — made to be worn season after season." },
+
+    { "type": "header", "content": "Products" },
+    { "type": "collection", "id": "collection", "label": "Collection" },
+    { "type": "range", "id": "products_to_show", "label": "Products to show", "min": 2, "max": 12, "step": 1, "default": 4 },
+    { "type": "range", "id": "columns", "label": "Columns on desktop", "min": 2, "max": 5, "step": 1, "default": 4 },
+    { "type": "range", "id": "image_index", "label": "Image to show", "min": 0, "max": 5, "step": 1, "default": 0, "info": "0 is the first product image." },
+
+    { "type": "header", "content": "Card details" },
+    { "type": "text", "id": "subtitle_metafield", "label": "Subtitle metafield", "default": "custom.subtitle", "info": "namespace.key — falls back to the product type when empty." },
+    { "type": "text", "id": "swatch_option", "label": "Swatch option name", "default": "Color", "info": "Reads colour swatches from this product option." },
+    { "type": "checkbox", "id": "show_quick_add", "label": "Show quick add", "default": true, "info": "Single-variant products add straight to cart; the rest link to the product page." },
+
+    { "type": "header", "content": "Badge" },
+    {
+      "type": "select", "id": "badge_source", "label": "Show badge",
+      "options": [
+        { "value": "none", "label": "Never" },
+        { "value": "sale", "label": "Only when on sale" },
+        { "value": "always", "label": "On every card" }
+      ],
+      "default": "sale"
+    },
+    { "type": "text", "id": "badge_text", "label": "Badge text", "default": "Sale" },
+
+    { "type": "header", "content": "Footer link" },
+    { "type": "text", "id": "cta_label", "label": "Label", "default": "View all pieces" },
+    { "type": "url", "id": "cta_url", "label": "Link" },
+
+    { "type": "header", "content": "Colors", "info": "Left empty, each of these follows the theme colour palette." },
+    { "type": "color", "id": "background_color", "label": "Background" },
+    { "type": "color", "id": "heading_color", "label": "Heading" },
+    { "type": "color", "id": "accent_color", "label": "Accent" },
+    { "type": "color", "id": "media_background", "label": "Image placeholder" },
+    { "type": "color", "id": "intro_color", "label": "Intro text", "default": "#5f6259" },
+    { "type": "color", "id": "subtitle_color", "label": "Card subtitle", "default": "#6d7066" },
+
+    { "type": "header", "content": "Layout" },
+    {
+      "type": "select", "id": "padding_scale", "label": "Vertical padding",
+      "options": [
+        { "value": "sm", "label": "Small" },
+        { "value": "normal", "label": "Normal" },
+        { "value": "lg", "label": "Large" }
+      ],
+      "default": "normal"
+    },
+    { "type": "range", "id": "image_ratio", "label": "Image ratio", "min": 60, "max": 140, "step": 2, "unit": "%", "default": 78, "info": "Width over height — 78 is the prototype's 0.78." },
+    { "type": "range", "id": "image_zoom", "label": "Hover zoom", "min": 0, "max": 100, "step": 5, "unit": "%", "default": 35, "info": "Thousandths — 35 is a 1.035 scale." },
+
+    { "type": "header", "content": "Placeholder" },
+    { "type": "text", "id": "placeholder_subtitle", "label": "Placeholder subtitle", "default": "Choose a collection to show real products" },
+
+    { "type": "header", "content": "Anchor" },
+    { "type": "text", "id": "anchor_id", "label": "Anchor ID", "default": "collection" }
+  ],
+  "presets": [{ "name": "Product section" }]
+}
+{% endschema %}

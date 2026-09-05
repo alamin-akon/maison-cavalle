@@ -16,37 +16,37 @@
      (1440px), so the preset itself is retuned rather than adding a 4th width.
      ------------------------------------------------------------------------ */
   --narrow-page-width: 100rem; /* 1600px */
-  --dev-content-max: var(--narrow-page-width);
-  --dev-page-pad: clamp(1.25rem, 4vw, 4.25rem);
-  --dev-editorial-gutter: calc(var(--dev-page-pad) + clamp(0rem, 4vw, 4rem));
+  --jci-content-max: var(--narrow-page-width);
+  --jci-page-pad: clamp(1.25rem, 4vw, 4.25rem);
+  --jci-editorial-gutter: calc(var(--jci-page-pad) + clamp(0rem, 4vw, 4rem));
 
   /* Section vertical rhythm — three steps only, no ad-hoc clamps */
-  --dev-section-pad-sm: clamp(3rem, 6vw, 5.5rem);
-  --dev-section-pad: clamp(4.5rem, 9vw, 8.5rem);
-  --dev-section-pad-lg: clamp(4.5rem, 8vw, 8rem);
+  --jci-section-pad-sm: clamp(3rem, 6vw, 5.5rem);
+  --jci-section-pad: clamp(4.5rem, 9vw, 8.5rem);
+  --jci-section-pad-lg: clamp(4.5rem, 8vw, 8rem);
 
   /* ------------------------------------------------------------------------
      Motion (§5)
      ------------------------------------------------------------------------ */
-  --dev-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --jci-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
 
   /* ------------------------------------------------------------------------
      Typography (§3)
      Two families only: Playfair Display (heading + accent italic) and
      Work Sans (body + subheading). Uppercase labels, eyebrows and buttons use
-     the subheading slot, exposed here as --dev-font-label.
+     the subheading slot, exposed here as --jci-font-label.
      ------------------------------------------------------------------------ */
-  --dev-font-display: var(--font-heading--family);
-  --dev-font-sans: var(--font-body--family);
-  --dev-font-label: var(--font-subheading--family);
+  --jci-font-display: var(--font-heading--family);
+  --jci-font-sans: var(--font-body--family);
+  --jci-font-label: var(--font-subheading--family);
 
   /* Exact prototype sizes. Horizon derives its own clamp minimum from the
      next smaller configured size, and 144px is not a dropdown option, so
      both headline sizes are pinned here instead. */
-  --dev-hero-title-size: clamp(4rem, 8vw, 9rem); /* 64 → 144px */
-  --dev-section-title-size: clamp(2.4rem, 5vw, 4.5rem); /* 38.4 → 72px */
-  --font-size--h1: var(--dev-hero-title-size);
-  --font-size--h2: var(--dev-section-title-size);
+  --jci-hero-title-size: clamp(4rem, 8vw, 9rem); /* 64 → 144px */
+  --jci-section-title-size: clamp(2.4rem, 5vw, 4.5rem); /* 38.4 → 72px */
+  --font-size--h1: var(--jci-hero-title-size);
+  --font-size--h2: var(--jci-section-title-size);
 
   /* Leading and tracking the dropdowns cannot express.
      display-tight carries the h2 value; the hero overrides it locally. */
@@ -54,38 +54,38 @@
   --letter-spacing--heading-tight: -0.055em;
   --line-height--body-loose: 1.55;
 
-  --dev-subtitle-size: 14px;
-  --dev-subtitle-leading: 1.55;
+  --jci-subtitle-size: 14px;
+  --jci-subtitle-leading: 1.55;
 
   /* ------------------------------------------------------------------------
      Buttons (§4)
      The button font dropdown only offers body/accent, but the prototype's
      buttons use the label face.
      ------------------------------------------------------------------------ */
-  --button-font-family-primary: var(--dev-font-label);
-  --button-font-family-secondary: var(--dev-font-label);
-  --dev-button-min-height: 46px;
-  --dev-button-padding: 0.9rem 1.35rem;
-  --dev-button-size: 10px;
-  --dev-button-tracking: 0.13em;
+  --button-font-family-primary: var(--jci-font-label);
+  --button-font-family-secondary: var(--jci-font-label);
+  --jci-button-min-height: 46px;
+  --jci-button-padding: 0.9rem 1.35rem;
+  --jci-button-size: 10px;
+  --jci-button-tracking: 0.13em;
 
   /* ------------------------------------------------------------------------
      Derived colour (§2)
-     Palette entries themselves are emitted by snippets/dev-tokens.liquid.
+     Palette entries themselves are emitted by snippets/jci-tokens.liquid.
      ------------------------------------------------------------------------ */
-  --dev-line: rgb(var(--color-foreground-rgb) / 0.16);
+  --jci-line: rgb(var(--color-foreground-rgb) / 0.16);
 }
 
 /* --------------------------------------------------------------------------
    Container defaults (§1)
-   Every dev-*-container inherits this. A section overrides it only where the
+   Every jci-*-container inherits this. A section overrides it only where the
    prototype genuinely differs.
    -------------------------------------------------------------------------- */
-[class^="dev-"][class$="-container"],
-[class*=" dev-"][class$="-container"] {
-  width: min(100%, var(--dev-content-max));
+[class^="jci-"][class$="-container"],
+[class*=" jci-"][class$="-container"] {
+  width: min(100%, var(--jci-content-max));
   margin-inline: auto;
-  padding-inline: var(--dev-page-pad);
+  padding-inline: var(--jci-page-pad);
 }
 
 /* --------------------------------------------------------------------------
@@ -93,9 +93,9 @@
    -------------------------------------------------------------------------- */
 
 /* Uppercase mono metadata — eyebrows, kickers, labels. */
-.dev-eyebrow {
+.jci-eyebrow {
   margin: 0;
-  font-family: var(--dev-font-label);
+  font-family: var(--jci-font-label);
   font-size: 10px;
   font-weight: 500;
   line-height: 1.2;
@@ -104,81 +104,81 @@
 }
 
 /* Underlined mono link with the ↗ glyph. */
-.dev-text-link {
+.jci-text-link {
   display: inline-flex;
   align-items: center;
   gap: 0.65rem;
   padding-bottom: 0.4rem;
   border-bottom: 1px solid currentcolor;
   color: inherit;
-  font-family: var(--dev-font-label);
+  font-family: var(--jci-font-label);
   font-size: 10px;
   letter-spacing: 0.12em;
   text-decoration: none;
   text-transform: uppercase;
 }
 
-.dev-text-link:not(:has(> span))::after {
+.jci-text-link:not(:has(> span))::after {
   content: "↗";
   font-size: 14px;
-  transition: transform 0.3s var(--dev-ease);
+  transition: transform 0.3s var(--jci-ease);
 }
 
-.dev-text-link:not(:has(> span)):hover::after {
+.jci-text-link:not(:has(> span)):hover::after {
   transform: translate(3px, -3px);
 }
 
 /* Sharp-cornered mono button. Three variants, matching the prototype. */
-.dev-button {
+.jci-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.75rem;
-  min-height: var(--dev-button-min-height);
-  padding: var(--dev-button-padding);
+  min-height: var(--jci-button-min-height);
+  padding: var(--jci-button-padding);
   border: 1px solid var(--color-foreground);
   border-radius: 0;
   color: var(--color-background);
   background: var(--color-foreground);
-  font-family: var(--dev-font-label);
-  font-size: var(--dev-button-size);
+  font-family: var(--jci-font-label);
+  font-size: var(--jci-button-size);
   line-height: 1;
-  letter-spacing: var(--dev-button-tracking);
+  letter-spacing: var(--jci-button-tracking);
   text-decoration: none;
   text-transform: uppercase;
   cursor: pointer;
   transition: color 0.3s, background 0.3s, border-color 0.3s;
 }
 
-.dev-button:hover {
+.jci-button:hover {
   color: var(--color-foreground);
   background: transparent;
 }
 
-.dev-button--light {
+.jci-button--light {
   color: var(--color-foreground);
   background: var(--color-background);
   border-color: var(--color-background);
 }
 
-.dev-button--light:hover {
+.jci-button--light:hover {
   color: var(--color-background);
   background: transparent;
   border-color: var(--color-background);
 }
 
-.dev-button--outline {
+.jci-button--outline {
   color: var(--color-foreground);
   background: transparent;
 }
 
-.dev-button--outline:hover {
+.jci-button--outline:hover {
   color: var(--color-background);
   background: var(--color-foreground);
 }
 
 /* Visually hidden, still announced by screen readers. */
-.dev-sr-only {
+.jci-sr-only {
   position: absolute;
   width: 1px;
   height: 1px;
@@ -191,7 +191,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .dev-text-link::after {
+  .jci-text-link::after {
     transition: none;
   }
 }

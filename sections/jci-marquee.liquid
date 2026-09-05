@@ -16,25 +16,25 @@
 
 {% if phrases.size > 0 %}
   <div
-    class="dev-marquee"
+    class="jci-marquee"
     style="
-      --dev-marquee-bg: {{ s.background_color | default: settings.color_palette.color5 }};
-      --dev-marquee-text: {{ s.text_color | default: settings.color_palette.background }};
-      --dev-marquee-separator: '{{ s.separator | replace: "'", "" | escape }}';
-      --dev-marquee-separator-color: {{ s.separator_color }};
-      --dev-marquee-font: var(--font-{{ s.font }}--family);
-      --dev-marquee-weight: var(--font-{{ s.font }}--weight);
-      --dev-marquee-size: {{ s.font_size }}px;
-      --dev-marquee-separator-size: {{ s.separator_size }}px;
-      --dev-marquee-tracking: {{ s.letter_spacing | divided_by: 100.0 }}em;
-      --dev-marquee-case: {{ s.text_case }};
-      --dev-marquee-gap: {{ s.gap | divided_by: 10.0 }}rem;
-      --dev-marquee-pad: {{ s.padding_block | divided_by: 100.0 }}rem;
-      --dev-marquee-speed: {{ s.speed }}s;
-      --dev-marquee-direction: {% if s.direction == 'right' %}reverse{% else %}normal{% endif %};
+      --jci-marquee-bg: {{ s.background_color | default: settings.color_palette.color5 }};
+      --jci-marquee-text: {{ s.text_color | default: settings.color_palette.background }};
+      --jci-marquee-separator: '{{ s.separator | replace: "'", "" | escape }}';
+      --jci-marquee-separator-color: {{ s.separator_color }};
+      --jci-marquee-font: var(--font-{{ s.font }}--family);
+      --jci-marquee-weight: var(--font-{{ s.font }}--weight);
+      --jci-marquee-size: {{ s.font_size }}px;
+      --jci-marquee-separator-size: {{ s.separator_size }}px;
+      --jci-marquee-tracking: {{ s.letter_spacing | divided_by: 100.0 }}em;
+      --jci-marquee-case: {{ s.text_case }};
+      --jci-marquee-gap: {{ s.gap | divided_by: 10.0 }}rem;
+      --jci-marquee-pad: {{ s.padding_block | divided_by: 100.0 }}rem;
+      --jci-marquee-speed: {{ s.speed }}s;
+      --jci-marquee-direction: {% if s.direction == 'right' %}reverse{% else %}normal{% endif %};
     "
   >
-    <div class="dev-marquee-track" aria-label="{{ s.aria_label }}">
+    <div class="jci-marquee-track" aria-label="{{ s.aria_label }}">
       {%- comment -%}
         Rendered twice: the first pass is the readable content, the second is
         the visual tail that makes the loop seamless and is hidden from
@@ -43,7 +43,7 @@
       {%- for pass in (1..2) -%}
         {%- for block in phrases -%}
           <span
-            class="dev-marquee-phrase"
+            class="jci-marquee-phrase"
             {% if pass == 2 %}aria-hidden="true"{% endif %}
             {{ block.shopify_attributes }}
           >{{ block.settings.text }}</span>
@@ -54,51 +54,51 @@
 {% endif %}
 
 {% stylesheet %}
-  .dev-marquee {
+  .jci-marquee {
     display: flex;
     overflow: hidden;
-    color: var(--dev-marquee-text);
-    background: var(--dev-marquee-bg);
+    color: var(--jci-marquee-text);
+    background: var(--jci-marquee-bg);
     white-space: nowrap;
   }
 
-  .dev-marquee-track {
+  .jci-marquee-track {
     display: flex;
     flex-shrink: 0;
     align-items: center;
-    gap: var(--dev-marquee-gap);
+    gap: var(--jci-marquee-gap);
     min-width: max-content;
-    padding-block: var(--dev-marquee-pad);
-    animation: dev-marquee var(--dev-marquee-speed) linear infinite;
-    animation-direction: var(--dev-marquee-direction);
+    padding-block: var(--jci-marquee-pad);
+    animation: jci-marquee var(--jci-marquee-speed) linear infinite;
+    animation-direction: var(--jci-marquee-direction);
   }
 
-  .dev-marquee-phrase {
+  .jci-marquee-phrase {
     display: inline-flex;
     align-items: center;
-    gap: var(--dev-marquee-gap);
-    font-family: var(--dev-marquee-font);
-    font-size: var(--dev-marquee-size);
-    font-weight: var(--dev-marquee-weight);
-    letter-spacing: var(--dev-marquee-tracking);
-    text-transform: var(--dev-marquee-case);
+    gap: var(--jci-marquee-gap);
+    font-family: var(--jci-marquee-font);
+    font-size: var(--jci-marquee-size);
+    font-weight: var(--jci-marquee-weight);
+    letter-spacing: var(--jci-marquee-tracking);
+    text-transform: var(--jci-marquee-case);
   }
 
   /* Separator sits after every phrase, so the gap reads evenly around the loop. */
-  .dev-marquee-phrase::after {
-    content: var(--dev-marquee-separator, '✦');
-    color: var(--dev-marquee-separator-color);
-    font-size: var(--dev-marquee-separator-size);
+  .jci-marquee-phrase::after {
+    content: var(--jci-marquee-separator, '✦');
+    color: var(--jci-marquee-separator-color);
+    font-size: var(--jci-marquee-separator-size);
   }
 
-  @keyframes dev-marquee {
+  @keyframes jci-marquee {
     to {
       transform: translateX(-50%);
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .dev-marquee-track {
+    .jci-marquee-track {
       animation: none;
     }
   }
@@ -108,7 +108,7 @@
 {
   "name": "Marquee band",
   "tag": "section",
-  "class": "dev-marquee-section",
+  "class": "jci-marquee-section",
   "max_blocks": 12,
   "blocks": [
     {

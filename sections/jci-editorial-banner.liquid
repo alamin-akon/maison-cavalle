@@ -1,0 +1,712 @@
+{% comment %}
+  Maison Cavallé — editorial banner
+  Prototype source: maison-cavalle-main/app.js → renderHome, editorialSlides,
+                    setupEditorialSlider
+                    maison-cavalle-main/styles.css → .editorial-* (375–408,
+                    1442–1443, 1534, 1550–1555, 1777–1778)
+  Reference: MAISON-CAVALLE-SPEC.md §1
+
+  Copy on the left, a two-image collage on the right that crossfades between
+  slides. Slides are blocks, so the set is editable.
+
+  The prototype staggers the copy reveal with :nth-child, which §1 does not
+  allow. Each of the four elements carries its own class instead and sets its
+  own delay — same timing, no structural selector.
+{% endcomment %}
+
+{% liquid
+  assign s = section.settings
+  assign slides = section.blocks | where: 'type', 'slide'
+%}
+
+<jci-editorial-banner
+  class="jci-editorial-banner"
+  {% if s.enable_reveal %}data-jci-editorial-reveal{% endif %}
+  {% if s.autoplay %}data-jci-editorial-autoplay{% endif %}
+  data-jci-editorial-interval="{{ s.autoplay_interval }}"
+  {% if s.anchor_id != blank %}id="{{ s.anchor_id | handleize }}"{% endif %}
+  style="
+    --jci-editorial-bg: {{ s.background_color | default: settings.color_palette.color5 }};
+    --jci-editorial-wash-rgb: {{ s.wash_color.rgb | default: settings.color_palette.color7.rgb }};
+    --jci-editorial-wash-opacity: {{ s.wash_opacity | divided_by: 100.0 }};
+    --jci-editorial-text: {{ s.text_color | default: settings.color_palette.background }};
+    --jci-editorial-text-rgb: {{ s.text_color.rgb | default: settings.color_palette.background.rgb }};
+    --jci-editorial-accent: {{ s.accent_color | default: settings.color_palette.color7 }};
+    --jci-editorial-accent-rgb: {{ s.accent_color.rgb | default: settings.color_palette.color7.rgb }};
+    --jci-editorial-eyebrow: {{ s.eyebrow_color }};
+    --jci-editorial-body: {{ s.body_color }};
+    --jci-editorial-frame-bg: {{ s.frame_background }};
+    --jci-editorial-scrim-rgb: {{ s.scrim_color.rgb }};
+    --jci-editorial-shade-rgb: {{ s.shade_color.rgb | default: settings.color_palette.foreground.rgb }};
+    --jci-editorial-min-height: clamp({{ s.min_height_min }}px, 50vw, {{ s.min_height_max }}px);
+    --jci-editorial-collage-width: {{ s.collage_width }}%;
+    --jci-editorial-crossfade: {{ s.crossfade_duration }}ms;
+  "
+>
+  <div class="jci-editorial-banner-container jci-editorial-banner-container--{{ s.background_width }}">
+    {%- if slides.size > 0 -%}
+      <div
+        class="jci-editorial-banner-collage"
+        data-jci-editorial-slider
+        role="region"
+        aria-roledescription="carousel"
+        aria-label="{{ s.carousel_label }}"
+      >
+        {%- for block in slides -%}
+          {%- liquid
+            assign b = block.settings
+            assign is_first = forloop.first
+
+            comment
+              An assets/ filename wins over the Files picker, so a theme that
+              ships its own imagery renders correctly before anything is
+              uploaded. Same order the story section uses for its poster.
+            endcomment
+            assign main_src = blank
+            if b.image_main_asset != blank
+              assign main_src = b.image_main_asset | strip | asset_url
+            elsif b.image_main != blank
+              assign main_src = b.image_main | image_url: width: 1200
+            endif
+
+            assign secondary_src = blank
+            if b.image_secondary_asset != blank
+              assign secondary_src = b.image_secondary_asset | strip | asset_url
+            elsif b.image_secondary != blank
+              assign secondary_src = b.image_secondary | image_url: width: 700
+            endif
+
+            comment
+              An asset filename carries no intrinsic size, so the figure's own
+              aspect ratio stands in. Both images are object-fit: cover inside a
+              fixed box, so these only serve as a pre-load hint.
+            endcomment
+            assign main_width = b.image_main.width | default: 1200
+            assign main_height = b.image_main.height | default: 1500
+            assign secondary_width = b.image_secondary.width | default: 700
+            assign secondary_height = b.image_secondary.height | default: 875
+          -%}
+          <article
+            class="jci-editorial-banner-slide{% if is_first %} is-active{% endif %}"
+            data-jci-editorial-slide
+            role="group"
+            aria-roledescription="slide"
+            aria-label="{{ b.note | escape }}"
+            aria-hidden="{% if is_first %}false{% else %}true{% endif %}"
+            {{ block.shopify_attributes }}
+          >
+            <figure class="jci-editorial-banner-figure jci-editorial-banner-figure--main">
+              {%- if main_src != blank -%}
+                <img
+                  class="jci-editorial-banner-image"
+                  src="{{ main_src }}"
+                  {%- if b.image_main_asset == blank and b.image_main != blank %}
+                    srcset="
+                      {{ b.image_main | image_url: width: 600 }} 600w,
+                      {{ b.image_main | image_url: width: 900 }} 900w,
+                      {{ b.image_main | image_url: width: 1200 }} 1200w
+                    "
+                    sizes="(max-width: 680px) 70vw, 40vw"
+                  {%- endif %}
+                  alt="{{ b.image_alt_main | escape }}"
+                  width="{{ main_width }}"
+                  height="{{ main_height }}"
+                  loading="lazy"
+                >
+              {%- else -%}
+                {{ 'lifestyle-1' | placeholder_svg_tag: 'jci-editorial-banner-image' }}
+              {%- endif -%}
+              {%- if b.index_main != blank -%}
+                <span class="jci-editorial-banner-figure-index">{{ b.index_main }}</span>
+              {%- endif -%}
+            </figure>
+
+            <figure class="jci-editorial-banner-figure jci-editorial-banner-figure--secondary">
+              {%- if secondary_src != blank -%}
+                <img
+                  class="jci-editorial-banner-image jci-editorial-banner-image--secondary"
+                  src="{{ secondary_src }}"
+                  {%- if b.image_secondary_asset == blank and b.image_secondary != blank %}
+                    srcset="
+                      {{ b.image_secondary | image_url: width: 400 }} 400w,
+                      {{ b.image_secondary | image_url: width: 700 }} 700w
+                    "
+                    sizes="(max-width: 680px) 26vw, 15vw"
+                  {%- endif %}
+                  alt="{{ b.image_alt_secondary | escape }}"
+                  width="{{ secondary_width }}"
+                  height="{{ secondary_height }}"
+                  loading="lazy"
+                >
+              {%- else -%}
+                {{ 'lifestyle-2' | placeholder_svg_tag: 'jci-editorial-banner-image jci-editorial-banner-image--secondary' }}
+              {%- endif -%}
+              {%- if b.index_secondary != blank -%}
+                <span class="jci-editorial-banner-figure-index">{{ b.index_secondary }}</span>
+              {%- endif -%}
+            </figure>
+
+            {%- if b.note != blank -%}
+              <span class="jci-editorial-banner-note">{{ b.note }}</span>
+            {%- endif -%}
+          </article>
+        {%- endfor -%}
+
+        {%- if slides.size > 1 -%}
+          <div class="jci-editorial-banner-controls" aria-label="{{ s.controls_label }}">
+            <button
+              class="jci-editorial-banner-control"
+              type="button"
+              data-jci-editorial-control="previous"
+              aria-label="{{ 'accessibility.slideshow_previous' | t }}"
+            >
+              <span class="jci-editorial-banner-control-glyph" aria-hidden="true">&#8592;</span>
+            </button>
+            <span class="jci-editorial-banner-counter">
+              <b class="jci-editorial-banner-counter-current" data-jci-editorial-current>01</b>
+              <span class="jci-editorial-banner-counter-total">/ {{ slides.size | prepend: '0' | slice: -2, 2 }}</span>
+            </span>
+            <button
+              class="jci-editorial-banner-control"
+              type="button"
+              data-jci-editorial-control="next"
+              aria-label="{{ 'accessibility.slideshow_next' | t }}"
+            >
+              <span class="jci-editorial-banner-control-glyph" aria-hidden="true">&#8594;</span>
+            </button>
+          </div>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    <div class="jci-editorial-banner-copy">
+      {%- if s.eyebrow != blank -%}
+        <p class="jci-eyebrow jci-editorial-banner-eyebrow">{{ s.eyebrow }}</p>
+      {%- endif -%}
+
+      {%- if s.title_line_one != blank or s.title_line_two != blank -%}
+        <h2 class="jci-editorial-banner-title">
+          {%- if s.title_line_one != blank -%}
+            <span class="jci-editorial-banner-title-line">{{ s.title_line_one }}</span>
+          {%- endif -%}
+          {%- if s.title_line_two != blank -%}
+            <em class="jci-editorial-banner-title-accent">{{ s.title_line_two }}</em>
+          {%- endif -%}
+        </h2>
+      {%- endif -%}
+
+      {%- if s.body != blank -%}
+        <p class="jci-editorial-banner-body">{{ s.body }}</p>
+      {%- endif -%}
+
+      {%- if s.cta_label != blank -%}
+        <a class="jci-button jci-button--light jci-editorial-banner-cta" href="{{ s.cta_url | default: '#' }}">
+          {{ s.cta_label }} <span aria-hidden="true">&#8599;</span>
+        </a>
+      {%- endif -%}
+    </div>
+  </div>
+</jci-editorial-banner>
+
+<script src="{{ 'jci-editorial-banner.js' | asset_url }}" type="module"></script>
+
+{% stylesheet %}
+  .jci-editorial-banner {
+    display: block;
+    overflow: hidden;
+    color: var(--jci-editorial-text);
+    text-align: left;
+  }
+
+  .jci-editorial-banner-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: var(--jci-editorial-min-height);
+    overflow: hidden;
+
+    /* The banner manages its own gutters, so the shared container padding is
+       cleared here — one of the §1 overrides the prototype genuinely needs. */
+    padding-inline: 0;
+    background:
+      radial-gradient(
+        circle at 72% 48%,
+        rgb(var(--jci-editorial-wash-rgb) / var(--jci-editorial-wash-opacity)),
+        transparent 34%
+      ),
+      var(--jci-editorial-bg);
+  }
+
+  .jci-editorial-banner-container--full {
+    width: 100vw;
+    max-width: none;
+    margin-left: calc(50% - 50vw);
+  }
+
+  /* Rotated hairline frame behind the collage. */
+  .jci-editorial-banner-container::before {
+    content: "";
+    position: absolute;
+    top: 9%;
+    right: 5%;
+    width: 47%;
+    height: 82%;
+    border: 1px solid rgb(var(--jci-editorial-accent-rgb) / 0.11);
+    transform: rotate(2deg);
+    pointer-events: none;
+  }
+
+  /* Left-to-right shade, so the copy keeps its contrast. */
+  .jci-editorial-banner-container::after {
+    content: "";
+    position: absolute;
+    z-index: 0;
+    inset: 0;
+    background: linear-gradient(
+      90deg,
+      rgb(var(--jci-editorial-shade-rgb) / 0.04),
+      rgb(var(--jci-editorial-shade-rgb) / 0.22)
+    );
+    pointer-events: none;
+  }
+
+  /* -- Collage ----------------------------------------------------------- */
+
+  .jci-editorial-banner-collage {
+    position: absolute;
+    z-index: 1;
+    top: clamp(2.5rem, 5vw, 4.5rem);
+    right: var(--jci-page-pad);
+    bottom: clamp(2.5rem, 5vw, 4.5rem);
+    display: block;
+    width: min(var(--jci-editorial-collage-width), 760px);
+    isolation: isolate;
+    opacity: 0;
+    transform: translate3d(24px, 0, 0);
+    transition:
+      opacity 0.9s var(--jci-ease),
+      transform 0.9s var(--jci-ease);
+  }
+
+  .jci-editorial-banner.is-revealed .jci-editorial-banner-collage {
+    opacity: 1;
+    transform: none;
+    transition-delay: 120ms;
+  }
+
+  .jci-editorial-banner-slide {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(130px, 0.45fr);
+    gap: clamp(0.75rem, 1.5vw, 1.5rem);
+    opacity: 0;
+    visibility: hidden;
+    transform: translate3d(24px, 0, 0);
+    pointer-events: none;
+    transition:
+      opacity var(--jci-editorial-crossfade) var(--jci-ease),
+      transform var(--jci-editorial-crossfade) var(--jci-ease);
+  }
+
+  .jci-editorial-banner-slide.is-active {
+    z-index: 2;
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    pointer-events: auto;
+  }
+
+  .jci-editorial-banner-figure {
+    position: relative;
+    min-width: 0;
+    min-height: 0;
+    margin: 0;
+    overflow: hidden;
+    border: 1px solid rgb(var(--jci-editorial-text-rgb) / 0.24);
+    background: var(--jci-editorial-frame-bg);
+    box-shadow: 14px 16px 0 rgb(var(--jci-editorial-text-rgb) / 0.08);
+  }
+
+  .jci-editorial-banner-figure::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      180deg,
+      rgb(var(--jci-editorial-scrim-rgb) / 0.04) 35%,
+      rgb(var(--jci-editorial-scrim-rgb) / 0.62)
+    );
+    pointer-events: none;
+  }
+
+  .jci-editorial-banner-figure--main {
+    height: 100%;
+  }
+
+  .jci-editorial-banner-figure--secondary {
+    align-self: end;
+    height: 64%;
+    transform: rotate(2.4deg) translateY(-4%);
+    transition:
+      transform 0.7s var(--jci-ease),
+      box-shadow 0.7s var(--jci-ease);
+  }
+
+  .jci-editorial-banner-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 32%;
+    filter: saturate(0.7) brightness(0.82);
+    transition:
+      transform 1s var(--jci-ease),
+      filter 0.7s var(--jci-ease);
+  }
+
+  .jci-editorial-banner-image--secondary {
+    object-position: center 40%;
+  }
+
+  .jci-editorial-banner:hover .jci-editorial-banner-image,
+  .jci-editorial-banner:focus-within .jci-editorial-banner-image {
+    filter: saturate(0.92) brightness(0.88);
+    transform: scale(1.06);
+  }
+
+  .jci-editorial-banner:hover .jci-editorial-banner-figure--secondary,
+  .jci-editorial-banner:focus-within .jci-editorial-banner-figure--secondary {
+    box-shadow: 18px 22px 0 rgb(var(--jci-editorial-text-rgb) / 0.1);
+    transform: rotate(2.4deg) translateY(-7%) translateX(-6px);
+  }
+
+  .jci-editorial-banner-figure-index {
+    position: absolute;
+    z-index: 1;
+    top: 1rem;
+    left: 1rem;
+    padding: 0.35rem 0.45rem;
+    color: rgb(var(--jci-editorial-text-rgb) / 0.88);
+    border: 1px solid rgb(var(--jci-editorial-text-rgb) / 0.28);
+    background: rgb(var(--jci-editorial-scrim-rgb) / 0.28);
+    font-family: var(--jci-font-label);
+    font-size: 12px;
+    letter-spacing: 0.1em;
+  }
+
+  .jci-editorial-banner-note {
+    position: absolute;
+    z-index: 2;
+    right: 1rem;
+    bottom: 1rem;
+    color: var(--jci-editorial-accent);
+    font-family: var(--jci-font-label);
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  /* -- Controls ---------------------------------------------------------- */
+
+  .jci-editorial-banner-controls {
+    position: absolute;
+    z-index: 6;
+    bottom: 1rem;
+    left: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0.35rem 0.45rem;
+    color: var(--jci-editorial-text);
+    border: 1px solid rgb(var(--jci-editorial-text-rgb) / 0.28);
+    background: rgb(var(--jci-editorial-shade-rgb) / 0.3);
+    font-family: var(--jci-font-label);
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    backdrop-filter: blur(10px);
+  }
+
+  .jci-editorial-banner-control {
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    color: var(--jci-editorial-text);
+    border: 1px solid rgb(var(--jci-editorial-text-rgb) / 0.35);
+    border-radius: 50%;
+    background: transparent;
+    font-size: 14px;
+    line-height: 1;
+    cursor: pointer;
+    transition:
+      color 0.3s var(--jci-ease),
+      background 0.3s var(--jci-ease),
+      transform 0.3s var(--jci-ease);
+  }
+
+  .jci-editorial-banner-control:hover,
+  .jci-editorial-banner-control:focus-visible {
+    color: var(--jci-editorial-bg);
+    background: var(--jci-editorial-text);
+    transform: scale(1.06);
+  }
+
+  .jci-editorial-banner-counter {
+    display: inline-flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 0.25rem;
+    min-width: 42px;
+  }
+
+  .jci-editorial-banner-counter-current {
+    color: var(--jci-editorial-text);
+    font-weight: 400;
+  }
+
+  /* -- Copy -------------------------------------------------------------- */
+
+  .jci-editorial-banner-copy {
+    position: relative;
+    z-index: 1;
+    width: min(100%, 660px);
+    max-width: 660px;
+    margin-right: auto;
+    margin-left: var(--jci-page-pad);
+    padding: clamp(3rem, 7vw, 6rem) var(--jci-page-pad) clamp(3rem, 7vw, 6rem) 0;
+  }
+
+  /* The prototype staggers these four with :nth-child. Explicit classes carry
+     the same delays without a structural selector (§1). */
+  .jci-editorial-banner-eyebrow,
+  .jci-editorial-banner-title,
+  .jci-editorial-banner-body,
+  .jci-editorial-banner-cta {
+    opacity: 0;
+    transform: translateY(18px);
+    transition:
+      opacity 0.7s var(--jci-ease),
+      transform 0.7s var(--jci-ease);
+  }
+
+  .jci-editorial-banner.is-revealed .jci-editorial-banner-eyebrow,
+  .jci-editorial-banner.is-revealed .jci-editorial-banner-title,
+  .jci-editorial-banner.is-revealed .jci-editorial-banner-body,
+  .jci-editorial-banner.is-revealed .jci-editorial-banner-cta {
+    opacity: 1;
+    transform: none;
+  }
+
+  .jci-editorial-banner.is-revealed .jci-editorial-banner-eyebrow {
+    transition-delay: 80ms;
+  }
+
+  .jci-editorial-banner.is-revealed .jci-editorial-banner-title {
+    transition-delay: 180ms;
+  }
+
+  .jci-editorial-banner.is-revealed .jci-editorial-banner-body {
+    transition-delay: 280ms;
+  }
+
+  .jci-editorial-banner.is-revealed .jci-editorial-banner-cta {
+    transition-delay: 380ms;
+  }
+
+  .jci-editorial-banner-eyebrow {
+    margin-bottom: 1.3rem;
+    color: var(--jci-editorial-eyebrow);
+  }
+
+  .jci-editorial-banner-title {
+    margin: 0 0 1.8rem;
+    font-family: var(--jci-font-display);
+    font-size: var(--jci-section-title-size);
+    font-weight: 500;
+    line-height: 0.92;
+    letter-spacing: -0.055em;
+  }
+
+  .jci-editorial-banner-title-line {
+    display: block;
+  }
+
+  .jci-editorial-banner-title-accent {
+    display: block;
+    color: var(--jci-editorial-accent);
+    font-style: italic;
+  }
+
+  .jci-editorial-banner-body {
+    max-width: 420px;
+    margin: 0 0 2rem;
+    color: var(--jci-editorial-body);
+    font-family: var(--jci-font-sans);
+    font-size: var(--jci-subtitle-size);
+    line-height: var(--jci-subtitle-leading);
+  }
+
+  .jci-editorial-banner-cta {
+    display: inline-flex;
+  }
+
+  /* -- Breakpoints (§5 — 900 and 680 only) ------------------------------- */
+
+  @media screen and (max-width: 900px) {
+    .jci-editorial-banner-collage {
+      width: min(48%, 560px);
+    }
+
+    .jci-editorial-banner-copy {
+      width: min(52%, 560px);
+      max-width: 560px;
+    }
+  }
+
+  @media screen and (max-width: 680px) {
+    .jci-editorial-banner-container {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      min-height: auto;
+      padding-top: 1.5rem;
+    }
+
+    .jci-editorial-banner-container::before {
+      display: none;
+    }
+
+    .jci-editorial-banner-collage {
+      position: relative;
+      order: 1;
+      inset: auto;
+      width: calc(100% - (var(--jci-page-pad) * 2));
+      height: clamp(290px, 78vw, 430px);
+      margin: 0 var(--jci-page-pad) 2rem;
+    }
+
+    .jci-editorial-banner-copy {
+      order: 2;
+      width: calc(100% - var(--jci-page-pad));
+      max-width: none;
+      margin-left: var(--jci-page-pad);
+      padding: 3rem var(--jci-page-pad) 3rem 0;
+    }
+
+    .jci-editorial-banner-title {
+      max-width: 330px;
+    }
+
+    .jci-editorial-banner-body {
+      max-width: 300px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .jci-editorial-banner-slide,
+    .jci-editorial-banner-collage,
+    .jci-editorial-banner-image,
+    .jci-editorial-banner-figure--secondary,
+    .jci-editorial-banner-control,
+    .jci-editorial-banner-eyebrow,
+    .jci-editorial-banner-title,
+    .jci-editorial-banner-body,
+    .jci-editorial-banner-cta {
+      transition: none;
+    }
+
+    .jci-editorial-banner-slide {
+      transform: none;
+    }
+
+    .jci-editorial-banner:hover .jci-editorial-banner-image,
+    .jci-editorial-banner:focus-within .jci-editorial-banner-image {
+      transform: none;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Editorial banner",
+  "tag": "section",
+  "class": "jci-editorial-banner-section",
+  "max_blocks": 8,
+  "settings": [
+    { "type": "header", "content": "Copy" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "The Maison philosophy" },
+    { "type": "text", "id": "title_line_one", "label": "Title first line", "default": "Made for the" },
+    { "type": "text", "id": "title_line_two", "label": "Title second line (italic)", "default": "moments between." },
+    { "type": "textarea", "id": "body", "label": "Body", "default": "At the stable, at an event, or simply as part of everyday life. Quiet confidence, wherever the day takes you." },
+    { "type": "text", "id": "cta_label", "label": "Button label", "default": "Shop the edit" },
+    { "type": "url", "id": "cta_url", "label": "Button link" },
+
+    { "type": "header", "content": "Colors", "info": "Left empty, each of these follows the theme colour palette." },
+    { "type": "color", "id": "background_color", "label": "Background" },
+    { "type": "color", "id": "wash_color", "label": "Centre wash" },
+    { "type": "range", "id": "wash_opacity", "label": "Centre wash opacity", "min": 0, "max": 60, "step": 1, "unit": "%", "default": 20 },
+    { "type": "color", "id": "text_color", "label": "Text" },
+    { "type": "color", "id": "accent_color", "label": "Accent" },
+    { "type": "color", "id": "shade_color", "label": "Shade and controls" },
+    { "type": "color", "id": "eyebrow_color", "label": "Eyebrow", "default": "#d3d5c9" },
+    { "type": "color", "id": "body_color", "label": "Body text", "default": "#e3e0d7" },
+    { "type": "color", "id": "frame_background", "label": "Image frame", "default": "#252a25" },
+    { "type": "color", "id": "scrim_color", "label": "Image scrim", "default": "#111511" },
+
+    { "type": "header", "content": "Layout" },
+    {
+      "type": "select", "id": "background_width", "label": "Background width",
+      "options": [
+        { "value": "content", "label": "Content width" },
+        { "value": "full", "label": "Full width" }
+      ],
+      "default": "content"
+    },
+    { "type": "range", "id": "min_height_min", "label": "Minimum height", "min": 320, "max": 800, "step": 10, "unit": "px", "default": 540 },
+    { "type": "range", "id": "min_height_max", "label": "Maximum height", "min": 480, "max": 980, "step": 10, "unit": "px", "default": 720 },
+    { "type": "range", "id": "collage_width", "label": "Collage width", "min": 30, "max": 70, "step": 1, "unit": "%", "default": 53 },
+
+    { "type": "header", "content": "Motion" },
+    { "type": "checkbox", "id": "enable_reveal", "label": "Fade in on scroll", "default": true },
+    { "type": "checkbox", "id": "autoplay", "label": "Advance slides automatically", "default": true },
+    { "type": "range", "id": "autoplay_interval", "label": "Time on each slide", "min": 2000, "max": 9800, "step": 200, "unit": "ms", "default": 5600 },
+    { "type": "range", "id": "crossfade_duration", "label": "Crossfade", "min": 200, "max": 2000, "step": 50, "unit": "ms", "default": 800 },
+
+    { "type": "header", "content": "Accessibility" },
+    { "type": "text", "id": "carousel_label", "label": "Carousel label", "default": "The Maison philosophy image story" },
+    { "type": "text", "id": "controls_label", "label": "Controls label", "default": "Philosophy image controls" },
+
+    { "type": "header", "content": "Anchor" },
+    { "type": "text", "id": "anchor_id", "label": "Anchor ID", "default": "journal" }
+  ],
+  "blocks": [
+    {
+      "type": "slide",
+      "name": "Slide",
+      "settings": [
+        { "type": "image_picker", "id": "image_main", "label": "Main image" },
+        { "type": "text", "id": "image_main_asset", "label": "Main image asset filename", "info": "A file in assets/. Wins over the image above." },
+        { "type": "text", "id": "image_alt_main", "label": "Main image alt text" },
+        { "type": "text", "id": "index_main", "label": "Main image index", "default": "01 / 02" },
+        { "type": "image_picker", "id": "image_secondary", "label": "Secondary image" },
+        { "type": "text", "id": "image_secondary_asset", "label": "Secondary image asset filename", "info": "A file in assets/. Wins over the image above." },
+        { "type": "text", "id": "image_alt_secondary", "label": "Secondary image alt text" },
+        { "type": "text", "id": "index_secondary", "label": "Secondary image index", "default": "02 / 02" },
+        { "type": "text", "id": "note", "label": "Note", "default": "Stable / everyday" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Editorial banner",
+      "blocks": [
+        { "type": "slide", "settings": { "image_main_asset": "jci-crest-cap-lifestyle.webp", "image_secondary_asset": "jci-crest-cap-front-logo.webp", "note": "Stable / everyday" } },
+        { "type": "slide", "settings": { "image_main_asset": "jci-active-turtleneck-front.webp", "image_secondary_asset": "jci-active-turtleneck-back.webp", "note": "Ease / motion" } },
+        { "type": "slide", "settings": { "image_main_asset": "jci-msfd007-riding.webp", "image_secondary_asset": "jci-msfd007-front.webp", "note": "Made / considered" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

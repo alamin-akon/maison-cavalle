@@ -1,0 +1,164 @@
+{% comment %}
+  Maison Cavallé — product card
+  Prototype source: maison-cavalle-main/app.js → productCard()
+                    maison-cavalle-main/styles.css → .product-card and friends
+  Reference: MAISON-CAVALLE-SPEC.md §1, §7
+
+  Accepts:
+    product          - product object (required)
+    subtitle_key     - "namespace.key" metafield holding the short descriptor
+    badge_text       - text for the badge when the product is not on sale
+    badge_source     - "none" | "sale" | "always"
+    swatch_option    - option name to read colour swatches from, e.g. "Color"
+    show_quick_add   - boolean
+    image_index      - which product image to show, 0-based
+    lazy             - boolean, false for above-the-fold cards
+
+  A single-variant product adds straight to cart. Anything with choices sends
+  the shopper to the product page instead, so no variant is guessed for them.
+{% endcomment %}
+
+{% liquid
+  assign image_index = image_index | default: 0
+  assign card_image = product.images[image_index] | default: product.featured_image
+
+  assign subtitle = blank
+  if subtitle_key != blank
+    assign subtitle_parts = subtitle_key | split: '.'
+    assign subtitle = product.metafields[subtitle_parts[0]][subtitle_parts[1]].value
+  endif
+  if subtitle == blank
+    assign subtitle = product.type
+  endif
+
+  assign on_sale = false
+  if product.compare_at_price > product.price
+    assign on_sale = true
+  endif
+
+  assign badge = blank
+  case badge_source
+    when 'sale'
+      if on_sale
+        assign badge = badge_text | default: 'Sale'
+      endif
+    when 'always'
+      assign badge = badge_text
+  endcase
+
+  assign swatch_values = blank
+  if swatch_option != blank
+    assign swatch_values = product.options_by_name[swatch_option].values
+  endif
+
+  assign quick_add_variant = blank
+  if show_quick_add and product.available
+    if product.variants.size == 1
+      assign quick_add_variant = product.selected_or_first_available_variant
+    endif
+  endif
+%}
+
+<article class="jci-product-card">
+  <div class="jci-product-card-media">
+    <a
+      class="jci-product-card-link"
+      href="{{ product.url }}"
+      aria-label="{{ product.title | escape }}"
+    >
+      {%- if badge != blank -%}
+        <span class="jci-product-card-badge">{{ badge }}</span>
+      {%- endif -%}
+
+      {%- if card_image != blank -%}
+        <img
+          class="jci-product-card-image"
+          src="{{ card_image | image_url: width: 800 }}"
+          srcset="
+            {{ card_image | image_url: width: 400 }} 400w,
+            {{ card_image | image_url: width: 600 }} 600w,
+            {{ card_image | image_url: width: 800 }} 800w
+          "
+          sizes="(max-width: 680px) 50vw, 25vw"
+          alt="{{ card_image.alt | escape | default: product.title | escape }}"
+          width="{{ card_image.width }}"
+          height="{{ card_image.height }}"
+          loading="{% if lazy == false %}eager{% else %}lazy{% endif %}"
+        >
+      {%- endif -%}
+    </a>
+
+    {%- if show_quick_add -%}
+      <div class="jci-product-card-quick-add">
+        {%- if quick_add_variant != blank -%}
+          <form action="{{ routes.cart_add_url }}" method="post" enctype="multipart/form-data">
+            <input type="hidden" name="id" value="{{ quick_add_variant.id }}">
+            <input type="hidden" name="quantity" value="1">
+            <button
+              class="jci-product-card-quick-add-button"
+              type="submit"
+              aria-label="{{ 'actions.add_to_cart' | t }} — {{ product.title | escape }}"
+            >
+              <span class="jci-product-card-quick-add-text">
+                {{- 'actions.add_to_cart' | t }} <span aria-hidden="true">&#65291;</span>
+              </span>
+              {% render 'jci-product-card-bag-icon' %}
+            </button>
+          </form>
+        {%- else -%}
+          {%- comment -%}
+            More than one variant, or sold out. Either way the product page is
+            the honest destination.
+          {%- endcomment -%}
+          <a
+            class="jci-product-card-quick-add-button"
+            href="{{ product.url }}"
+            aria-label="{{ product.title | escape }}"
+          >
+            <span class="jci-product-card-quick-add-text">
+              {%- if product.available -%}
+                {{ 'actions.show_all_options' | t }} <span aria-hidden="true">&#65291;</span>
+              {%- else -%}
+                {{ 'products.product.sold_out' | t }}
+              {%- endif -%}
+            </span>
+            {% render 'jci-product-card-bag-icon' %}
+          </a>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+  </div>
+
+  <div class="jci-product-card-info">
+    <div class="jci-product-card-details">
+      <h3 class="jci-product-card-title">
+        <a class="jci-product-card-title-link" href="{{ product.url }}">{{ product.title }}</a>
+      </h3>
+
+      {%- if subtitle != blank -%}
+        <p class="jci-product-card-subtitle">{{ subtitle }}</p>
+      {%- endif -%}
+
+      {%- if swatch_values != blank -%}
+        <div class="jci-product-card-swatches">
+          {%- for value in swatch_values -%}
+            {%- if value.swatch.color != blank -%}
+              <span
+                class="jci-product-card-swatch"
+                style="--jci-product-card-swatch-color: {{ value.swatch.color }};"
+                title="{{ value | escape }}"
+              ></span>
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+    </div>
+
+    <span class="jci-product-card-price">
+      {{- product.price | money -}}
+      {%- if on_sale -%}
+        <s class="jci-product-card-price-was">{{ product.compare_at_price | money }}</s>
+      {%- endif -%}
+    </span>
+  </div>
+</article>

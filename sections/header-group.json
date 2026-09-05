@@ -44,8 +44,8 @@
         "padding-block-end": 10
       }
     },
-    "dev_announcement_bar_f4kTfc": {
-      "type": "dev-announcement-bar",
+    "jci_announcement_bar_f4kTfc": {
+      "type": "jci-announcement-bar",
       "name": "Announcement bar",
       "settings": {
         "text": "Complimentary Australian shipping on orders over $150",
@@ -156,8 +156,8 @@
         "text_color_transparent_collection": ""
       }
     },
-    "dev_header_8JBVWV": {
-      "type": "dev-header",
+    "jci_header_8JBVWV": {
+      "type": "jci-header",
       "name": "Header",
       "settings": {
         "menu": "main-menu",
@@ -209,8 +209,8 @@
   },
   "order": [
     "header_announcements_9jGBFp",
-    "dev_announcement_bar_f4kTfc",
+    "jci_announcement_bar_f4kTfc",
     "header_section",
-    "dev_header_8JBVWV"
+    "jci_header_8JBVWV"
   ]
 }

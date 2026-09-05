@@ -27,72 +27,72 @@
   endunless
 %}
 
-<dev-header
-  class="dev-header"
+<jci-header
+  class="jci-header"
   {% if s.enable_sticky %}
-    data-dev-sticky
+    data-jci-sticky
   {% endif %}
   {% if s.hide_labels_tablet %}
-    data-dev-hide-labels-tablet
+    data-jci-hide-labels-tablet
   {% endif %}
   {% if s.hide_account_mobile %}
-    data-dev-hide-account-mobile
+    data-jci-hide-account-mobile
   {% endif %}
   style="
-    --dev-header-bg: {{ s.background_color | default: settings.color_palette.background }};
-    --dev-header-bg-rgb: {{ s.background_color.rgb | default: settings.color_palette.background.rgb }};
-    --dev-header-text: {{ s.text_color | default: settings.color_palette.foreground }};
-    --dev-header-blur: {{ s.backdrop_blur }}px;
-    --dev-header-saturate: {{ s.backdrop_saturate | divided_by: 100.0 }};
-    --dev-header-bg-opacity-top: {{ s.bg_opacity_top | divided_by: 100.0 }};
-    --dev-header-bg-opacity-bottom: {{ s.bg_opacity_bottom | divided_by: 100.0 }};
-    --dev-header-bg-opacity-scrolled: {{ s.bg_opacity_scrolled | divided_by: 100.0 }};
-    --dev-header-border-opacity: {{ s.border_opacity | divided_by: 100.0 }};
-    --dev-header-height: {{ s.height }}px;
-    --dev-header-height-mobile: {{ s.height_mobile }}px;
-    --dev-header-height-scrolled: {{ height_scrolled }}px;
-    --dev-header-logo-width: {{ s.logo_width }}px;
-    --dev-header-logo-height: {{ s.logo_height }}px;
-    --dev-header-logo-height-scrolled: {{ logo_height_scrolled }}px;
-    --dev-header-logo-width-mobile: {{ s.logo_width_mobile }}px;
-    --dev-header-logo-height-mobile: {{ s.logo_height_mobile }}px;
-    --dev-header-nav-size: {{ s.nav_font_size }}px;
-    --dev-header-nav-tracking: {{ s.nav_tracking | divided_by: 100.0 }}em;
-    --dev-header-nav-gap: {{ s.nav_gap }}px;
-    --dev-header-nav-hover: {{ s.nav_hover_color | default: settings.color_palette.color5 }};
-    --dev-header-nav-dot: {{ s.nav_dot_color | default: settings.color_palette.color6 }};
-    --dev-header-nav-dot-rgb: {{ s.nav_dot_color.rgb | default: settings.color_palette.color6.rgb }};
-    --dev-header-label-size: {{ s.label_size }}px;
-    --dev-header-label-tracking: {{ s.label_tracking | divided_by: 100.0 }}em;
-    --dev-header-icon-size: {{ s.icon_size }}px;
-    --dev-header-icon-stroke: {{ s.icon_stroke_width | divided_by: 100.0 }};
-    --dev-header-badge-size: {{ s.cart_badge_size }}px;
-    --dev-header-badge-bg: {{ s.cart_badge_color | default: settings.color_palette.foreground }};
-    --dev-header-badge-hover-bg: {{ s.cart_badge_hover_color | default: settings.color_palette.color6 }};
-    --dev-header-drawer-bg: {{ s.drawer_background_color | default: settings.color_palette.color3 }};
-    --dev-header-drawer-width: {{ s.drawer_width }}px;
-    {% unless s.enable_reveal %}--dev-header-reveal-name: none; --dev-header-logo-reveal-name: none;{% endunless %}
-    {% unless s.enable_glint %}--dev-header-glint-name: none;{% endunless %}
+    --jci-header-bg: {{ s.background_color | default: settings.color_palette.background }};
+    --jci-header-bg-rgb: {{ s.background_color.rgb | default: settings.color_palette.background.rgb }};
+    --jci-header-text: {{ s.text_color | default: settings.color_palette.foreground }};
+    --jci-header-blur: {{ s.backdrop_blur }}px;
+    --jci-header-saturate: {{ s.backdrop_saturate | divided_by: 100.0 }};
+    --jci-header-bg-opacity-top: {{ s.bg_opacity_top | divided_by: 100.0 }};
+    --jci-header-bg-opacity-bottom: {{ s.bg_opacity_bottom | divided_by: 100.0 }};
+    --jci-header-bg-opacity-scrolled: {{ s.bg_opacity_scrolled | divided_by: 100.0 }};
+    --jci-header-border-opacity: {{ s.border_opacity | divided_by: 100.0 }};
+    --jci-header-height: {{ s.height }}px;
+    --jci-header-height-mobile: {{ s.height_mobile }}px;
+    --jci-header-height-scrolled: {{ height_scrolled }}px;
+    --jci-header-logo-width: {{ s.logo_width }}px;
+    --jci-header-logo-height: {{ s.logo_height }}px;
+    --jci-header-logo-height-scrolled: {{ logo_height_scrolled }}px;
+    --jci-header-logo-width-mobile: {{ s.logo_width_mobile }}px;
+    --jci-header-logo-height-mobile: {{ s.logo_height_mobile }}px;
+    --jci-header-nav-size: {{ s.nav_font_size }}px;
+    --jci-header-nav-tracking: {{ s.nav_tracking | divided_by: 100.0 }}em;
+    --jci-header-nav-gap: {{ s.nav_gap }}px;
+    --jci-header-nav-hover: {{ s.nav_hover_color | default: settings.color_palette.color5 }};
+    --jci-header-nav-dot: {{ s.nav_dot_color | default: settings.color_palette.color6 }};
+    --jci-header-nav-dot-rgb: {{ s.nav_dot_color.rgb | default: settings.color_palette.color6.rgb }};
+    --jci-header-label-size: {{ s.label_size }}px;
+    --jci-header-label-tracking: {{ s.label_tracking | divided_by: 100.0 }}em;
+    --jci-header-icon-size: {{ s.icon_size }}px;
+    --jci-header-icon-stroke: {{ s.icon_stroke_width | divided_by: 100.0 }};
+    --jci-header-badge-size: {{ s.cart_badge_size }}px;
+    --jci-header-badge-bg: {{ s.cart_badge_color | default: settings.color_palette.foreground }};
+    --jci-header-badge-hover-bg: {{ s.cart_badge_hover_color | default: settings.color_palette.color6 }};
+    --jci-header-drawer-bg: {{ s.drawer_background_color | default: settings.color_palette.color3 }};
+    --jci-header-drawer-width: {{ s.drawer_width }}px;
+    {% unless s.enable_reveal %}--jci-header-reveal-name: none; --jci-header-logo-reveal-name: none;{% endunless %}
+    {% unless s.enable_glint %}--jci-header-glint-name: none;{% endunless %}
   "
 >
-  <div class="dev-header-container">
+  <div class="jci-header-container">
     {%- comment -%} Mobile only — opens the navigation drawer. {%- endcomment -%}
     <button
-      class="dev-header-icon-button dev-header-menu-trigger"
+      class="jci-header-icon-button jci-header-menu-trigger"
       type="button"
-      data-dev-menu-trigger
+      data-jci-menu-trigger
       aria-expanded="false"
-      aria-controls="dev-header-drawer"
+      aria-controls="jci-header-drawer"
     >
-      <span class="dev-header-menu-icon" aria-hidden="true"><i></i><i></i></span>
-      <span class="dev-header-menu-label">{{ 'accessibility.menu' | t }}</span>
+      <span class="jci-header-menu-icon" aria-hidden="true"><i></i><i></i></span>
+      <span class="jci-header-menu-label">{{ 'accessibility.menu' | t }}</span>
     </button>
 
     {%- if menu != blank and menu.links.size > 0 -%}
-      <nav class="dev-header-nav" aria-label="{{ 'accessibility.menu' | t | default: shop.name }}">
+      <nav class="jci-header-nav" aria-label="{{ 'accessibility.menu' | t | default: shop.name }}">
         {%- for link in menu.links -%}
           <a
-            class="dev-header-nav-link{% if link.active %} is-active{% endif %}"
+            class="jci-header-nav-link{% if link.active %} is-active{% endif %}"
             href="{{ link.url }}"
           >
             {{- link.title -}}
@@ -101,12 +101,12 @@
       </nav>
     {%- endif -%}
 
-    <a class="dev-header-wordmark" href="{{ routes.root_url }}">
+    <a class="jci-header-wordmark" href="{{ routes.root_url }}">
       {%- if settings.logo != blank -%}
         {{
           settings.logo
           | image_url: width: 620
-          | image_tag: class: 'dev-header-logo', alt: logo_alt, loading: 'eager', fetchpriority: 'high'
+          | image_tag: class: 'jci-header-logo', alt: logo_alt, loading: 'eager', fetchpriority: 'high'
         }}
       {%- else -%}
         {%- comment -%}
@@ -114,8 +114,8 @@
           assets, so the logo travels with the theme code. See SPEC §2.
         {%- endcomment -%}
         <img
-          class="dev-header-logo"
-          src="{{ 'dev-logo.svg' | asset_url }}"
+          class="jci-header-logo"
+          src="{{ 'jci-logo.svg' | asset_url }}"
           alt="{{ logo_alt }}"
           width="620"
           height="354"
@@ -125,10 +125,10 @@
       {%- endif -%}
     </a>
 
-    <div class="dev-header-actions">
+    <div class="jci-header-actions">
       {%- if s.show_search -%}
         <button
-          class="dev-header-icon-button dev-header-search-trigger"
+          class="jci-header-icon-button jci-header-search-trigger"
           type="button"
           on:click="#search-modal/showDialog"
           aria-haspopup="dialog"
@@ -138,13 +138,13 @@
             <circle cx="10.8" cy="10.8" r="6.2"></circle>
             <path d="m16 16 4.2 4.2"></path>
           </svg>
-          <span class="dev-header-action-label">{{ 'content.search' | t }}</span>
+          <span class="jci-header-action-label">{{ 'content.search' | t }}</span>
         </button>
       {%- endif -%}
 
       {%- if s.show_account and shop.customer_accounts_enabled -%}
         <a
-          class="dev-header-icon-button dev-header-account-trigger"
+          class="jci-header-icon-button jci-header-account-trigger"
           href="{{ routes.account_url }}"
           aria-label="{{ 'content.account_title' | t }}"
         >
@@ -152,7 +152,7 @@
             <circle cx="12" cy="8" r="3.2"></circle>
             <path d="M5.8 20c.7-3.3 2.7-5 6.2-5s5.5 1.7 6.2 5"></path>
           </svg>
-          <span class="dev-header-action-label">{{ 'content.account_title' | t }}</span>
+          <span class="jci-header-action-label">{{ 'content.account_title' | t }}</span>
         </a>
       {%- endif -%}
 
@@ -162,13 +162,13 @@
             <path d="M5.4 8.5h13.2l1 11H4.4l1-11Z"></path>
             <path d="M8.5 9V6.8a3.5 3.5 0 0 1 7 0V9"></path>
           </svg>
-          <span class="dev-header-action-label">{{ 'content.cart_title' | t }}</span>
-          <span class="dev-header-cart-count">{{ cart.item_count }}</span>
+          <span class="jci-header-action-label">{{ 'content.cart_title' | t }}</span>
+          <span class="jci-header-cart-count">{{ cart.item_count }}</span>
         {%- endcapture -%}
 
         {%- if settings.cart_type == 'drawer' and template.name != 'cart' -%}
           <button
-            class="dev-header-icon-button dev-header-cart-trigger"
+            class="jci-header-icon-button jci-header-cart-trigger"
             type="button"
             on:click="#cart-drawer/toggle"
             aria-haspopup="dialog"
@@ -180,7 +180,7 @@
           </button>
         {%- else -%}
           <a
-            class="dev-header-icon-button dev-header-cart-trigger"
+            class="jci-header-icon-button jci-header-cart-trigger"
             href="{{ routes.cart_url }}"
             aria-label="{{ 'accessibility.cart' | t }}"
           >
@@ -192,26 +192,26 @@
   </div>
 
   {%- comment -%} Mobile navigation drawer — the prototype's own design. {%- endcomment -%}
-  <div class="dev-header-backdrop" data-dev-drawer-backdrop hidden></div>
+  <div class="jci-header-backdrop" data-jci-drawer-backdrop hidden></div>
 
   <aside
-    class="dev-header-drawer"
-    id="dev-header-drawer"
-    data-dev-drawer
+    class="jci-header-drawer"
+    id="jci-header-drawer"
+    data-jci-drawer
     aria-label="{{ 'accessibility.menu' | t | default: shop.name }}"
     aria-hidden="true"
     inert
   >
-    <div class="dev-header-drawer-head">
-      <button class="dev-header-drawer-back" type="button" data-dev-drawer-close>
+    <div class="jci-header-drawer-head">
+      <button class="jci-header-drawer-back" type="button" data-jci-drawer-close>
         <span aria-hidden="true">&larr;</span> {{ 'actions.close' | t }}
       </button>
-      <span class="dev-eyebrow">{{ shop.name }}</span>
+      <span class="jci-eyebrow">{{ shop.name }}</span>
     </div>
 
     {%- if s.drawer_eyebrow != blank -%}
-      <div class="dev-header-drawer-intro">
-        <span class="dev-eyebrow">{{ s.drawer_eyebrow }}</span>
+      <div class="jci-header-drawer-intro">
+        <span class="jci-eyebrow">{{ s.drawer_eyebrow }}</span>
         {%- if menu != blank -%}
           <span>{{ menu.links.size }} {{ s.drawer_count_label }}</span>
         {%- endif -%}
@@ -219,9 +219,9 @@
     {%- endif -%}
 
     {%- if menu != blank and menu.links.size > 0 -%}
-      <nav class="dev-header-drawer-nav">
+      <nav class="jci-header-drawer-nav">
         {%- for link in menu.links -%}
-          <a class="dev-header-drawer-link" href="{{ link.url }}">
+          <a class="jci-header-drawer-link" href="{{ link.url }}">
             {{ link.title }} <span aria-hidden="true">&#8599;</span>
           </a>
         {%- endfor -%}
@@ -229,49 +229,49 @@
     {%- endif -%}
 
     {%- if s.drawer_footer_left != blank or s.drawer_footer_right != blank -%}
-      <div class="dev-header-drawer-footer">
+      <div class="jci-header-drawer-footer">
         <span>{{ s.drawer_footer_left }}</span>
         <span>{{ s.drawer_footer_right }}</span>
       </div>
     {%- endif -%}
   </aside>
-</dev-header>
+</jci-header>
 
-<script src="{{ 'dev-header.js' | asset_url }}" type="module"></script>
+<script src="{{ 'jci-header.js' | asset_url }}" type="module"></script>
 
 {% stylesheet %}
-  .dev-header {
+  .jci-header {
     position: relative;
     z-index: 10;
     display: block;
     isolation: isolate;
-    color: var(--dev-header-text);
+    color: var(--jci-header-text);
     background: linear-gradient(
       180deg,
-      rgb(var(--dev-header-bg-rgb) / var(--dev-header-bg-opacity-top)),
-      rgb(var(--dev-header-bg-rgb) / var(--dev-header-bg-opacity-bottom))
+      rgb(var(--jci-header-bg-rgb) / var(--jci-header-bg-opacity-top)),
+      rgb(var(--jci-header-bg-rgb) / var(--jci-header-bg-opacity-bottom))
     );
-    border-block-end: 1px solid rgb(var(--color-foreground-rgb) / var(--dev-header-border-opacity));
+    border-block-end: 1px solid rgb(var(--color-foreground-rgb) / var(--jci-header-border-opacity));
     box-shadow: 0 8px 24px rgb(var(--color-foreground-rgb) / 0.04);
-    backdrop-filter: blur(var(--dev-header-blur)) saturate(var(--dev-header-saturate));
-    -webkit-backdrop-filter: blur(var(--dev-header-blur)) saturate(var(--dev-header-saturate));
-    animation: var(--dev-header-reveal-name, dev-header-reveal) 0.8s var(--dev-ease) both;
-    transition: background 0.35s var(--dev-ease), border-color 0.35s var(--dev-ease),
-      box-shadow 0.35s var(--dev-ease);
+    backdrop-filter: blur(var(--jci-header-blur)) saturate(var(--jci-header-saturate));
+    -webkit-backdrop-filter: blur(var(--jci-header-blur)) saturate(var(--jci-header-saturate));
+    animation: var(--jci-header-reveal-name, jci-header-reveal) 0.8s var(--jci-ease) both;
+    transition: background 0.35s var(--jci-ease), border-color 0.35s var(--jci-ease),
+      box-shadow 0.35s var(--jci-ease);
   }
 
-  .dev-header[data-dev-sticky] {
+  .jci-header[data-jci-sticky] {
     position: sticky;
     top: 0;
   }
 
-  .dev-header.is-scrolled {
-    background: rgb(var(--dev-header-bg-rgb) / var(--dev-header-bg-opacity-scrolled));
+  .jci-header.is-scrolled {
+    background: rgb(var(--jci-header-bg-rgb) / var(--jci-header-bg-opacity-scrolled));
     box-shadow: 0 10px 28px rgb(var(--color-foreground-rgb) / 0.08);
   }
 
   /* One-off light sweep across the header on first paint. */
-  .dev-header::before {
+  .jci-header::before {
     content: '';
     position: absolute;
     inset: 0;
@@ -279,51 +279,51 @@
     background: linear-gradient(105deg, transparent 35%, rgb(255 255 255 / 0.55) 50%, transparent 65%);
     pointer-events: none;
     transform: translateX(-120%);
-    animation: var(--dev-header-glint-name, dev-header-glint) 1.4s 0.25s var(--dev-ease) both;
+    animation: var(--jci-header-glint-name, jci-header-glint) 1.4s 0.25s var(--jci-ease) both;
   }
 
-  .dev-header-container {
+  .jci-header-container {
     position: relative;
     z-index: 1;
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
     align-items: center;
     gap: 1rem;
-    min-height: var(--dev-header-height);
+    min-height: var(--jci-header-height);
     padding-block: 0.75rem;
-    transition: min-height 0.35s var(--dev-ease), padding 0.35s var(--dev-ease);
+    transition: min-height 0.35s var(--jci-ease), padding 0.35s var(--jci-ease);
   }
 
-  .dev-header.is-scrolled .dev-header-container {
-    min-height: var(--dev-header-height-scrolled);
+  .jci-header.is-scrolled .jci-header-container {
+    min-height: var(--jci-header-height-scrolled);
     padding-block: 0.4rem;
   }
 
   /* --- Desktop navigation --- */
-  .dev-header-nav {
+  .jci-header-nav {
     display: flex;
     align-items: center;
     min-width: 0;
-    gap: var(--dev-header-nav-gap);
+    gap: var(--jci-header-nav-gap);
   }
 
-  .dev-header-nav-link {
+  .jci-header-nav-link {
     position: relative;
     display: inline-flex;
     align-items: center;
     padding: 0.5rem 0.05rem;
     color: inherit;
-    font-family: var(--dev-font-label);
-    font-size: var(--dev-header-nav-size);
+    font-family: var(--jci-font-label);
+    font-size: var(--jci-header-nav-size);
     line-height: 1;
-    letter-spacing: var(--dev-header-nav-tracking);
+    letter-spacing: var(--jci-header-nav-tracking);
     text-decoration: none;
     text-transform: uppercase;
-    transition: color 0.3s var(--dev-ease), transform 0.3s var(--dev-ease);
+    transition: color 0.3s var(--jci-ease), transform 0.3s var(--jci-ease);
   }
 
   /* Dot that appears to the left of a hovered link. */
-  .dev-header-nav-link::before {
+  .jci-header-nav-link::before {
     content: '';
     position: absolute;
     inset-block-start: 50%;
@@ -331,13 +331,13 @@
     width: 4px;
     height: 4px;
     border-radius: 50%;
-    background: var(--dev-header-nav-dot);
+    background: var(--jci-header-nav-dot);
     transform: translateY(-50%) scale(0);
-    transition: transform 0.3s var(--dev-ease);
+    transition: transform 0.3s var(--jci-ease);
   }
 
   /* Underline that sweeps in from the left. */
-  .dev-header-nav-link::after {
+  .jci-header-nav-link::after {
     content: '';
     position: absolute;
     inset-inline: 0;
@@ -346,64 +346,64 @@
     background: currentcolor;
     transform: scaleX(0);
     transform-origin: left;
-    transition: transform 0.4s var(--dev-ease);
+    transition: transform 0.4s var(--jci-ease);
   }
 
-  .dev-header-nav-link:hover,
-  .dev-header-nav-link:focus-visible {
-    color: var(--dev-header-nav-hover);
+  .jci-header-nav-link:hover,
+  .jci-header-nav-link:focus-visible {
+    color: var(--jci-header-nav-hover);
     transform: translateY(-2px);
   }
 
-  .dev-header-nav-link:hover::before,
-  .dev-header-nav-link:focus-visible::before {
+  .jci-header-nav-link:hover::before,
+  .jci-header-nav-link:focus-visible::before {
     transform: translateY(-50%) scale(1);
   }
 
-  .dev-header-nav-link:hover::after,
-  .dev-header-nav-link:focus-visible::after {
+  .jci-header-nav-link:hover::after,
+  .jci-header-nav-link:focus-visible::after {
     transform: scaleX(1);
   }
 
   /* --- Logo --- */
-  .dev-header-wordmark {
+  .jci-header-wordmark {
     position: relative;
     justify-self: center;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: min(var(--dev-header-logo-width), 24vw);
-    height: var(--dev-header-logo-height);
+    width: min(var(--jci-header-logo-width), 24vw);
+    height: var(--jci-header-logo-height);
     overflow: visible;
-    animation: var(--dev-header-logo-reveal-name, dev-header-logo-reveal) 0.85s 0.08s var(--dev-ease) both;
-    transition: transform 0.4s var(--dev-ease), height 0.35s var(--dev-ease);
+    animation: var(--jci-header-logo-reveal-name, jci-header-logo-reveal) 0.85s 0.08s var(--jci-ease) both;
+    transition: transform 0.4s var(--jci-ease), height 0.35s var(--jci-ease);
   }
 
-  .dev-header-wordmark:hover,
-  .dev-header-wordmark:focus-visible {
+  .jci-header-wordmark:hover,
+  .jci-header-wordmark:focus-visible {
     transform: translateY(-2px);
   }
 
-  .dev-header-logo {
+  .jci-header-logo {
     display: block;
     width: 100%;
     max-width: 100%;
     height: 100%;
     object-fit: contain;
-    transition: transform 0.5s var(--dev-ease);
+    transition: transform 0.5s var(--jci-ease);
   }
 
-  .dev-header-wordmark:hover .dev-header-logo,
-  .dev-header-wordmark:focus-visible .dev-header-logo {
+  .jci-header-wordmark:hover .jci-header-logo,
+  .jci-header-wordmark:focus-visible .jci-header-logo {
     transform: scale(1.035);
   }
 
-  .dev-header.is-scrolled .dev-header-wordmark {
-    height: var(--dev-header-logo-height-scrolled);
+  .jci-header.is-scrolled .jci-header-wordmark {
+    height: var(--jci-header-logo-height-scrolled);
   }
 
   /* --- Actions --- */
-  .dev-header-actions {
+  .jci-header-actions {
     display: flex;
     align-items: center;
     justify-content: flex-end;
@@ -411,7 +411,7 @@
     gap: clamp(0.75rem, 1.7vw, 1.5rem);
   }
 
-  .dev-header-icon-button {
+  .jci-header-icon-button {
     position: relative;
     display: inline-flex;
     align-items: center;
@@ -422,167 +422,167 @@
     background: transparent;
     text-decoration: none;
     cursor: pointer;
-    transition: color 0.3s var(--dev-ease), transform 0.35s var(--dev-ease);
+    transition: color 0.3s var(--jci-ease), transform 0.35s var(--jci-ease);
   }
 
   /* Pill that fades in behind a hovered action. */
-  .dev-header-icon-button::before {
+  .jci-header-icon-button::before {
     content: '';
     position: absolute;
     inset: 0.1rem -0.35rem;
     z-index: 0;
     border: 1px solid transparent;
     border-radius: 999px;
-    background: rgb(var(--dev-olive-rgb) / 0);
+    background: rgb(var(--jci-olive-rgb) / 0);
     pointer-events: none;
     transform: scale(0.85);
-    transition: border-color 0.3s var(--dev-ease), background-color 0.3s var(--dev-ease),
-      transform 0.35s var(--dev-ease);
+    transition: border-color 0.3s var(--jci-ease), background-color 0.3s var(--jci-ease),
+      transform 0.35s var(--jci-ease);
   }
 
-  .dev-header-icon-button > * {
+  .jci-header-icon-button > * {
     position: relative;
     z-index: 1;
   }
 
-  .dev-header-icon-button svg {
-    width: var(--dev-header-icon-size);
-    height: var(--dev-header-icon-size);
+  .jci-header-icon-button svg {
+    width: var(--jci-header-icon-size);
+    height: var(--jci-header-icon-size);
     fill: none;
     stroke: currentcolor;
-    stroke-width: var(--dev-header-icon-stroke);
-    transition: transform 0.35s var(--dev-ease);
+    stroke-width: var(--jci-header-icon-stroke);
+    transition: transform 0.35s var(--jci-ease);
   }
 
-  .dev-header-icon-button:hover,
-  .dev-header-icon-button:focus-visible {
-    color: var(--dev-header-nav-hover);
+  .jci-header-icon-button:hover,
+  .jci-header-icon-button:focus-visible {
+    color: var(--jci-header-nav-hover);
     transform: translateY(-2px);
   }
 
-  .dev-header-icon-button:hover::before,
-  .dev-header-icon-button:focus-visible::before {
-    border-color: rgb(var(--dev-olive-rgb) / 0.35);
-    background: rgb(var(--dev-olive-rgb) / 0.07);
+  .jci-header-icon-button:hover::before,
+  .jci-header-icon-button:focus-visible::before {
+    border-color: rgb(var(--jci-olive-rgb) / 0.35);
+    background: rgb(var(--jci-olive-rgb) / 0.07);
     transform: scale(1);
   }
 
-  .dev-header-icon-button:hover svg,
-  .dev-header-icon-button:focus-visible svg {
+  .jci-header-icon-button:hover svg,
+  .jci-header-icon-button:focus-visible svg {
     transform: scale(1.08) rotate(-6deg);
   }
 
-  .dev-header-action-label,
-  .dev-header-menu-label {
-    font-family: var(--dev-font-label);
-    font-size: var(--dev-header-label-size);
+  .jci-header-action-label,
+  .jci-header-menu-label {
+    font-family: var(--jci-font-label);
+    font-size: var(--jci-header-label-size);
     line-height: 1;
-    letter-spacing: var(--dev-header-label-tracking);
+    letter-spacing: var(--jci-header-label-tracking);
     text-transform: uppercase;
   }
 
   /* --- Cart count --- */
-  .dev-header-cart-trigger {
+  .jci-header-cart-trigger {
     position: relative;
   }
 
-  .dev-header-cart-count {
+  .jci-header-cart-count {
     display: inline-grid;
     place-items: center;
-    min-width: var(--dev-header-badge-size);
-    height: var(--dev-header-badge-size);
+    min-width: var(--jci-header-badge-size);
+    height: var(--jci-header-badge-size);
     margin-inline-start: -0.25rem;
     padding-inline: 0.2rem;
-    color: var(--dev-header-bg);
-    background: var(--dev-header-badge-bg);
+    color: var(--jci-header-bg);
+    background: var(--jci-header-badge-bg);
     border-radius: 50%;
-    font-family: var(--dev-font-label);
+    font-family: var(--jci-font-label);
     font-size: 9px;
     line-height: 1;
-    transition: background-color 0.3s var(--dev-ease), transform 0.3s var(--dev-ease);
+    transition: background-color 0.3s var(--jci-ease), transform 0.3s var(--jci-ease);
   }
 
-  .dev-header-cart-trigger:hover .dev-header-cart-count,
-  .dev-header-cart-trigger:focus-visible .dev-header-cart-count {
-    background: var(--dev-header-badge-hover-bg);
+  .jci-header-cart-trigger:hover .jci-header-cart-count,
+  .jci-header-cart-trigger:focus-visible .jci-header-cart-count {
+    background: var(--jci-header-badge-hover-bg);
     transform: translate(1px, -2px);
   }
 
   /* --- Mobile menu trigger --- */
-  .dev-header-menu-trigger {
+  .jci-header-menu-trigger {
     display: none;
   }
 
-  .dev-header-menu-icon {
+  .jci-header-menu-icon {
     display: flex;
     flex-direction: column;
     gap: 4px;
     width: 17px;
   }
 
-  .dev-header-menu-icon i {
+  .jci-header-menu-icon i {
     display: block;
     width: 100%;
     height: 1px;
     background: currentcolor;
-    transition: transform 0.25s var(--dev-ease);
+    transition: transform 0.25s var(--jci-ease);
   }
 
-  .dev-header-menu-trigger[aria-expanded='true'] .dev-header-menu-icon i:first-child {
+  .jci-header-menu-trigger[aria-expanded='true'] .jci-header-menu-icon i:first-child {
     transform: translateY(2.5px) rotate(45deg);
   }
 
-  .dev-header-menu-trigger[aria-expanded='true'] .dev-header-menu-icon i:last-child {
+  .jci-header-menu-trigger[aria-expanded='true'] .jci-header-menu-icon i:last-child {
     transform: translateY(-2.5px) rotate(-45deg);
   }
 
   /* --- Mobile drawer --- */
-  .dev-header-backdrop {
+  .jci-header-backdrop {
     position: fixed;
     inset: 0;
     z-index: 20;
     background: rgb(15 17 14 / 0.48);
     opacity: 0;
-    transition: opacity 0.4s var(--dev-ease);
+    transition: opacity 0.4s var(--jci-ease);
   }
 
-  .dev-header-backdrop.is-visible {
+  .jci-header-backdrop.is-visible {
     opacity: 1;
   }
 
-  .dev-header-backdrop[hidden] {
+  .jci-header-backdrop[hidden] {
     display: none;
   }
 
-  .dev-header-drawer {
+  .jci-header-drawer {
     position: fixed;
     inset-block: 0;
     inset-inline-start: 0;
     z-index: 30;
     isolation: isolate;
     overflow: hidden;
-    width: min(var(--dev-header-drawer-width), 91vw);
-    padding: 1.5rem var(--dev-page-pad);
+    width: min(var(--jci-header-drawer-width), 91vw);
+    padding: 1.5rem var(--jci-page-pad);
     color: var(--color-foreground);
-    background: var(--dev-header-drawer-bg);
+    background: var(--jci-header-drawer-bg);
     box-shadow: 0 0 40px rgb(15 17 14 / 0.14);
     transform: translateX(-105%);
-    transition: transform 0.45s var(--dev-ease);
+    transition: transform 0.45s var(--jci-ease);
   }
 
-  .dev-header-drawer.is-open {
+  .jci-header-drawer.is-open {
     transform: translateX(0);
   }
 
   /* Oversized monogram watermark behind the drawer content. */
-  .dev-header-drawer::before {
+  .jci-header-drawer::before {
     content: 'MC';
     position: absolute;
     inset-inline-end: -0.08em;
     inset-block-end: -0.08em;
     z-index: -1;
-    color: rgb(var(--dev-olive-rgb) / 0.13);
-    font-family: var(--dev-font-display);
+    color: rgb(var(--jci-olive-rgb) / 0.13);
+    font-family: var(--jci-font-display);
     font-size: clamp(14rem, 53vw, 25rem);
     font-weight: 600;
     line-height: 0.72;
@@ -590,21 +590,21 @@
     pointer-events: none;
   }
 
-  .dev-header-drawer-head {
+  .jci-header-drawer-head {
     position: relative;
     z-index: 1;
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding-block-end: 1rem;
-    border-block-end: 1px solid var(--dev-line);
+    border-block-end: 1px solid var(--jci-line);
   }
 
-  .dev-header-drawer-head .dev-eyebrow {
-    color: var(--dev-olive);
+  .jci-header-drawer-head .jci-eyebrow {
+    color: var(--jci-olive);
   }
 
-  .dev-header-drawer-back {
+  .jci-header-drawer-back {
     display: inline-flex;
     align-items: center;
     gap: 0.45rem;
@@ -612,24 +612,24 @@
     border: 0;
     color: inherit;
     background: transparent;
-    font-family: var(--dev-font-label);
+    font-family: var(--jci-font-label);
     font-size: 9px;
     letter-spacing: 0.12em;
     text-transform: uppercase;
     cursor: pointer;
   }
 
-  .dev-header-drawer-back span {
+  .jci-header-drawer-back span {
     font-size: 16px;
-    transition: transform 0.3s var(--dev-ease);
+    transition: transform 0.3s var(--jci-ease);
   }
 
-  .dev-header-drawer-back:hover span,
-  .dev-header-drawer-back:focus-visible span {
+  .jci-header-drawer-back:hover span,
+  .jci-header-drawer-back:focus-visible span {
     transform: translateX(-3px);
   }
 
-  .dev-header-drawer-intro {
+  .jci-header-drawer-intro {
     position: relative;
     z-index: 1;
     display: flex;
@@ -638,19 +638,19 @@
     gap: 1rem;
     margin-block-start: clamp(2.3rem, 10vw, 4rem);
     padding-block-end: 0.85rem;
-    border-block-end: 1px solid var(--dev-line);
-    color: var(--dev-stone);
-    font-family: var(--dev-font-label);
+    border-block-end: 1px solid var(--jci-line);
+    color: var(--jci-stone);
+    font-family: var(--jci-font-label);
     font-size: 8px;
     letter-spacing: 0.11em;
     text-transform: uppercase;
   }
 
-  .dev-header-drawer-intro .dev-eyebrow {
-    color: var(--dev-olive);
+  .jci-header-drawer-intro .jci-eyebrow {
+    color: var(--jci-olive);
   }
 
-  .dev-header-drawer-nav {
+  .jci-header-drawer-nav {
     position: relative;
     z-index: 1;
     display: grid;
@@ -658,31 +658,31 @@
     padding-block-start: 0.35rem;
   }
 
-  .dev-header-drawer-link {
+  .jci-header-drawer-link {
     display: flex;
     justify-content: space-between;
     padding-block: 1rem;
-    border-block-end: 1px solid var(--dev-line);
+    border-block-end: 1px solid var(--jci-line);
     color: inherit;
-    font-family: var(--dev-font-display);
+    font-family: var(--jci-font-display);
     font-size: 28px;
     text-decoration: none;
   }
 
-  .dev-header-drawer-link span {
-    font-family: var(--dev-font-sans);
+  .jci-header-drawer-link span {
+    font-family: var(--jci-font-sans);
     font-size: 17px;
   }
 
-  .dev-header-drawer-back:focus-visible,
-  .dev-header-drawer-link:focus-visible {
-    outline: 2px solid var(--dev-rust);
+  .jci-header-drawer-back:focus-visible,
+  .jci-header-drawer-link:focus-visible {
+    outline: 2px solid var(--jci-rust);
     outline-offset: 4px;
   }
 
-  .dev-header-drawer-footer {
+  .jci-header-drawer-footer {
     position: absolute;
-    inset-inline: var(--dev-page-pad);
+    inset-inline: var(--jci-page-pad);
     inset-block-end: 2.5rem;
     z-index: 1;
     display: flex;
@@ -690,14 +690,14 @@
     justify-content: space-between;
     gap: 1rem;
     padding-block-start: 1.3rem;
-    border-block-start: 1px solid var(--dev-line);
-    font-family: var(--dev-font-label);
+    border-block-start: 1px solid var(--jci-line);
+    font-family: var(--jci-font-label);
     font-size: 9px;
     letter-spacing: 0.1em;
     text-transform: uppercase;
   }
 
-  @keyframes dev-header-reveal {
+  @keyframes jci-header-reveal {
     from {
       opacity: 0;
       transform: translateY(-14px);
@@ -709,7 +709,7 @@
     }
   }
 
-  @keyframes dev-header-logo-reveal {
+  @keyframes jci-header-logo-reveal {
     from {
       opacity: 0;
       transform: translateY(-8px) scale(0.96);
@@ -721,7 +721,7 @@
     }
   }
 
-  @keyframes dev-header-glint {
+  @keyframes jci-header-glint {
     0%,
     55% {
       opacity: 0;
@@ -739,78 +739,78 @@
   }
 
   @media screen and (max-width: 900px) {
-    .dev-header-nav {
+    .jci-header-nav {
       gap: 1rem;
     }
 
-    .dev-header[data-dev-hide-labels-tablet] .dev-header-action-label {
+    .jci-header[data-jci-hide-labels-tablet] .jci-header-action-label {
       display: none;
     }
   }
 
   @media screen and (max-width: 680px) {
-    .dev-header-container {
+    .jci-header-container {
       grid-template-columns: minmax(34px, 1fr) auto minmax(0, 1fr);
       gap: 0.5rem;
-      min-height: var(--dev-header-height-mobile);
+      min-height: var(--jci-header-height-mobile);
       padding-block: 0.65rem;
     }
 
-    .dev-header-nav {
+    .jci-header-nav {
       display: none;
     }
 
-    .dev-header[data-dev-hide-account-mobile] .dev-header-account-trigger {
+    .jci-header[data-jci-hide-account-mobile] .jci-header-account-trigger {
       display: none;
     }
 
-    .dev-header-menu-trigger {
+    .jci-header-menu-trigger {
       display: inline-flex;
       justify-content: flex-start;
       min-width: 34px;
     }
 
-    .dev-header-actions {
+    .jci-header-actions {
       gap: 0.55rem;
     }
 
-    .dev-header-search-trigger,
-    .dev-header-cart-trigger {
+    .jci-header-search-trigger,
+    .jci-header-cart-trigger {
       justify-content: center;
       min-width: 34px;
     }
 
-    .dev-header-search-trigger svg,
-    .dev-header-cart-trigger svg {
+    .jci-header-search-trigger svg,
+    .jci-header-cart-trigger svg {
       width: 18px;
       height: 18px;
     }
 
-    .dev-header-wordmark {
-      width: min(var(--dev-header-logo-width-mobile), 46vw);
-      height: var(--dev-header-logo-height-mobile);
+    .jci-header-wordmark {
+      width: min(var(--jci-header-logo-width-mobile), 46vw);
+      height: var(--jci-header-logo-height-mobile);
     }
 
-    .dev-header-drawer {
+    .jci-header-drawer {
       width: 100%;
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .dev-header,
-    .dev-header::before,
-    .dev-header-wordmark {
+    .jci-header,
+    .jci-header::before,
+    .jci-header-wordmark {
       animation: none;
     }
 
-    .dev-header-nav-link,
-    .dev-header-nav-link::before,
-    .dev-header-nav-link::after,
-    .dev-header-icon-button,
-    .dev-header-icon-button::before,
-    .dev-header-icon-button svg,
-    .dev-header-drawer,
-    .dev-header-backdrop {
+    .jci-header-nav-link,
+    .jci-header-nav-link::before,
+    .jci-header-nav-link::after,
+    .jci-header-icon-button,
+    .jci-header-icon-button::before,
+    .jci-header-icon-button svg,
+    .jci-header-drawer,
+    .jci-header-backdrop {
       transition: none;
     }
   }
@@ -820,7 +820,7 @@
 {
   "name": "Header",
   "tag": "header",
-  "class": "dev-header-section",
+  "class": "jci-header-section",
   "enabled_on": {
     "groups": ["header"]
   },
