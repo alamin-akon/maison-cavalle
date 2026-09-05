@@ -18,6 +18,9 @@ const NARROW_QUERY = '(max-width: 680px)';
 const DRAG_AXIS_THRESHOLD = 8;
 const DRAG_MOVE_THRESHOLD = 4;
 const CLICK_SUPPRESS_MS = 350;
+/* Below this the section has no usable scroll runway, so scroll-driving it
+   would just snap between the first and last card. */
+const MIN_TRAVEL = 120;
 
 class JciBestSellers extends HTMLElement {
   #frame = null;
@@ -81,12 +84,28 @@ class JciBestSellers extends HTMLElement {
       return;
     }
 
-    if (this.narrowQuery.matches) {
+    // Without a runway taller than the viewport there is no scroll to read, so
+    // the stack falls back to being stepped rather than freezing at progress 0.
+    if (this.narrowQuery.matches || this.#travel() < MIN_TRAVEL) {
       this.#presentByIndex(this.#narrowIndex);
       return;
     }
 
     this.#presentByScroll();
+  }
+
+  /**
+   * offsetTop/offsetHeight are measured against offsetParent, which is any
+   * positioned ancestor — a section wrapper is enough to throw them off. The
+   * viewport rect plus the scroll offset is the same number without that trap.
+   */
+  #geometry() {
+    const rect = this.getBoundingClientRect();
+    return { top: rect.top, documentTop: rect.top + window.scrollY, height: rect.height };
+  }
+
+  #travel() {
+    return this.#geometry().height - window.innerHeight;
   }
 
   /* --- Presentations --- */
@@ -104,8 +123,9 @@ class JciBestSellers extends HTMLElement {
 
   /** Scroll progress through the section deals the cards. */
   #presentByScroll() {
-    const travel = Math.max(this.offsetHeight - window.innerHeight, 1);
-    const progress = Math.min(1, Math.max(0, -this.getBoundingClientRect().top / travel));
+    const { top } = this.#geometry();
+    const travel = Math.max(this.#travel(), 1);
+    const progress = Math.min(1, Math.max(0, -top / travel));
     const position = progress * (this.cards.length - 1);
     const activeIndex = Math.min(this.cards.length - 1, Math.round(position));
 
@@ -211,14 +231,18 @@ class JciBestSellers extends HTMLElement {
     if (this.cards.length < 2) return;
     const nextIndex = Math.min(this.cards.length - 1, Math.max(0, index));
 
-    if (this.narrowQuery.matches && !this.motionQuery.matches) {
+    const travel = this.#travel();
+
+    // Same two cases as #update: no runway, or too narrow, means stepping the
+    // stack in place rather than scrolling the page to it.
+    if (this.motionQuery.matches || this.narrowQuery.matches || travel < MIN_TRAVEL) {
       this.#presentByIndex(nextIndex);
       return;
     }
 
-    const travel = Math.max(this.offsetHeight - window.innerHeight, 1);
-    const top = this.offsetTop + (travel * nextIndex) / (this.cards.length - 1);
-    window.scrollTo({ top, behavior: this.motionQuery.matches ? 'auto' : 'smooth' });
+    const { documentTop } = this.#geometry();
+    const target = documentTop + (travel * nextIndex) / (this.cards.length - 1);
+    window.scrollTo({ top: target, behavior: 'smooth' });
   }
 
   #handleControlClick = (event) => {

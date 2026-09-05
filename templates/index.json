@@ -268,7 +268,7 @@
           "name": "Product",
           "settings": {
             "product": "angelic",
-            "video_main_asset": "jci-editorial-motion.mp4",
+            "video_main_asset": "",
             "image_main_asset": "",
             "image_alt_main": "",
             "index_main": "01 / 02",
@@ -284,7 +284,7 @@
           "name": "Product",
           "settings": {
             "product": "almas",
-            "video_main_asset": "jci-editorial-considered.mp4",
+            "video_main_asset": "",
             "image_main_asset": "",
             "image_alt_main": "",
             "index_main": "01 / 02",
@@ -344,7 +344,7 @@
         "piece_1": {
           "type": "piece",
           "settings": {
-            "product": "",
+            "product": "blue-sapphire-supercharged",
             "category": "",
             "badge": "The Maison edit"
           }
@@ -352,7 +352,7 @@
         "piece_2": {
           "type": "piece",
           "settings": {
-            "product": "",
+            "product": "bodacious",
             "category": "",
             "badge": "The Maison edit"
           }
@@ -360,7 +360,7 @@
         "piece_3": {
           "type": "piece",
           "settings": {
-            "product": "",
+            "product": "dasman",
             "category": "",
             "badge": "The Maison edit"
           }
@@ -368,7 +368,7 @@
         "piece_4": {
           "type": "piece",
           "settings": {
-            "product": "",
+            "product": "consort",
             "category": "",
             "badge": "The Maison edit"
           }
