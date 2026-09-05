@@ -22,6 +22,27 @@ const CLICK_SUPPRESS_MS = 350;
    would just snap between the first and last card. */
 const MIN_TRAVEL = 120;
 
+/**
+ * Horizon locks html/body to 100dvh on desktop (base.css:28), so the page
+ * scrolls inside .page-wrapper and `window` never fires a scroll event. These
+ * two find whatever is actually scrolling instead of assuming it is the window.
+ */
+function scrollRoot(from) {
+  let node = from?.parentElement;
+  while (node && node !== document.body && node !== document.documentElement) {
+    const overflowY = getComputedStyle(node).overflowY;
+    const scrolls = overflowY === 'auto' || overflowY === 'scroll' || overflowY === 'hidden';
+    if (scrolls && node.scrollHeight > node.clientHeight + 1) return node;
+    node = node.parentElement;
+  }
+  return null;
+}
+
+function scrollTopOf(root) {
+  if (root) return root.scrollTop;
+  return window.scrollY || document.documentElement.scrollTop || 0;
+}
+
 class JciBestSellers extends HTMLElement {
   #frame = null;
   #drag = null;
@@ -47,7 +68,9 @@ class JciBestSellers extends HTMLElement {
 
     this.narrowQuery.addEventListener('change', this.#requestUpdate);
     this.motionQuery.addEventListener('change', this.#requestUpdate);
-    window.addEventListener('scroll', this.#requestUpdate, { passive: true });
+    // Capture on document: scroll does not bubble, but it does pass through
+    // the capture phase, so this catches whichever element actually scrolls.
+    document.addEventListener('scroll', this.#requestUpdate, { capture: true, passive: true });
     window.addEventListener('resize', this.#requestUpdate, { passive: true });
 
     this.#setupDrag();
@@ -64,7 +87,7 @@ class JciBestSellers extends HTMLElement {
 
     this.narrowQuery?.removeEventListener('change', this.#requestUpdate);
     this.motionQuery?.removeEventListener('change', this.#requestUpdate);
-    window.removeEventListener('scroll', this.#requestUpdate);
+    document.removeEventListener('scroll', this.#requestUpdate, { capture: true });
     window.removeEventListener('resize', this.#requestUpdate);
   }
 
@@ -100,8 +123,9 @@ class JciBestSellers extends HTMLElement {
    * viewport rect plus the scroll offset is the same number without that trap.
    */
   #geometry() {
+    const root = scrollRoot(this);
     const rect = this.getBoundingClientRect();
-    return { top: rect.top, documentTop: rect.top + window.scrollY, height: rect.height };
+    return { top: rect.top, scrolled: scrollTopOf(root), root, height: rect.height };
   }
 
   #travel() {
@@ -240,9 +264,9 @@ class JciBestSellers extends HTMLElement {
       return;
     }
 
-    const { documentTop } = this.#geometry();
-    const target = documentTop + (travel * nextIndex) / (this.cards.length - 1);
-    window.scrollTo({ top: target, behavior: 'smooth' });
+    const { top, scrolled, root } = this.#geometry();
+    const target = scrolled + top + (travel * nextIndex) / (this.cards.length - 1);
+    (root ?? window).scrollTo({ top: target, behavior: 'smooth' });
   }
 
   #handleControlClick = (event) => {

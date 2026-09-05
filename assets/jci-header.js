@@ -10,6 +10,27 @@
  */
 const SCROLL_THRESHOLD = 8;
 
+/**
+ * Horizon locks html/body to 100dvh on desktop (base.css:28), so the page
+ * scrolls inside .page-wrapper and `window` never fires a scroll event. These
+ * two find whatever is actually scrolling instead of assuming it is the window.
+ */
+function scrollRoot(from) {
+  let node = from?.parentElement;
+  while (node && node !== document.body && node !== document.documentElement) {
+    const overflowY = getComputedStyle(node).overflowY;
+    const scrolls = overflowY === 'auto' || overflowY === 'scroll' || overflowY === 'hidden';
+    if (scrolls && node.scrollHeight > node.clientHeight + 1) return node;
+    node = node.parentElement;
+  }
+  return null;
+}
+
+function scrollTopOf(root) {
+  if (root) return root.scrollTop;
+  return window.scrollY || document.documentElement.scrollTop || 0;
+}
+
 class JciHeader extends HTMLElement {
   #rafId = null;
 
@@ -20,7 +41,7 @@ class JciHeader extends HTMLElement {
     this.closeButton = this.querySelector('[data-jci-drawer-close]');
 
     this.#syncScrollState();
-    window.addEventListener('scroll', this.#handleScroll, { passive: true });
+    document.addEventListener('scroll', this.#handleScroll, { capture: true, passive: true });
 
     this.trigger?.addEventListener('click', this.#toggleDrawer);
     this.closeButton?.addEventListener('click', this.#closeDrawer);
@@ -29,7 +50,7 @@ class JciHeader extends HTMLElement {
   }
 
   disconnectedCallback() {
-    window.removeEventListener('scroll', this.#handleScroll);
+    document.removeEventListener('scroll', this.#handleScroll, { capture: true });
     this.trigger?.removeEventListener('click', this.#toggleDrawer);
     this.closeButton?.removeEventListener('click', this.#closeDrawer);
     this.backdrop?.removeEventListener('click', this.#closeDrawer);
@@ -55,7 +76,7 @@ class JciHeader extends HTMLElement {
   };
 
   #syncScrollState() {
-    this.classList.toggle('is-scrolled', window.scrollY > SCROLL_THRESHOLD);
+    this.classList.toggle('is-scrolled', scrollTopOf(scrollRoot(this)) > SCROLL_THRESHOLD);
   }
 
   /* --- Mobile drawer --- */

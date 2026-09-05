@@ -14,6 +14,27 @@ const POINTER_SHIFT_Y = 6;
 const SCROLL_FACTOR = 0.08;
 const SCROLL_MAX = 38;
 
+/**
+ * Horizon locks html/body to 100dvh on desktop (base.css:28), so the page
+ * scrolls inside .page-wrapper and `window` never fires a scroll event. These
+ * two find whatever is actually scrolling instead of assuming it is the window.
+ */
+function scrollRoot(from) {
+  let node = from?.parentElement;
+  while (node && node !== document.body && node !== document.documentElement) {
+    const overflowY = getComputedStyle(node).overflowY;
+    const scrolls = overflowY === 'auto' || overflowY === 'scroll' || overflowY === 'hidden';
+    if (scrolls && node.scrollHeight > node.clientHeight + 1) return node;
+    node = node.parentElement;
+  }
+  return null;
+}
+
+function scrollTopOf(root) {
+  if (root) return root.scrollTop;
+  return window.scrollY || document.documentElement.scrollTop || 0;
+}
+
 class JciHero extends HTMLElement {
   #index = 0;
   #titleSwapTimer = null;
@@ -56,14 +77,14 @@ class JciHero extends HTMLElement {
     }
 
     if (this.hasAttribute('data-jci-scroll-depth') && !this.reducedMotion) {
-      window.addEventListener('scroll', this.#handleScroll, { passive: true });
+      document.addEventListener('scroll', this.#handleScroll, { capture: true, passive: true });
     }
 
     this.#show(0);
   }
 
   disconnectedCallback() {
-    window.removeEventListener('scroll', this.#handleScroll);
+    document.removeEventListener('scroll', this.#handleScroll, { capture: true });
     window.clearTimeout(this.#titleSwapTimer);
     if (this.#scrollRafId !== null) cancelAnimationFrame(this.#scrollRafId);
   }
@@ -239,7 +260,7 @@ class JciHero extends HTMLElement {
 
     this.#scrollRafId = requestAnimationFrame(() => {
       this.#scrollRafId = null;
-      const drift = Math.min(window.scrollY * SCROLL_FACTOR, SCROLL_MAX);
+      const drift = Math.min(scrollTopOf(scrollRoot(this)) * SCROLL_FACTOR, SCROLL_MAX);
       this.style.setProperty('--jci-hero-scroll-y', `${drift}px`);
     });
   };
