@@ -206,8 +206,7 @@
             "title": "Elevated equestrian, for a life well lived.",
             "accent_from": 2,
             "copy": "Considered pieces shaped by a lifetime with horses. Made for the saddle, the stable and every place in between.",
-            "descriptor": "The pace of the field",
-            "video_asset": "dev-hero-ride.mp4"
+            "descriptor": "The pace of the field"
           }
         },
         "moment_ritual": {
@@ -218,8 +217,7 @@
             "title": "The quiet rituals matter most.",
             "accent_from": 3,
             "copy": "Thoughtful layers for early starts, familiar hands and the small preparations that make a day feel like your own.",
-            "descriptor": "Made for the moments before",
-            "video_asset": "dev-hero-ritual.mp4"
+            "descriptor": "Made for the moments before"
           }
         },
         "moment_everyday": {
@@ -230,8 +228,7 @@
             "title": "Made for the life around the ride.",
             "accent_from": 4,
             "copy": "A considered wardrobe with the ease to follow you from the yard to the rest of the day, wherever it takes you.",
-            "descriptor": "For every place in between",
-            "video_asset": "dev-hero-everyday.mp4"
+            "descriptor": "For every place in between"
           }
         }
       },
