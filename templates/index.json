@@ -251,14 +251,14 @@
           "type": "slide",
           "name": "Product",
           "settings": {
-            "product": "aqua-sapphire",
+            "product": "",
             "video_main_asset": "",
-            "image_main_asset": "",
-            "image_alt_main": "",
+            "image_main_asset": "jci-crest-cap-lifestyle.webp",
+            "image_alt_main": "Maison Cavallé Crest Cap in the stable",
             "index_main": "01 / 02",
             "video_secondary_asset": "",
-            "image_secondary_asset": "",
-            "image_alt_secondary": "",
+            "image_secondary_asset": "jci-crest-cap-front-logo.webp",
+            "image_alt_secondary": "Maison Cavallé Crest Cap with embroidered logo",
             "index_secondary": "02 / 02",
             "note": "Stable / everyday"
           }
@@ -267,14 +267,14 @@
           "type": "slide",
           "name": "Product",
           "settings": {
-            "product": "angelic",
+            "product": "",
             "video_main_asset": "",
-            "image_main_asset": "",
-            "image_alt_main": "",
+            "image_main_asset": "jci-active-turtleneck-front.webp",
+            "image_alt_main": "Maison Cavallé Active Turtleneck Top, front view",
             "index_main": "01 / 02",
             "video_secondary_asset": "",
-            "image_secondary_asset": "",
-            "image_alt_secondary": "",
+            "image_secondary_asset": "jci-active-turtleneck-back.webp",
+            "image_alt_secondary": "Maison Cavallé Active Turtleneck Top, back view",
             "index_secondary": "02 / 02",
             "note": "Ease / motion"
           }
@@ -283,14 +283,14 @@
           "type": "slide",
           "name": "Product",
           "settings": {
-            "product": "almas",
+            "product": "",
             "video_main_asset": "",
-            "image_main_asset": "",
-            "image_alt_main": "",
+            "image_main_asset": "jci-msfd007-riding.webp",
+            "image_alt_main": "Maison Cavallé Contrast Collar Riding Polo in motion",
             "index_main": "01 / 02",
             "video_secondary_asset": "",
-            "image_secondary_asset": "",
-            "image_alt_secondary": "",
+            "image_secondary_asset": "jci-msfd007-front.webp",
+            "image_alt_secondary": "Maison Cavallé Contrast Collar Riding Polo",
             "index_secondary": "02 / 02",
             "note": "Made / considered"
           }
