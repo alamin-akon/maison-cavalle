@@ -16,7 +16,7 @@
           "type": "moment",
           "settings": {
             "label": "The ride",
-            "video_asset": "",
+            "video_asset": "jci-hero-ride.mp4",
             "poster_asset": "",
             "eyebrow": "The first collection · 2026",
             "title": "Elevated equestrian, for a life well lived.",
@@ -29,7 +29,7 @@
           "type": "moment",
           "settings": {
             "label": "The ritual",
-            "video_asset": "",
+            "video_asset": "jci-hero-ritual.mp4",
             "poster_asset": "",
             "eyebrow": "Before the ride · 2026",
             "title": "The quiet rituals matter most.",
@@ -42,7 +42,7 @@
           "type": "moment",
           "settings": {
             "label": "The everyday",
-            "video_asset": "",
+            "video_asset": "jci-hero-everyday.mp4",
             "poster_asset": "",
             "eyebrow": "Beyond the stable · 2026",
             "title": "Made for the life around the ride.",
@@ -250,6 +250,7 @@
         "slide_stable": {
           "type": "slide",
           "settings": {
+            "video_main_asset": "jci-editorial-stable.mp4",
             "image_main_asset": "jci-crest-cap-lifestyle.webp",
             "image_alt_main": "Maison Cavallé Crest Cap in the stable",
             "index_main": "01 / 02",
@@ -262,6 +263,7 @@
         "slide_motion": {
           "type": "slide",
           "settings": {
+            "video_main_asset": "jci-editorial-motion.mp4",
             "image_main_asset": "jci-active-turtleneck-front.webp",
             "image_alt_main": "Maison Cavallé Active Turtleneck Top, front view",
             "index_main": "01 / 02",
@@ -274,6 +276,7 @@
         "slide_considered": {
           "type": "slide",
           "settings": {
+            "video_main_asset": "jci-editorial-considered.mp4",
             "image_main_asset": "jci-msfd007-riding.webp",
             "image_alt_main": "Maison Cavallé Contrast Collar Riding Polo in motion",
             "index_main": "01 / 02",
@@ -387,7 +390,9 @@
         "answer_indent": 48,
         "question_size_min": 22,
         "question_size_max": 31,
-        "anchor_id": "home-faq"
+        "anchor_id": "home-faq",
+        "toggle_duration": 320,
+        "single_open": false
       }
     }
   },

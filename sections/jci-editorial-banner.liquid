@@ -99,6 +99,35 @@
               aspect ratio stands in. Both images are object-fit: cover inside a
               fixed box, so these only serve as a pre-load hint.
             endcomment
+            comment
+              A film wins over the still on either figure. Files upload first,
+              then an assets/ filename, so a clip can live either side of the
+              20 MB asset cap — the same order the hero and story use.
+            endcomment
+            assign film_main = blank
+            if b.video_main_asset != blank
+              assign film_main = b.video_main_asset | strip | asset_url
+            elsif b.video_main != blank
+              for source in b.video_main.sources
+                if source.format == 'mp4'
+                  assign film_main = source.url
+                  break
+                endif
+              endfor
+            endif
+
+            assign film_secondary = blank
+            if b.video_secondary_asset != blank
+              assign film_secondary = b.video_secondary_asset | strip | asset_url
+            elsif b.video_secondary != blank
+              for source in b.video_secondary.sources
+                if source.format == 'mp4'
+                  assign film_secondary = source.url
+                  break
+                endif
+              endfor
+            endif
+
             assign main_width = b.image_main.width | default: 1200
             assign main_height = b.image_main.height | default: 1500
             assign secondary_width = b.image_secondary.width | default: 700
@@ -114,7 +143,20 @@
             {{ block.shopify_attributes }}
           >
             <figure class="jci-editorial-banner-figure jci-editorial-banner-figure--main">
-              {%- if main_src != blank -%}
+              {%- if film_main != blank -%}
+                <video
+                  class="jci-editorial-banner-image"
+                  autoplay
+                  muted
+                  loop
+                  playsinline
+                  preload="metadata"
+                  {% if main_src != blank %}poster="{{ main_src }}"{% endif %}
+                  aria-label="{{ b.image_alt_main | escape }}"
+                >
+                  <source src="{{ film_main }}" type="video/mp4">
+                </video>
+              {%- elsif main_src != blank -%}
                 <img
                   class="jci-editorial-banner-image"
                   src="{{ main_src }}"
@@ -140,7 +182,20 @@
             </figure>
 
             <figure class="jci-editorial-banner-figure jci-editorial-banner-figure--secondary">
-              {%- if secondary_src != blank -%}
+              {%- if film_secondary != blank -%}
+                <video
+                  class="jci-editorial-banner-image jci-editorial-banner-image--secondary"
+                  autoplay
+                  muted
+                  loop
+                  playsinline
+                  preload="metadata"
+                  {% if secondary_src != blank %}poster="{{ secondary_src }}"{% endif %}
+                  aria-label="{{ b.image_alt_secondary | escape }}"
+                >
+                  <source src="{{ film_secondary }}" type="video/mp4">
+                </video>
+              {%- elsif secondary_src != blank -%}
                 <img
                   class="jci-editorial-banner-image jci-editorial-banner-image--secondary"
                   src="{{ secondary_src }}"
@@ -706,11 +761,15 @@
       "type": "slide",
       "name": "Slide",
       "settings": [
-        { "type": "image_picker", "id": "image_main", "label": "Main image" },
+        { "type": "video", "id": "video_main", "label": "Main video", "info": "Plays in place of the main image. No 20 MB limit." },
+        { "type": "text", "id": "video_main_asset", "label": "Main video asset filename", "info": "A file in assets/. Wins over the video above." },
+        { "type": "image_picker", "id": "image_main", "label": "Main image", "info": "Also used as the video poster." },
         { "type": "text", "id": "image_main_asset", "label": "Main image asset filename", "info": "A file in assets/. Wins over the image above." },
         { "type": "text", "id": "image_alt_main", "label": "Main image alt text" },
         { "type": "text", "id": "index_main", "label": "Main image index", "default": "01 / 02" },
-        { "type": "image_picker", "id": "image_secondary", "label": "Secondary image" },
+        { "type": "video", "id": "video_secondary", "label": "Secondary video" },
+        { "type": "text", "id": "video_secondary_asset", "label": "Secondary video asset filename", "info": "A file in assets/. Wins over the video above." },
+        { "type": "image_picker", "id": "image_secondary", "label": "Secondary image", "info": "Also used as the video poster." },
         { "type": "text", "id": "image_secondary_asset", "label": "Secondary image asset filename", "info": "A file in assets/. Wins over the image above." },
         { "type": "text", "id": "image_alt_secondary", "label": "Secondary image alt text" },
         { "type": "text", "id": "index_secondary", "label": "Secondary image index", "default": "02 / 02" },
@@ -722,9 +781,9 @@
     {
       "name": "Editorial banner",
       "blocks": [
-        { "type": "slide", "settings": { "image_main_asset": "jci-crest-cap-lifestyle.webp", "image_secondary_asset": "jci-crest-cap-front-logo.webp", "note": "Stable / everyday" } },
-        { "type": "slide", "settings": { "image_main_asset": "jci-active-turtleneck-front.webp", "image_secondary_asset": "jci-active-turtleneck-back.webp", "note": "Ease / motion" } },
-        { "type": "slide", "settings": { "image_main_asset": "jci-msfd007-riding.webp", "image_secondary_asset": "jci-msfd007-front.webp", "note": "Made / considered" } }
+        { "type": "slide", "settings": { "video_main_asset": "jci-editorial-stable.mp4", "image_main_asset": "jci-crest-cap-lifestyle.webp", "image_secondary_asset": "jci-crest-cap-front-logo.webp", "note": "Stable / everyday" } },
+        { "type": "slide", "settings": { "video_main_asset": "jci-editorial-motion.mp4", "image_main_asset": "jci-active-turtleneck-front.webp", "image_secondary_asset": "jci-active-turtleneck-back.webp", "note": "Ease / motion" } },
+        { "type": "slide", "settings": { "video_main_asset": "jci-editorial-considered.mp4", "image_main_asset": "jci-msfd007-riding.webp", "image_secondary_asset": "jci-msfd007-front.webp", "note": "Made / considered" } }
       ]
     }
   ]

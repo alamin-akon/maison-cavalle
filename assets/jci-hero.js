@@ -34,7 +34,9 @@ class JciHero extends HTMLElement {
 
     this.reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    if (!this.slides.length) return;
+    // The tabs drive the copy, so they stay live even when no moment has a
+    // video or poster yet — an empty media layer used to leave them dead.
+    if (!this.slides.length && !this.tabs.length) return;
 
     for (const slide of this.slides) {
       if (slide instanceof HTMLVideoElement) {
@@ -78,9 +80,12 @@ class JciHero extends HTMLElement {
     }
   }
 
+  /* Counted off the moments, not the slides: a moment without a video still
+     has a tab and copy to show, and an empty slide list would divide by zero. */
   #normalize(index) {
-    const count = this.slides.length;
-    return ((Number(index) || 0) % count + count) % count;
+    const count = this.moments.length || this.tabs.length || this.slides.length;
+    if (!count) return 0;
+    return (((Number(index) || 0) % count) + count) % count;
   }
 
   /* --- Presentation --- */

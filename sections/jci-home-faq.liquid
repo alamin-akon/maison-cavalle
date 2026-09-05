@@ -18,8 +18,10 @@
   assign items = section.blocks | where: 'type', 'item'
 %}
 
-<section
+<jci-home-faq
   class="jci-home-faq"
+  data-jci-faq-duration="{{ s.toggle_duration }}"
+  {% if s.single_open %}data-jci-faq-single{% endif %}
   {% if s.anchor_id != blank %}id="{{ s.anchor_id | handleize }}"{% endif %}
   style="
     --jci-home-faq-bg: {{ s.background_color | default: settings.color_palette.color3 }};
@@ -82,15 +84,16 @@
             -%}
             <details
               class="jci-home-faq-item"
+              data-jci-faq-item
               {% if b.open_by_default %}open{% endif %}
               {{ block.shopify_attributes }}
             >
-              <summary class="jci-home-faq-summary">
+              <summary class="jci-home-faq-summary" data-jci-faq-summary>
                 <span class="jci-home-faq-index">{{ b.index | default: forloop.index | prepend: '0' | slice: -2, 2 }}</span>
                 <h3 class="jci-home-faq-question">{{ b.question }}</h3>
                 <b class="jci-home-faq-toggle" aria-hidden="true">&#65291;</b>
               </summary>
-              <div class="jci-home-faq-answer">{{ answer }}</div>
+              <div class="jci-home-faq-answer" data-jci-faq-answer>{{ answer }}</div>
             </details>
           {%- endfor -%}
         </div>
@@ -119,7 +122,9 @@
       {%- endif -%}
     </div>
   </div>
-</section>
+</jci-home-faq>
+
+<script src="{{ 'jci-home-faq.js' | asset_url }}" type="module"></script>
 
 {% stylesheet %}
   .jci-home-faq {
@@ -234,7 +239,9 @@
     transform: rotate(45deg);
   }
 
+  /* Height is animated by jci-home-faq.js, so the answer clips as it moves. */
   .jci-home-faq-answer {
+    overflow: hidden;
     padding: 0 3rem 1.35rem var(--jci-home-faq-answer-indent);
   }
 
@@ -415,6 +422,10 @@
     { "type": "range", "id": "answer_indent", "label": "Answer indent", "min": 0, "max": 96, "step": 2, "unit": "px", "default": 48 },
     { "type": "range", "id": "question_size_min", "label": "Question size, smallest", "min": 14, "max": 40, "step": 1, "unit": "px", "default": 22 },
     { "type": "range", "id": "question_size_max", "label": "Question size, largest", "min": 20, "max": 60, "step": 1, "unit": "px", "default": 31 },
+
+    { "type": "header", "content": "Motion" },
+    { "type": "range", "id": "toggle_duration", "label": "Open and close speed", "min": 0, "max": 800, "step": 20, "unit": "ms", "default": 320, "info": "0 turns the animation off." },
+    { "type": "checkbox", "id": "single_open", "label": "Only one question open at a time", "default": false },
 
     { "type": "header", "content": "Anchor" },
     { "type": "text", "id": "anchor_id", "label": "Anchor ID", "default": "home-faq" }
