@@ -182,7 +182,7 @@
             data-jci-best-sellers-control="previous"
             aria-label="{{ 'accessibility.slideshow_previous' | t }}"
           >
-            <span class="jci-best-sellers-control-glyph" aria-hidden="true">&#8592;</span>
+            {% render 'jci-action-arrow', direction: 'left', class: 'jci-best-sellers-control-arrow' %}
           </button>
           <span class="jci-best-sellers-counter">
             <b class="jci-best-sellers-counter-current" data-jci-best-sellers-current-card>01</b>
@@ -194,7 +194,7 @@
             data-jci-best-sellers-control="next"
             aria-label="{{ 'accessibility.slideshow_next' | t }}"
           >
-            <span class="jci-best-sellers-control-glyph" aria-hidden="true">&#8594;</span>
+            {% render 'jci-action-arrow', direction: 'right', class: 'jci-best-sellers-control-arrow' %}
           </button>
         </div>
       {%- endif -%}
@@ -630,6 +630,12 @@
     text-transform: uppercase;
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
+  }
+
+  .jci-best-sellers-control-arrow {
+    flex: 0 0 12px;
+    width: 12px;
+    height: 12px;
   }
 
   .jci-best-sellers-control {

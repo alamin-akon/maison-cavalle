@@ -220,6 +220,7 @@
         "subtitle_metafield": "custom.subtitle",
         "swatch_option": "Color",
         "show_quick_add": true,
+        "quick_add_label": "Quick add",
         "badge_source": "sale",
         "badge_text": "Sale",
         "cta_label": "View all pieces",
@@ -240,8 +241,7 @@
         "image_ratio": 78,
         "image_zoom": 35,
         "placeholder_subtitle": "Choose a collection to show real products",
-        "anchor_id": "collection",
-        "quick_add_label": "Quick add"
+        "anchor_id": "collection"
       }
     },
     "jci_editorial_banner": {
@@ -249,27 +249,48 @@
       "blocks": {
         "slide_stable": {
           "type": "slide",
+          "name": "Product",
           "settings": {
-            "video_main_asset": "jci-editorial-stable.mp4",
+            "product": "aqua-sapphire",
+            "video_main_asset": "",
+            "image_main_asset": "",
+            "image_alt_main": "",
             "index_main": "01 / 02",
+            "video_secondary_asset": "",
+            "image_secondary_asset": "",
+            "image_alt_secondary": "",
             "index_secondary": "02 / 02",
             "note": "Stable / everyday"
           }
         },
         "slide_motion": {
           "type": "slide",
+          "name": "Product",
           "settings": {
+            "product": "angelic",
             "video_main_asset": "jci-editorial-motion.mp4",
+            "image_main_asset": "",
+            "image_alt_main": "",
             "index_main": "01 / 02",
+            "video_secondary_asset": "",
+            "image_secondary_asset": "",
+            "image_alt_secondary": "",
             "index_secondary": "02 / 02",
             "note": "Ease / motion"
           }
         },
         "slide_considered": {
           "type": "slide",
+          "name": "Product",
           "settings": {
+            "product": "almas",
             "video_main_asset": "jci-editorial-considered.mp4",
+            "image_main_asset": "",
+            "image_alt_main": "",
             "index_main": "01 / 02",
+            "video_secondary_asset": "",
+            "image_secondary_asset": "",
+            "image_alt_secondary": "",
             "index_secondary": "02 / 02",
             "note": "Made / considered"
           }
@@ -317,12 +338,95 @@
         "anchor_id": "journal"
       }
     },
+    "jci_best_sellers": {
+      "type": "jci-best-sellers",
+      "blocks": {
+        "piece_1": {
+          "type": "piece",
+          "settings": {
+            "product": "",
+            "category": "",
+            "badge": "The Maison edit"
+          }
+        },
+        "piece_2": {
+          "type": "piece",
+          "settings": {
+            "product": "",
+            "category": "",
+            "badge": "The Maison edit"
+          }
+        },
+        "piece_3": {
+          "type": "piece",
+          "settings": {
+            "product": "",
+            "category": "",
+            "badge": "The Maison edit"
+          }
+        },
+        "piece_4": {
+          "type": "piece",
+          "settings": {
+            "product": "",
+            "category": "",
+            "badge": "The Maison edit"
+          }
+        }
+      },
+      "block_order": [
+        "piece_1",
+        "piece_2",
+        "piece_3",
+        "piece_4"
+      ],
+      "settings": {
+        "eyebrow": "The Maison edit",
+        "eyebrow_noun": "pieces",
+        "live_label": "Curated edit",
+        "title_line_one": "Best sellers",
+        "title_line_two": "for every ride.",
+        "body": "A considered edit of the pieces our riders reach for first — moving with you from the stable to the rest of the day.",
+        "of_label": "of",
+        "progress_hint": "Scroll to browse",
+        "cta_label": "Explore all pieces",
+        "cta_url": "",
+        "subtitle_metafield": "custom.subtitle",
+        "card_link_label": "View the piece",
+        "placeholder_title": "Choose a product",
+        "card_width": 455,
+        "card_height": 650,
+        "card_grayscale": 100,
+        "background_color": "",
+        "text_color": "",
+        "accent_color": "#cdd3b5",
+        "body_color": "#c4c8bd",
+        "meta_color": "#adb4a5",
+        "live_color": "#9da692",
+        "live_dot_color": "#bd765b",
+        "focus_color": "",
+        "card_background": "",
+        "card_text_color": "",
+        "card_media_background": "",
+        "card_eyebrow_color": "",
+        "card_subtitle_color": "#70756a",
+        "scroll_length": 260,
+        "padding_top": 112,
+        "padding_bottom": 112,
+        "column_gap": 144,
+        "watermark_opacity": 3.5,
+        "stage_label": "Best selling Maison Cavallé products",
+        "controls_label": "Best sellers navigation",
+        "anchor_id": "best-sellers"
+      }
+    },
     "jci_home_faq": {
       "type": "jci-home-faq",
       "blocks": {
         "item_size": {
           "type": "item",
           "settings": {
+            "index": "",
             "question": "How do I find my usual size?",
             "answer": "<p>Use our <a href=\"/pages/size-guide\">size guide</a> to compare your bust, waist and hip measurements. If you are between sizes, choose the larger size.</p>",
             "open_by_default": false
@@ -331,6 +435,7 @@
         "item_delivery": {
           "type": "item",
           "settings": {
+            "index": "",
             "question": "How quickly will my order arrive?",
             "answer": "<p>Australian orders are dispatched from the Maison with delivery updates provided once your parcel is on its way.</p>",
             "open_by_default": false
@@ -339,6 +444,7 @@
         "item_returns": {
           "type": "item",
           "settings": {
+            "index": "",
             "question": "Can I return or exchange a piece?",
             "answer": "<p>Yes. We offer easy 14-day returns on eligible unworn pieces. Visit <a href=\"/pages/shipping\">shipping &amp; returns</a> for the full details.</p>",
             "open_by_default": false
@@ -361,10 +467,17 @@
         "side_title": "Ask the Maison.",
         "side_text": "Find thoughtful answers about fit, care, delivery and returns.",
         "side_link_label": "Visit all FAQs",
+        "side_link_url": "",
         "side_min_height": 250,
         "side_padding": 140,
         "mark_size": 100,
+        "background_color": "",
+        "heading_color": "",
+        "accent_color": "",
+        "focus_color": "",
         "body_color": "#65695f",
+        "side_background": "",
+        "side_text_color": "",
         "side_eyebrow_color": "#e0e4d0",
         "side_body_color": "#edf0e8",
         "padding_top": 136,
@@ -378,9 +491,9 @@
         "answer_indent": 48,
         "question_size_min": 22,
         "question_size_max": 31,
-        "anchor_id": "home-faq",
         "toggle_duration": 320,
-        "single_open": false
+        "single_open": false,
+        "anchor_id": "home-faq"
       }
     },
     "jci_newsletter": {
@@ -395,12 +508,18 @@
         "button_label": "Join",
         "button_aria_label": "Join the Maison letter",
         "customer_tag": "newsletter",
+        "background_color": "",
+        "text_color": "",
         "accent_color": "#c6cda9",
         "body_color": "#c4c7ba",
         "placeholder_color": "#bfc1b7",
         "message_color": "#c8d19d",
         "fineprint_color": "#92998b",
         "ring_color": "#d3d5c9",
+        "button_background": "",
+        "button_text_color": "",
+        "button_background_hover": "",
+        "button_text_hover": "",
         "background_width": "content",
         "space_above": 32,
         "padding_top": 96,
@@ -414,72 +533,6 @@
         "ring_size": 280,
         "anchor_id": "newsletter"
       }
-    },
-    "jci_best_sellers": {
-      "type": "jci-best-sellers",
-      "blocks": {
-        "piece_1": {
-          "type": "piece",
-          "settings": {
-            "badge": "The Maison edit"
-          }
-        },
-        "piece_2": {
-          "type": "piece",
-          "settings": {
-            "badge": "The Maison edit"
-          }
-        },
-        "piece_3": {
-          "type": "piece",
-          "settings": {
-            "badge": "The Maison edit"
-          }
-        },
-        "piece_4": {
-          "type": "piece",
-          "settings": {
-            "badge": "The Maison edit"
-          }
-        }
-      },
-      "block_order": [
-        "piece_1",
-        "piece_2",
-        "piece_3",
-        "piece_4"
-      ],
-      "settings": {
-        "eyebrow": "The Maison edit",
-        "eyebrow_noun": "pieces",
-        "live_label": "Curated edit",
-        "title_line_one": "Best sellers",
-        "title_line_two": "for every ride.",
-        "body": "A considered edit of the pieces our riders reach for first — moving with you from the stable to the rest of the day.",
-        "of_label": "of",
-        "progress_hint": "Scroll to browse",
-        "cta_label": "Explore all pieces",
-        "subtitle_metafield": "custom.subtitle",
-        "card_link_label": "View the piece",
-        "placeholder_title": "Choose a product",
-        "card_width": 455,
-        "card_height": 650,
-        "card_grayscale": 100,
-        "accent_color": "#cdd3b5",
-        "body_color": "#c4c8bd",
-        "meta_color": "#adb4a5",
-        "live_color": "#9da692",
-        "live_dot_color": "#bd765b",
-        "card_subtitle_color": "#70756a",
-        "scroll_length": 260,
-        "padding_top": 112,
-        "padding_bottom": 112,
-        "column_gap": 144,
-        "watermark_opacity": 3.5,
-        "stage_label": "Best selling Maison Cavallé products",
-        "controls_label": "Best sellers navigation",
-        "anchor_id": "best-sellers"
-      }
     }
   },
   "order": [
@@ -487,8 +540,8 @@
     "jci_marquee",
     "jci_story_qPUAMy",
     "jci_product_section_ya4nNw",
-    "jci_best_sellers",
     "jci_editorial_banner",
+    "jci_best_sellers",
     "jci_home_faq",
     "jci_newsletter"
   ]

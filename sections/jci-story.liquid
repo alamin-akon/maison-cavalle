@@ -140,7 +140,7 @@
           {%- endif -%}
           {%- if s.scroll_note != blank -%}
             <span class="jci-story-scroll-note">
-              {{ s.scroll_note }} <span class="jci-story-scroll-note-icon" aria-hidden="true">&#8595;</span>
+              {{ s.scroll_note }} <span class="jci-story-scroll-note-icon" aria-hidden="true">{% render 'jci-action-arrow', direction: 'down', class: 'jci-story-scroll-note-arrow' %}</span>
             </span>
           {%- endif -%}
         </div>
@@ -416,6 +416,13 @@
     font-size: 12px;
     letter-spacing: 0.1em;
     text-transform: uppercase;
+  }
+
+  /* The arrow sits inside the bobbing circle, so it keeps its own size. */
+  .jci-story-scroll-note-arrow {
+    flex: 0 0 10px;
+    width: 10px;
+    height: 10px;
   }
 
   .jci-story-scroll-note-icon {

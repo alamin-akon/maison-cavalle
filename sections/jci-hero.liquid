@@ -179,7 +179,7 @@
     <div class="jci-hero-bottomline">
       {%- if s.scroll_label != blank -%}
         <div class="jci-hero-scroll">
-          {{ s.scroll_label }} <span aria-hidden="true">&#8595;</span>
+          {{ s.scroll_label }} {% render 'jci-action-arrow', direction: 'down', class: 'jci-hero-scroll-arrow' %}
         </div>
       {%- endif -%}
 
@@ -535,6 +535,12 @@
     align-items: end;
     padding-block-start: 1.1rem;
     border-block-start: 1px solid rgb(251 250 247 / 0.3);
+  }
+
+  .jci-hero-scroll-arrow {
+    flex: 0 0 11px;
+    width: 11px;
+    height: 11px;
   }
 
   .jci-hero-scroll {

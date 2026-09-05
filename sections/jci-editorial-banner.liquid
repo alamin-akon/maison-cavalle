@@ -123,7 +123,12 @@
             elsif b.image_main != blank
               assign main_image = b.image_main
             elsif product != blank
-              assign main_image = product.featured_image
+              comment
+                The product's first image, literally — a merchant can set a
+                featured image that is not images[0], and the pair is meant to
+                read as image one beside image two.
+              endcomment
+              assign main_image = product.images[0] | default: product.featured_image
             endif
             if main_image != blank
               assign main_src = main_image | image_url: width: 1200
@@ -137,10 +142,10 @@
               assign secondary_image = b.image_secondary
             elsif product != blank
               comment
-                The product's second image, so the pair reads as two views of
-                one piece. A single-image product repeats its own.
+                The second image, so the pair reads as two views of one piece.
+                A product with only one image shows that one in both frames.
               endcomment
-              assign secondary_image = product.images[1] | default: product.featured_image
+              assign secondary_image = product.images[1] | default: product.images[0] | default: product.featured_image
             endif
             if secondary_image != blank
               assign secondary_src = secondary_image | image_url: width: 700
@@ -253,7 +258,7 @@
               data-jci-editorial-control="previous"
               aria-label="{{ 'accessibility.slideshow_previous' | t }}"
             >
-              <span class="jci-editorial-banner-control-glyph" aria-hidden="true">&#8592;</span>
+              {% render 'jci-action-arrow', direction: 'left', class: 'jci-editorial-banner-control-arrow' %}
             </button>
             <span class="jci-editorial-banner-counter">
               <b class="jci-editorial-banner-counter-current" data-jci-editorial-current>01</b>
@@ -265,7 +270,7 @@
               data-jci-editorial-control="next"
               aria-label="{{ 'accessibility.slideshow_next' | t }}"
             >
-              <span class="jci-editorial-banner-control-glyph" aria-hidden="true">&#8594;</span>
+              {% render 'jci-action-arrow', direction: 'right', class: 'jci-editorial-banner-control-arrow' %}
             </button>
           </div>
         {%- endif -%}
@@ -509,6 +514,12 @@
     letter-spacing: 0.1em;
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
+  }
+
+  .jci-editorial-banner-control-arrow {
+    flex: 0 0 11px;
+    width: 11px;
+    height: 11px;
   }
 
   .jci-editorial-banner-control {
