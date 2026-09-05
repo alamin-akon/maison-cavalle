@@ -11,6 +11,7 @@
     badge_source     - "none" | "sale" | "always"
     swatch_option    - option name to read colour swatches from, e.g. "Color"
     show_quick_add   - boolean
+    quick_add_label  - visible button text
     image_index      - which product image to show, 0-based
     lazy             - boolean, false for above-the-fold cards
 
@@ -100,7 +101,7 @@
               aria-label="{{ 'actions.add_to_cart' | t }} — {{ product.title | escape }}"
             >
               <span class="jci-product-card-quick-add-text">
-                {{- 'actions.add_to_cart' | t }} <span aria-hidden="true">&#65291;</span>
+                {{- quick_add_label }} <span aria-hidden="true">&#65291;</span>
               </span>
               {% render 'jci-product-card-bag-icon' %}
             </button>
@@ -109,15 +110,19 @@
           {%- comment -%}
             More than one variant, or sold out. Either way the product page is
             the honest destination.
+
+            The prototype's button always reads "Quick add", so the visible
+            label matches it and the aria-label carries what actually happens —
+            nobody is told a variant was picked for them.
           {%- endcomment -%}
           <a
             class="jci-product-card-quick-add-button"
             href="{{ product.url }}"
-            aria-label="{{ product.title | escape }}"
+            aria-label="{{ 'actions.show_all_options' | t }} — {{ product.title | escape }}"
           >
             <span class="jci-product-card-quick-add-text">
               {%- if product.available -%}
-                {{ 'actions.show_all_options' | t }} <span aria-hidden="true">&#65291;</span>
+                {{ quick_add_label }} <span aria-hidden="true">&#65291;</span>
               {%- else -%}
                 {{ 'products.product.sold_out' | t }}
               {%- endif -%}
@@ -135,9 +140,11 @@
         <a class="jci-product-card-title-link" href="{{ product.url }}">{{ product.title }}</a>
       </h3>
 
-      {%- if subtitle != blank -%}
-        <p class="jci-product-card-subtitle">{{ subtitle }}</p>
-      {%- endif -%}
+      {%- comment -%}
+        Rendered even when empty: styles.css:305 reserves 2.7em here, and
+        without it the price rides up level with the next card's title.
+      {%- endcomment -%}
+      <p class="jci-product-card-subtitle">{{ subtitle }}</p>
 
       {%- if swatch_values != blank -%}
         <div class="jci-product-card-swatches">

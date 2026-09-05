@@ -1,0 +1,445 @@
+{% comment %}
+  Maison Cavallé — home FAQ
+  Prototype source: maison-cavalle-main/app.js → renderHome, .home-faq-section
+                    maison-cavalle-main/styles.css → .home-faq-* (348–373, 1741–1747)
+  Reference: MAISON-CAVALLE-SPEC.md §1
+
+  An accordion beside a standing "ask us" card. Questions are blocks, the card
+  and every spacing value are settings.
+
+  Answers are rich text so a link can sit mid-sentence. Shopify wraps rich text
+  in its own <p>, which §1 will not let us reach with a tag selector, so the
+  class is injected into the generated markup instead — the styling stays
+  one-class-one-rule.
+{% endcomment %}
+
+{% liquid
+  assign s = section.settings
+  assign items = section.blocks | where: 'type', 'item'
+%}
+
+<section
+  class="jci-home-faq"
+  {% if s.anchor_id != blank %}id="{{ s.anchor_id | handleize }}"{% endif %}
+  style="
+    --jci-home-faq-bg: {{ s.background_color | default: settings.color_palette.color3 }};
+    --jci-home-faq-heading: {{ s.heading_color | default: settings.color_palette.foreground }};
+    --jci-home-faq-heading-rgb: {{ s.heading_color.rgb | default: settings.color_palette.foreground.rgb }};
+    --jci-home-faq-accent: {{ s.accent_color | default: settings.color_palette.color5 }};
+    --jci-home-faq-focus: {{ s.focus_color | default: settings.color_palette.color6 }};
+    --jci-home-faq-body: {{ s.body_color }};
+    --jci-home-faq-side-bg: {{ s.side_background | default: settings.color_palette.color5 }};
+    --jci-home-faq-side-text: {{ s.side_text_color | default: settings.color_palette.background }};
+    --jci-home-faq-side-text-rgb: {{ s.side_text_color.rgb | default: settings.color_palette.background.rgb }};
+    --jci-home-faq-side-eyebrow: {{ s.side_eyebrow_color }};
+    --jci-home-faq-side-body: {{ s.side_body_color }};
+    --jci-home-faq-pad-top: {{ s.padding_top }}px;
+    --jci-home-faq-pad-bottom: {{ s.padding_bottom }}px;
+    --jci-home-faq-pad-top-mobile: {{ s.padding_top_mobile }}px;
+    --jci-home-faq-pad-bottom-mobile: {{ s.padding_bottom_mobile }}px;
+    --jci-home-faq-head-gap: {{ s.head_gap }}px;
+    --jci-home-faq-head-space: {{ s.head_space }}px;
+    --jci-home-faq-grid-gap: {{ s.grid_gap }}px;
+    --jci-home-faq-row-pad: {{ s.row_padding }}px;
+    --jci-home-faq-answer-indent: {{ s.answer_indent }}px;
+    --jci-home-faq-question-size: clamp({{ s.question_size_min }}px, 2.3vw, {{ s.question_size_max }}px);
+    --jci-home-faq-side-min-height: {{ s.side_min_height }}px;
+    --jci-home-faq-side-pad: {{ s.side_padding | divided_by: 100.0 }}rem;
+    --jci-home-faq-mark-size: {{ s.mark_size }}px;
+  "
+>
+  <div class="jci-home-faq-container">
+    {%- if s.eyebrow != blank or s.title_line_one != blank or s.intro != blank -%}
+      <div class="jci-home-faq-head">
+        <div class="jci-home-faq-head-copy">
+          {%- if s.eyebrow != blank -%}
+            <p class="jci-eyebrow jci-home-faq-eyebrow">{{ s.eyebrow }}</p>
+          {%- endif -%}
+          {%- if s.title_line_one != blank or s.title_line_two != blank -%}
+            <h2 class="jci-home-faq-title">
+              {{- s.title_line_one -}}
+              {%- if s.title_line_one != blank and s.title_line_two != blank -%}<br>{%- endif -%}
+              {%- if s.title_line_two != blank -%}
+                <em class="jci-home-faq-title-accent">{{ s.title_line_two }}</em>
+              {%- endif -%}
+            </h2>
+          {%- endif -%}
+        </div>
+        {%- if s.intro != blank -%}
+          <p class="jci-home-faq-intro">{{ s.intro }}</p>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    <div class="jci-home-faq-grid">
+      {%- if items.size > 0 -%}
+        <div class="jci-home-faq-list">
+          {%- for block in items -%}
+            {%- liquid
+              assign b = block.settings
+              assign answer = b.answer | replace: '<p>', '<p class="jci-home-faq-answer-text">'
+              assign answer = answer | replace: '<a ', '<a class="jci-home-faq-answer-link" '
+            -%}
+            <details
+              class="jci-home-faq-item"
+              {% if b.open_by_default %}open{% endif %}
+              {{ block.shopify_attributes }}
+            >
+              <summary class="jci-home-faq-summary">
+                <span class="jci-home-faq-index">{{ b.index | default: forloop.index | prepend: '0' | slice: -2, 2 }}</span>
+                <h3 class="jci-home-faq-question">{{ b.question }}</h3>
+                <b class="jci-home-faq-toggle" aria-hidden="true">&#65291;</b>
+              </summary>
+              <div class="jci-home-faq-answer">{{ answer }}</div>
+            </details>
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+
+      {%- if s.show_side_card -%}
+        <div class="jci-home-faq-side">
+          {%- if s.side_mark != blank -%}
+            <span class="jci-home-faq-mark" aria-hidden="true">{{ s.side_mark }}</span>
+          {%- endif -%}
+          {%- if s.side_eyebrow != blank -%}
+            <p class="jci-eyebrow jci-home-faq-side-eyebrow">{{ s.side_eyebrow }}</p>
+          {%- endif -%}
+          {%- if s.side_title != blank -%}
+            <h3 class="jci-home-faq-side-title">{{ s.side_title }}</h3>
+          {%- endif -%}
+          {%- if s.side_text != blank -%}
+            <p class="jci-home-faq-side-text">{{ s.side_text }}</p>
+          {%- endif -%}
+          {%- if s.side_link_label != blank -%}
+            <a class="jci-text-link jci-home-faq-side-link" href="{{ s.side_link_url | default: '#' }}">
+              {{ s.side_link_label }} <span aria-hidden="true">&#8599;</span>
+            </a>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+  .jci-home-faq {
+    display: block;
+    color: var(--jci-home-faq-heading);
+    background: var(--jci-home-faq-bg);
+  }
+
+  .jci-home-faq-container {
+    padding-block: var(--jci-home-faq-pad-top) var(--jci-home-faq-pad-bottom);
+  }
+
+  /* -- Head -------------------------------------------------------------- */
+
+  .jci-home-faq-head {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(260px, 0.55fr);
+    gap: var(--jci-home-faq-head-gap);
+    align-items: end;
+    margin: 0 0 var(--jci-home-faq-head-space);
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--jci-line);
+  }
+
+  .jci-home-faq-eyebrow {
+    margin-bottom: 0.9rem;
+    color: var(--jci-home-faq-accent);
+  }
+
+  .jci-home-faq-title {
+    margin: 0;
+    font-family: var(--jci-font-display);
+    font-size: var(--jci-section-title-size);
+    font-weight: 500;
+    line-height: 0.92;
+    letter-spacing: -0.055em;
+  }
+
+  .jci-home-faq-title-accent {
+    color: var(--jci-home-faq-accent);
+    font-style: italic;
+  }
+
+  .jci-home-faq-intro {
+    max-width: 350px;
+    margin: 0;
+    color: var(--jci-home-faq-body);
+    font-family: var(--jci-font-sans);
+    font-size: var(--jci-subtitle-size);
+    line-height: var(--jci-subtitle-leading);
+  }
+
+  /* -- Accordion --------------------------------------------------------- */
+
+  .jci-home-faq-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(220px, 0.6fr);
+    gap: var(--jci-home-faq-grid-gap);
+    margin: 0;
+  }
+
+  .jci-home-faq-list {
+    border-top: 1px solid var(--jci-home-faq-heading);
+  }
+
+  .jci-home-faq-item {
+    border-bottom: 1px solid var(--jci-line);
+  }
+
+  .jci-home-faq-summary {
+    display: grid;
+    grid-template-columns: 30px minmax(0, 1fr) auto;
+    gap: 1rem;
+    align-items: center;
+    padding-block: var(--jci-home-faq-row-pad);
+    list-style: none;
+    cursor: pointer;
+  }
+
+  .jci-home-faq-summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .jci-home-faq-summary:focus-visible {
+    outline: 2px solid var(--jci-home-faq-focus);
+    outline-offset: 4px;
+  }
+
+  .jci-home-faq-index {
+    color: var(--jci-home-faq-accent);
+    font-family: var(--jci-font-label);
+    font-size: 12px;
+  }
+
+  .jci-home-faq-question {
+    margin: 0;
+    font-family: var(--jci-font-display);
+    font-size: var(--jci-home-faq-question-size);
+    font-weight: 500;
+    line-height: 1.05;
+  }
+
+  .jci-home-faq-toggle {
+    color: var(--jci-home-faq-accent);
+    font-family: var(--jci-font-sans);
+    font-size: 22px;
+    font-weight: 400;
+    transition: transform 0.3s var(--jci-ease);
+  }
+
+  .jci-home-faq-item[open] .jci-home-faq-toggle {
+    transform: rotate(45deg);
+  }
+
+  .jci-home-faq-answer {
+    padding: 0 3rem 1.35rem var(--jci-home-faq-answer-indent);
+  }
+
+  .jci-home-faq-answer-text {
+    max-width: 640px;
+    margin: 0;
+    color: var(--jci-home-faq-body);
+    font-family: var(--jci-font-sans);
+    font-size: var(--jci-subtitle-size);
+    line-height: var(--jci-subtitle-leading);
+  }
+
+  .jci-home-faq-answer-link {
+    color: var(--jci-home-faq-heading);
+    text-decoration: underline;
+    text-decoration-color: var(--jci-home-faq-accent);
+    text-underline-offset: 0.18em;
+  }
+
+  /* -- Side card --------------------------------------------------------- */
+
+  .jci-home-faq-side {
+    position: relative;
+    align-self: start;
+    min-height: var(--jci-home-faq-side-min-height);
+    padding: var(--jci-home-faq-side-pad);
+    overflow: hidden;
+    color: var(--jci-home-faq-side-text);
+    border: 1px solid var(--jci-home-faq-side-bg);
+    background: var(--jci-home-faq-side-bg);
+  }
+
+  /* Ringed circle bleeding out of the bottom-right corner. */
+  .jci-home-faq-side::after {
+    content: "";
+    position: absolute;
+    right: -3rem;
+    bottom: -4rem;
+    width: 12rem;
+    height: 12rem;
+    border: 1px solid rgb(var(--jci-home-faq-side-text-rgb) / 0.28);
+    border-radius: 50%;
+    box-shadow:
+      0 0 0 2rem rgb(var(--jci-home-faq-side-text-rgb) / 0.06),
+      0 0 0 4rem rgb(var(--jci-home-faq-side-text-rgb) / 0.035);
+    pointer-events: none;
+  }
+
+  .jci-home-faq-mark {
+    position: absolute;
+    top: 0.45rem;
+    right: 1rem;
+    color: rgb(var(--jci-home-faq-side-text-rgb) / 0.35);
+    font-family: var(--jci-font-display);
+    font-size: var(--jci-home-faq-mark-size);
+    line-height: 0.8;
+  }
+
+  .jci-home-faq-side-eyebrow {
+    position: relative;
+    z-index: 1;
+    margin-bottom: 1rem;
+    color: var(--jci-home-faq-side-eyebrow);
+  }
+
+  .jci-home-faq-side-title {
+    position: relative;
+    z-index: 1;
+    margin: 0 0 0.55rem;
+    font-family: var(--jci-font-display);
+    font-size: 31px;
+    font-weight: 500;
+    line-height: 1;
+  }
+
+  .jci-home-faq-side-text {
+    position: relative;
+    z-index: 1;
+    max-width: 220px;
+    margin: 0 0 1.7rem;
+    color: var(--jci-home-faq-side-body);
+    font-family: var(--jci-font-sans);
+    font-size: var(--jci-subtitle-size);
+    line-height: var(--jci-subtitle-leading);
+  }
+
+  .jci-home-faq-side-link {
+    position: relative;
+    z-index: 1;
+    color: var(--jci-home-faq-side-text);
+  }
+
+  /* -- Breakpoints (§5 — 900 and 680 only) ------------------------------- */
+
+  @media screen and (max-width: 680px) {
+    .jci-home-faq-container {
+      padding-block: var(--jci-home-faq-pad-top-mobile) var(--jci-home-faq-pad-bottom-mobile);
+    }
+
+    .jci-home-faq-head,
+    .jci-home-faq-grid {
+      display: block;
+    }
+
+    .jci-home-faq-intro {
+      margin-top: 1.5rem;
+    }
+
+    .jci-home-faq-side {
+      margin-top: 2rem;
+    }
+
+    .jci-home-faq-summary {
+      gap: 0.7rem;
+    }
+
+    .jci-home-faq-question {
+      font-size: 22px;
+    }
+
+    .jci-home-faq-answer {
+      padding-left: 2.3rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .jci-home-faq-toggle {
+      transition: none;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Home FAQ",
+  "tag": "div",
+  "class": "jci-home-faq-wrapper",
+  "max_blocks": 12,
+  "settings": [
+    { "type": "header", "content": "Head" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "The Maison help desk" },
+    { "type": "text", "id": "title_line_one", "label": "Title first line", "default": "Good to know." },
+    { "type": "text", "id": "title_line_two", "label": "Title second line (italic)", "default": "Easy to find." },
+    { "type": "textarea", "id": "intro", "label": "Intro", "default": "Clear answers for the moments before the ride, after checkout and everywhere in between." },
+
+    { "type": "header", "content": "Side card" },
+    { "type": "checkbox", "id": "show_side_card", "label": "Show side card", "default": true },
+    { "type": "text", "id": "side_mark", "label": "Watermark", "default": "?" },
+    { "type": "text", "id": "side_eyebrow", "label": "Eyebrow", "default": "Need a little more?" },
+    { "type": "text", "id": "side_title", "label": "Title", "default": "Ask the Maison." },
+    { "type": "textarea", "id": "side_text", "label": "Text", "default": "Find thoughtful answers about fit, care, delivery and returns." },
+    { "type": "text", "id": "side_link_label", "label": "Link label", "default": "Visit all FAQs" },
+    { "type": "url", "id": "side_link_url", "label": "Link" },
+    { "type": "range", "id": "side_min_height", "label": "Minimum height", "min": 140, "max": 480, "step": 10, "unit": "px", "default": 250 },
+    { "type": "range", "id": "side_padding", "label": "Padding", "min": 40, "max": 400, "step": 10, "unit": "%", "default": 140, "info": "Hundredths of a rem — 140 is 1.4rem." },
+    { "type": "range", "id": "mark_size", "label": "Watermark size", "min": 40, "max": 220, "step": 2, "unit": "px", "default": 100 },
+
+    { "type": "header", "content": "Colors", "info": "Left empty, each of these follows the theme colour palette." },
+    { "type": "color", "id": "background_color", "label": "Background" },
+    { "type": "color", "id": "heading_color", "label": "Heading and rules" },
+    { "type": "color", "id": "accent_color", "label": "Accent" },
+    { "type": "color", "id": "focus_color", "label": "Focus ring" },
+    { "type": "color", "id": "body_color", "label": "Body text", "default": "#65695f" },
+    { "type": "color", "id": "side_background", "label": "Side card background" },
+    { "type": "color", "id": "side_text_color", "label": "Side card text" },
+    { "type": "color", "id": "side_eyebrow_color", "label": "Side card eyebrow", "default": "#e0e4d0" },
+    { "type": "color", "id": "side_body_color", "label": "Side card body", "default": "#edf0e8" },
+
+    { "type": "header", "content": "Layout" },
+    { "type": "range", "id": "padding_top", "label": "Padding top", "min": 0, "max": 240, "step": 4, "unit": "px", "default": 136 },
+    { "type": "range", "id": "padding_bottom", "label": "Padding bottom", "min": 0, "max": 240, "step": 4, "unit": "px", "default": 136 },
+    { "type": "range", "id": "padding_top_mobile", "label": "Padding top on mobile", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 72 },
+    { "type": "range", "id": "padding_bottom_mobile", "label": "Padding bottom on mobile", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 72 },
+    { "type": "range", "id": "head_gap", "label": "Head column gap", "min": 16, "max": 160, "step": 4, "unit": "px", "default": 128 },
+    { "type": "range", "id": "head_space", "label": "Space under the head", "min": 0, "max": 120, "step": 2, "unit": "px", "default": 48 },
+    { "type": "range", "id": "grid_gap", "label": "Grid column gap", "min": 16, "max": 160, "step": 4, "unit": "px", "default": 128 },
+    { "type": "range", "id": "row_padding", "label": "Question row padding", "min": 8, "max": 64, "step": 1, "unit": "px", "default": 20 },
+    { "type": "range", "id": "answer_indent", "label": "Answer indent", "min": 0, "max": 96, "step": 2, "unit": "px", "default": 48 },
+    { "type": "range", "id": "question_size_min", "label": "Question size, smallest", "min": 14, "max": 40, "step": 1, "unit": "px", "default": 22 },
+    { "type": "range", "id": "question_size_max", "label": "Question size, largest", "min": 20, "max": 60, "step": 1, "unit": "px", "default": 31 },
+
+    { "type": "header", "content": "Anchor" },
+    { "type": "text", "id": "anchor_id", "label": "Anchor ID", "default": "home-faq" }
+  ],
+  "blocks": [
+    {
+      "type": "item",
+      "name": "Question",
+      "settings": [
+        { "type": "text", "id": "index", "label": "Index", "info": "Left empty, the position in the list is used." },
+        { "type": "text", "id": "question", "label": "Question", "default": "How do I find my usual size?" },
+        { "type": "richtext", "id": "answer", "label": "Answer", "default": "<p>Use our size guide to compare your bust, waist and hip measurements. If you are between sizes, choose the larger size.</p>" },
+        { "type": "checkbox", "id": "open_by_default", "label": "Open by default", "default": false }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Home FAQ",
+      "blocks": [
+        { "type": "item", "settings": { "question": "How do I find my usual size?", "answer": "<p>Use our size guide to compare your bust, waist and hip measurements. If you are between sizes, choose the larger size.</p>" } },
+        { "type": "item", "settings": { "question": "How quickly will my order arrive?", "answer": "<p>Australian orders are dispatched from the Maison with delivery updates provided once your parcel is on its way.</p>" } },
+        { "type": "item", "settings": { "question": "Can I return or exchange a piece?", "answer": "<p>Yes. We offer easy 14-day returns on eligible unworn pieces. Visit shipping &amp; returns for the full details.</p>" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

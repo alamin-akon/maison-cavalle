@@ -147,45 +147,6 @@
         "aria_label": "Maison Cavallé values"
       }
     },
-    "jci_product_section_ya4nNw": {
-      "type": "jci-product-section",
-      "name": "Product section",
-      "settings": {
-        "eyebrow": "The opening collection",
-        "title_line_one": "Pieces to come",
-        "title_line_two": "back to.",
-        "intro": "Fewer, better pieces — made to be worn season after season.",
-        "collection": "frontpage",
-        "products_to_show": 4,
-        "columns": 4,
-        "image_index": 0,
-        "subtitle_metafield": "custom.subtitle",
-        "swatch_option": "Color",
-        "show_quick_add": true,
-        "badge_source": "sale",
-        "badge_text": "Sale",
-        "cta_label": "View all pieces",
-        "cta_url": "",
-        "background_color": "",
-        "heading_color": "",
-        "accent_color": "",
-        "media_background": "",
-        "intro_color": "#5f6259",
-        "subtitle_color": "#6d7066",
-        "image_ratio": 78,
-        "image_zoom": 35,
-        "placeholder_subtitle": "Choose a collection to show real products",
-        "anchor_id": "collection",
-        "padding_top": 136,
-        "padding_bottom": 136,
-        "padding_top_mobile": 72,
-        "padding_bottom_mobile": 72,
-        "columns_mobile": 2,
-        "header_gap": 40,
-        "grid_gap": 28,
-        "grid_row_gap_mobile": 36
-      }
-    },
     "jci_story_qPUAMy": {
       "type": "jci-story",
       "name": "Story",
@@ -225,21 +186,62 @@
         "body_color": "#595d53",
         "meta_color": "#73776c",
         "caption_meta_color": "#d3d5c9",
+        "on_film_color": "",
         "scrim_color": "#111511",
         "glow_color": "#e8e0c0",
         "watermark": "MC",
         "watermark_opacity": 5.5,
         "background_width": "content",
+        "padding_top": 136,
+        "padding_bottom": 136,
+        "padding_top_mobile": 72,
+        "padding_bottom_mobile": 72,
         "column_gap": 80,
         "copy_max_width": 560,
         "frame_min_height": 450,
         "enable_reveal": true,
         "enable_tilt": true,
-        "anchor_id": "story",
+        "anchor_id": "story"
+      }
+    },
+    "jci_product_section_ya4nNw": {
+      "type": "jci-product-section",
+      "name": "Product section",
+      "settings": {
+        "eyebrow": "The opening collection",
+        "title_line_one": "Pieces to come",
+        "title_line_two": "back to.",
+        "intro": "Fewer, better pieces — made to be worn season after season.",
+        "collection": "frontpage",
+        "products_to_show": 4,
+        "columns": 4,
+        "columns_mobile": 2,
+        "image_index": 0,
+        "subtitle_metafield": "custom.subtitle",
+        "swatch_option": "Color",
+        "show_quick_add": true,
+        "badge_source": "sale",
+        "badge_text": "Sale",
+        "cta_label": "View all pieces",
+        "cta_url": "",
+        "background_color": "",
+        "heading_color": "",
+        "accent_color": "",
+        "media_background": "",
+        "intro_color": "#5f6259",
+        "subtitle_color": "#6d7066",
         "padding_top": 136,
         "padding_bottom": 136,
         "padding_top_mobile": 72,
-        "padding_bottom_mobile": 72
+        "padding_bottom_mobile": 72,
+        "header_gap": 40,
+        "grid_gap": 28,
+        "grid_row_gap_mobile": 36,
+        "image_ratio": 78,
+        "image_zoom": 35,
+        "placeholder_subtitle": "Choose a collection to show real products",
+        "anchor_id": "collection",
+        "quick_add_label": "Quick add"
       }
     },
     "jci_editorial_banner": {
@@ -293,7 +295,13 @@
         "title_line_two": "moments between.",
         "body": "At the stable, at an event, or simply as part of everyday life. Quiet confidence, wherever the day takes you.",
         "cta_label": "Shop the edit",
+        "cta_url": "",
+        "background_color": "",
+        "wash_color": "",
         "wash_opacity": 20,
+        "text_color": "",
+        "accent_color": "",
+        "shade_color": "",
         "eyebrow_color": "#d3d5c9",
         "body_color": "#e3e0d7",
         "frame_background": "#252a25",
@@ -302,28 +310,93 @@
         "min_height_min": 540,
         "min_height_max": 720,
         "collage_width": 53,
-        "enable_reveal": true,
-        "autoplay": true,
-        "autoplay_interval": 5600,
-        "crossfade_duration": 800,
-        "carousel_label": "The Maison philosophy image story",
-        "controls_label": "Philosophy image controls",
-        "anchor_id": "journal",
         "collage_inset": 72,
         "collage_gap": 24,
         "copy_max_width": 660,
         "copy_padding_top": 96,
         "copy_padding_bottom": 96,
         "copy_padding_top_mobile": 48,
-        "copy_padding_bottom_mobile": 48
+        "copy_padding_bottom_mobile": 48,
+        "enable_reveal": true,
+        "autoplay": true,
+        "autoplay_interval": 5600,
+        "crossfade_duration": 800,
+        "carousel_label": "The Maison philosophy image story",
+        "controls_label": "Philosophy image controls",
+        "anchor_id": "journal"
+      }
+    },
+    "jci_home_faq": {
+      "type": "jci-home-faq",
+      "blocks": {
+        "item_size": {
+          "type": "item",
+          "settings": {
+            "question": "How do I find my usual size?",
+            "answer": "<p>Use our <a href=\"/pages/size-guide\">size guide</a> to compare your bust, waist and hip measurements. If you are between sizes, choose the larger size.</p>",
+            "open_by_default": false
+          }
+        },
+        "item_delivery": {
+          "type": "item",
+          "settings": {
+            "question": "How quickly will my order arrive?",
+            "answer": "<p>Australian orders are dispatched from the Maison with delivery updates provided once your parcel is on its way.</p>",
+            "open_by_default": false
+          }
+        },
+        "item_returns": {
+          "type": "item",
+          "settings": {
+            "question": "Can I return or exchange a piece?",
+            "answer": "<p>Yes. We offer easy 14-day returns on eligible unworn pieces. Visit <a href=\"/pages/shipping\">shipping &amp; returns</a> for the full details.</p>",
+            "open_by_default": false
+          }
+        }
+      },
+      "block_order": [
+        "item_size",
+        "item_delivery",
+        "item_returns"
+      ],
+      "settings": {
+        "eyebrow": "The Maison help desk",
+        "title_line_one": "Good to know.",
+        "title_line_two": "Easy to find.",
+        "intro": "Clear answers for the moments before the ride, after checkout and everywhere in between.",
+        "show_side_card": true,
+        "side_mark": "?",
+        "side_eyebrow": "Need a little more?",
+        "side_title": "Ask the Maison.",
+        "side_text": "Find thoughtful answers about fit, care, delivery and returns.",
+        "side_link_label": "Visit all FAQs",
+        "side_min_height": 250,
+        "side_padding": 140,
+        "mark_size": 100,
+        "body_color": "#65695f",
+        "side_eyebrow_color": "#e0e4d0",
+        "side_body_color": "#edf0e8",
+        "padding_top": 136,
+        "padding_bottom": 136,
+        "padding_top_mobile": 72,
+        "padding_bottom_mobile": 72,
+        "head_gap": 128,
+        "head_space": 48,
+        "grid_gap": 128,
+        "row_padding": 20,
+        "answer_indent": 48,
+        "question_size_min": 22,
+        "question_size_max": 31,
+        "anchor_id": "home-faq"
       }
     }
   },
   "order": [
     "jci_hero",
     "jci_marquee",
-    "jci_product_section_ya4nNw",
     "jci_story_qPUAMy",
-    "jci_editorial_banner"
+    "jci_product_section_ya4nNw",
+    "jci_editorial_banner",
+    "jci_home_faq"
   ]
 }
