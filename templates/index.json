@@ -382,6 +382,104 @@
         "toggle_duration": 320,
         "single_open": false
       }
+    },
+    "jci_newsletter": {
+      "type": "jci-newsletter",
+      "settings": {
+        "eyebrow": "The Maison letter",
+        "title": "Stay close to the",
+        "title_accent": "Maison.",
+        "body": "Sign up for first access to new pieces, stories from the stable and thoughtful notes from our world.",
+        "fineprint": "No noise. Just considered notes from the Maison.",
+        "placeholder": "Your email address",
+        "button_label": "Join",
+        "button_aria_label": "Join the Maison letter",
+        "customer_tag": "newsletter",
+        "accent_color": "#c6cda9",
+        "body_color": "#c4c7ba",
+        "placeholder_color": "#bfc1b7",
+        "message_color": "#c8d19d",
+        "fineprint_color": "#92998b",
+        "ring_color": "#d3d5c9",
+        "background_width": "content",
+        "space_above": 32,
+        "padding_top": 96,
+        "padding_bottom": 96,
+        "padding_top_mobile": 52,
+        "padding_bottom_mobile": 52,
+        "column_gap": 160,
+        "copy_max_width": 420,
+        "frame_inset": 100,
+        "frame_opacity": 13,
+        "ring_size": 280,
+        "anchor_id": "newsletter"
+      }
+    },
+    "jci_best_sellers": {
+      "type": "jci-best-sellers",
+      "blocks": {
+        "piece_1": {
+          "type": "piece",
+          "settings": {
+            "badge": "The Maison edit"
+          }
+        },
+        "piece_2": {
+          "type": "piece",
+          "settings": {
+            "badge": "The Maison edit"
+          }
+        },
+        "piece_3": {
+          "type": "piece",
+          "settings": {
+            "badge": "The Maison edit"
+          }
+        },
+        "piece_4": {
+          "type": "piece",
+          "settings": {
+            "badge": "The Maison edit"
+          }
+        }
+      },
+      "block_order": [
+        "piece_1",
+        "piece_2",
+        "piece_3",
+        "piece_4"
+      ],
+      "settings": {
+        "eyebrow": "The Maison edit",
+        "eyebrow_noun": "pieces",
+        "live_label": "Curated edit",
+        "title_line_one": "Best sellers",
+        "title_line_two": "for every ride.",
+        "body": "A considered edit of the pieces our riders reach for first — moving with you from the stable to the rest of the day.",
+        "of_label": "of",
+        "progress_hint": "Scroll to browse",
+        "cta_label": "Explore all pieces",
+        "subtitle_metafield": "custom.subtitle",
+        "card_link_label": "View the piece",
+        "placeholder_title": "Choose a product",
+        "card_width": 455,
+        "card_height": 650,
+        "card_grayscale": 100,
+        "accent_color": "#cdd3b5",
+        "body_color": "#c4c8bd",
+        "meta_color": "#adb4a5",
+        "live_color": "#9da692",
+        "live_dot_color": "#bd765b",
+        "card_subtitle_color": "#70756a",
+        "scroll_length": 260,
+        "padding_top": 112,
+        "padding_bottom": 112,
+        "column_gap": 144,
+        "watermark_opacity": 3.5,
+        "stage_label": "Best selling Maison Cavallé products",
+        "controls_label": "Best sellers navigation",
+        "anchor_id": "best-sellers"
+      }
     }
   },
   "order": [
@@ -389,7 +487,9 @@
     "jci_marquee",
     "jci_story_qPUAMy",
     "jci_product_section_ya4nNw",
+    "jci_best_sellers",
     "jci_editorial_banner",
-    "jci_home_faq"
+    "jci_home_faq",
+    "jci_newsletter"
   ]
 }

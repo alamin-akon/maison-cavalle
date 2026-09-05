@@ -1,0 +1,896 @@
+{% comment %}
+  Maison Cavallé — best sellers
+  Prototype source: maison-cavalle-main/app.js → bestSellersSection,
+                    bestSellerCard, updateBestSellerScroll,
+                    setMobileBestSellerPresentation, scrollBestSellerTo,
+                    activateBestSellerDrag
+                    maison-cavalle-main/styles.css → .best-seller* (223–282,
+                    1433–1435, 1501–1519, 1771–1774, 1784)
+  Reference: MAISON-CAVALLE-SPEC.md §1
+
+  A tall section with a sticky stage. Scrolling deals a stack of product cards.
+  The pieces are blocks, so the edit is curated by hand the way the prototype
+  curates it — not pulled wholesale from a collection.
+
+  Everything the card shows comes from the product; each block can override the
+  image and the corner label without touching the product itself.
+{% endcomment %}
+
+{% liquid
+  assign s = section.settings
+  assign pieces = section.blocks | where: 'type', 'piece'
+  assign total = pieces.size | prepend: '0' | slice: -2, 2
+%}
+
+<jci-best-sellers
+  class="jci-best-sellers"
+  {% if s.anchor_id != blank %}id="{{ s.anchor_id | handleize }}"{% endif %}
+  style="
+    --jci-best-sellers-bg: {{ s.background_color | default: settings.color_palette.foreground }};
+    --jci-best-sellers-bg-rgb: {{ s.background_color.rgb | default: settings.color_palette.foreground.rgb }};
+    --jci-best-sellers-text: {{ s.text_color | default: settings.color_palette.background }};
+    --jci-best-sellers-text-rgb: {{ s.text_color.rgb | default: settings.color_palette.background.rgb }};
+    --jci-best-sellers-accent: {{ s.accent_color }};
+    --jci-best-sellers-accent-rgb: {{ s.accent_color.rgb }};
+    --jci-best-sellers-body: {{ s.body_color }};
+    --jci-best-sellers-meta: {{ s.meta_color }};
+    --jci-best-sellers-live: {{ s.live_color }};
+    --jci-best-sellers-live-dot: {{ s.live_dot_color }};
+    --jci-best-sellers-live-dot-rgb: {{ s.live_dot_color.rgb }};
+    --jci-best-sellers-focus: {{ s.focus_color | default: settings.color_palette.color6 }};
+    --jci-best-sellers-card-bg: {{ s.card_background | default: settings.color_palette.background }};
+    --jci-best-sellers-card-text: {{ s.card_text_color | default: settings.color_palette.foreground }};
+    --jci-best-sellers-card-text-rgb: {{ s.card_text_color.rgb | default: settings.color_palette.foreground.rgb }};
+    --jci-best-sellers-card-media-bg: {{ s.card_media_background | default: settings.color_palette.color2 }};
+    --jci-best-sellers-card-eyebrow: {{ s.card_eyebrow_color | default: settings.color_palette.color5 }};
+    --jci-best-sellers-card-subtitle: {{ s.card_subtitle_color }};
+    --jci-best-sellers-scroll-length: {{ s.scroll_length }}vh;
+    --jci-best-sellers-pad-top: {{ s.padding_top }}px;
+    --jci-best-sellers-pad-bottom: {{ s.padding_bottom }}px;
+    --jci-best-sellers-gap: clamp(2.5rem, 8vw, {{ s.column_gap }}px);
+    --jci-best-sellers-card-width: {{ s.card_width }}px;
+    --jci-best-sellers-card-height: {{ s.card_height }}px;
+    --jci-best-sellers-watermark-opacity: {{ s.watermark_opacity | divided_by: 100.0 }};
+    --jci-best-sellers-grayscale: {{ s.card_grayscale | divided_by: 100.0 }};
+  "
+>
+  <div class="jci-best-sellers-container">
+    <div class="jci-best-sellers-intro">
+      <div class="jci-best-sellers-kicker-row">
+        {%- if s.eyebrow != blank -%}
+          <p class="jci-eyebrow jci-best-sellers-eyebrow">{{ s.eyebrow }} &middot; {{ total }} {{ s.eyebrow_noun }}</p>
+        {%- endif -%}
+        {%- if s.live_label != blank -%}
+          <span class="jci-best-sellers-live">
+            <i class="jci-best-sellers-live-dot" aria-hidden="true"></i> {{ s.live_label }}
+          </span>
+        {%- endif -%}
+      </div>
+
+      {%- if s.title_line_one != blank or s.title_line_two != blank -%}
+        <h2 class="jci-best-sellers-title">
+          {{- s.title_line_one -}}
+          {%- if s.title_line_one != blank and s.title_line_two != blank -%}<br>{%- endif -%}
+          {%- if s.title_line_two != blank -%}
+            <em class="jci-best-sellers-title-accent">{{ s.title_line_two }}</em>
+          {%- endif -%}
+        </h2>
+      {%- endif -%}
+
+      {%- if s.body != blank -%}
+        <p class="jci-best-sellers-copy">{{ s.body }}</p>
+      {%- endif -%}
+
+      <div class="jci-best-sellers-progress">
+        <span class="jci-best-sellers-progress-label">
+          <span class="jci-best-sellers-current" data-jci-best-sellers-current>01</span>
+          <span class="jci-best-sellers-of">{{ s.of_label }} {{ total }}</span>
+        </span>
+        <span class="jci-best-sellers-track" aria-hidden="true">
+          <span class="jci-best-sellers-track-fill" data-jci-best-sellers-progress></span>
+        </span>
+        <span class="jci-best-sellers-hint">{{ s.progress_hint }}</span>
+      </div>
+
+      {%- if s.cta_label != blank -%}
+        <a class="jci-text-link jci-best-sellers-cta" href="{{ s.cta_url | default: routes.all_products_collection_url }}">
+          {{ s.cta_label }} {% render 'jci-action-arrow' %}
+        </a>
+      {%- endif -%}
+    </div>
+
+    <div class="jci-best-sellers-stage" data-jci-best-sellers-stage aria-label="{{ s.stage_label }}">
+      <span class="jci-best-sellers-orbit" aria-hidden="true">
+        <span class="jci-best-sellers-orbit-dot"></span>
+      </span>
+
+      {%- for block in pieces -%}
+        {%- liquid
+          assign b = block.settings
+          assign product = b.product
+
+          assign card_image = blank
+          if b.image != blank
+            assign card_image = b.image
+          elsif product != blank
+            assign card_image = product.featured_image
+          endif
+
+          assign subtitle = blank
+          if s.subtitle_metafield != blank
+            assign parts = s.subtitle_metafield | split: '.'
+            assign subtitle = product.metafields[parts[0]][parts[1]].value
+          endif
+
+          assign eyebrow = b.category | default: product.type
+        -%}
+        <a
+          class="jci-best-seller-card"
+          href="{{ product.url | default: routes.all_products_collection_url }}"
+          data-jci-best-seller-card
+          aria-label="{{ product.title | escape }}"
+          {{ block.shopify_attributes }}
+        >
+          <span class="jci-best-seller-card-media">
+            {%- if card_image != blank -%}
+              <img
+                class="jci-best-seller-card-image"
+                src="{{ card_image | image_url: width: 900 }}"
+                srcset="
+                  {{ card_image | image_url: width: 500 }} 500w,
+                  {{ card_image | image_url: width: 900 }} 900w
+                "
+                sizes="(max-width: 680px) 82vw, 455px"
+                alt="{{ card_image.alt | escape | default: product.title | escape }}"
+                width="{{ card_image.width | default: 900 }}"
+                height="{{ card_image.height | default: 1150 }}"
+                loading="lazy"
+              >
+            {%- else -%}
+              {{ 'product-apparel-1' | placeholder_svg_tag: 'jci-best-seller-card-image' }}
+            {%- endif -%}
+            <span class="jci-best-seller-card-index">{{ forloop.index | prepend: '0' | slice: -2, 2 }} / {{ total }}</span>
+            {%- if b.badge != blank -%}
+              <small class="jci-best-seller-card-badge">{{ b.badge }}</small>
+            {%- endif -%}
+          </span>
+
+          <span class="jci-best-seller-card-info">
+            <span class="jci-best-seller-card-details">
+              {%- if eyebrow != blank -%}
+                <span class="jci-eyebrow jci-best-seller-card-eyebrow">{{ eyebrow }}</span>
+              {%- endif -%}
+              <span class="jci-best-seller-card-title">{{ product.title | default: s.placeholder_title }}</span>
+              <span class="jci-best-seller-card-subtitle">{{ subtitle }}</span>
+            </span>
+            <strong class="jci-best-seller-card-price">
+              {%- if product != blank -%}{{ product.price | money }}{%- endif -%}
+            </strong>
+          </span>
+
+          <span class="jci-best-seller-card-link">
+            {{ s.card_link_label }} {% render 'jci-action-arrow', class: 'jci-best-seller-card-arrow' %}
+          </span>
+        </a>
+      {%- endfor -%}
+
+      {%- if pieces.size > 1 -%}
+        <div class="jci-best-sellers-controls" data-jci-best-sellers-controls aria-label="{{ s.controls_label }}">
+          <button
+            class="jci-best-sellers-control"
+            type="button"
+            data-jci-best-sellers-control="previous"
+            aria-label="{{ 'accessibility.slideshow_previous' | t }}"
+          >
+            <span class="jci-best-sellers-control-glyph" aria-hidden="true">&#8592;</span>
+          </button>
+          <span class="jci-best-sellers-counter">
+            <b class="jci-best-sellers-counter-current" data-jci-best-sellers-current-card>01</b>
+            <span class="jci-best-sellers-counter-total">/ {{ total }}</span>
+          </span>
+          <button
+            class="jci-best-sellers-control"
+            type="button"
+            data-jci-best-sellers-control="next"
+            aria-label="{{ 'accessibility.slideshow_next' | t }}"
+          >
+            <span class="jci-best-sellers-control-glyph" aria-hidden="true">&#8594;</span>
+          </button>
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+</jci-best-sellers>
+
+<script src="{{ 'jci-best-sellers.js' | asset_url }}" type="module"></script>
+
+{% stylesheet %}
+  .jci-best-sellers {
+    position: relative;
+    display: block;
+    min-height: var(--jci-best-sellers-scroll-length);
+    overflow: clip;
+    color: var(--jci-best-sellers-text);
+    background: var(--jci-best-sellers-bg);
+  }
+
+  /* Oversized monogram bleeding out of the bottom-right. */
+  .jci-best-sellers::before {
+    content: "MC";
+    position: absolute;
+    right: -2%;
+    bottom: -10%;
+    color: rgb(var(--jci-best-sellers-text-rgb) / var(--jci-best-sellers-watermark-opacity));
+    font-family: var(--jci-font-display);
+    font-size: clamp(220px, 38vw, 620px);
+    font-weight: 600;
+    line-height: 0.8;
+    letter-spacing: -0.16em;
+    pointer-events: none;
+  }
+
+  /* The sticky pane the section scrolls past. */
+  .jci-best-sellers-container {
+    position: sticky;
+    top: 0;
+    display: grid;
+    grid-template-columns: minmax(280px, 0.72fr) minmax(0, 1.28fr);
+    gap: var(--jci-best-sellers-gap);
+    align-items: center;
+    min-height: 100svh;
+    padding-block: var(--jci-best-sellers-pad-top) var(--jci-best-sellers-pad-bottom);
+  }
+
+  /* -- Intro ------------------------------------------------------------- */
+
+  .jci-best-sellers-intro {
+    position: relative;
+    z-index: 1;
+    max-width: 430px;
+  }
+
+  .jci-best-sellers-kicker-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.4rem;
+  }
+
+  .jci-best-sellers-eyebrow {
+    margin-bottom: 0;
+    color: var(--jci-best-sellers-accent);
+  }
+
+  .jci-best-sellers-live {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--jci-best-sellers-live);
+    font-family: var(--jci-font-label);
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .jci-best-sellers-live-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--jci-best-sellers-live-dot);
+    box-shadow: 0 0 0 4px rgb(var(--jci-best-sellers-live-dot-rgb) / 0.12);
+  }
+
+  .jci-best-sellers-title {
+    margin: 0 0 1.8rem;
+    font-family: var(--jci-font-display);
+    font-size: var(--jci-section-title-size);
+    font-weight: 500;
+    line-height: 0.92;
+    letter-spacing: -0.055em;
+  }
+
+  .jci-best-sellers-title-accent {
+    color: var(--jci-best-sellers-accent);
+    font-style: italic;
+  }
+
+  .jci-best-sellers-copy {
+    max-width: 350px;
+    margin: 0;
+    color: var(--jci-best-sellers-body);
+    font-family: var(--jci-font-sans);
+    font-size: var(--jci-subtitle-size);
+    line-height: var(--jci-subtitle-leading);
+  }
+
+  /* -- Progress ---------------------------------------------------------- */
+
+  .jci-best-sellers-progress {
+    display: grid;
+    grid-template-columns: auto minmax(70px, 1fr) auto;
+    align-items: center;
+    gap: 0.8rem;
+    max-width: 390px;
+    margin-top: 3rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgb(var(--jci-best-sellers-text-rgb) / 0.22);
+    color: var(--jci-best-sellers-meta);
+    font-family: var(--jci-font-label);
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .jci-best-sellers-progress-label {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.35rem;
+  }
+
+  .jci-best-sellers-current {
+    color: var(--jci-best-sellers-text);
+    font-size: 13px;
+  }
+
+  .jci-best-sellers-of {
+    color: var(--jci-best-sellers-meta);
+    font-size: 12px;
+  }
+
+  .jci-best-sellers-track {
+    position: relative;
+    display: block;
+    height: 2px;
+    overflow: hidden;
+    background: rgb(var(--jci-best-sellers-text-rgb) / 0.16);
+  }
+
+  .jci-best-sellers-track-fill {
+    display: block;
+    width: 0;
+    height: 100%;
+    background: var(--jci-best-sellers-accent);
+    transition: width 0.45s var(--jci-ease);
+  }
+
+  .jci-best-sellers-hint {
+    justify-self: end;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+
+  .jci-best-sellers-cta {
+    display: inline-flex;
+    margin-top: 2rem;
+    color: var(--jci-best-sellers-text);
+  }
+
+  /* -- Stage ------------------------------------------------------------- */
+
+  .jci-best-sellers-stage {
+    position: relative;
+    display: grid;
+    place-items: center;
+    min-height: min(680px, calc(100svh - 4rem));
+    perspective: 1400px;
+    touch-action: pan-y;
+    cursor: grab;
+  }
+
+  .jci-best-sellers-stage.is-dragging {
+    cursor: grabbing;
+  }
+
+  /* Faint ringed circle centred behind the stack. */
+  .jci-best-sellers-stage::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: min(70vw, 560px);
+    aspect-ratio: 1;
+    border: 1px solid rgb(var(--jci-best-sellers-accent-rgb) / 0.12);
+    border-radius: 50%;
+    box-shadow:
+      0 0 0 34px rgb(var(--jci-best-sellers-accent-rgb) / 0.025),
+      0 0 0 90px rgb(var(--jci-best-sellers-accent-rgb) / 0.018);
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+
+  .jci-best-sellers-orbit {
+    position: absolute;
+    z-index: 0;
+    right: 8%;
+    bottom: 7%;
+    width: 76px;
+    height: 76px;
+    border: 1px solid rgb(var(--jci-best-sellers-accent-rgb) / 0.24);
+    border-radius: 50%;
+    transform: rotate(-18deg);
+    pointer-events: none;
+  }
+
+  .jci-best-sellers-orbit::before,
+  .jci-best-sellers-orbit::after {
+    content: "";
+    position: absolute;
+    border: 1px solid rgb(var(--jci-best-sellers-accent-rgb) / 0.14);
+    border-radius: 50%;
+  }
+
+  .jci-best-sellers-orbit::before {
+    inset: 9px -16px -9px 16px;
+  }
+
+  .jci-best-sellers-orbit::after {
+    inset: -14px 14px 14px -14px;
+  }
+
+  .jci-best-sellers-orbit-dot {
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--jci-best-sellers-accent);
+    transform: translateX(-50%);
+  }
+
+  /* -- Card -------------------------------------------------------------- */
+
+  .jci-best-seller-card {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    z-index: var(--jci-card-z, 1);
+    display: flex;
+    flex-direction: column;
+    width: min(100%, var(--jci-best-sellers-card-width));
+    height: min(var(--jci-best-sellers-card-height), calc(100svh - 5rem));
+    padding: 0.65rem;
+    color: var(--jci-best-sellers-card-text);
+    background: var(--jci-best-sellers-card-bg);
+    box-shadow:
+      14px 16px 0 rgb(var(--jci-best-sellers-text-rgb) / 0.08),
+      0 25px 55px rgb(0 0 0 / 0.2);
+    text-decoration: none;
+    opacity: var(--jci-card-opacity, 1);
+    transform: translate(-50%, -50%)
+      translate3d(var(--jci-card-x, 0px), var(--jci-card-y, 0px), 0)
+      rotate(var(--jci-card-rotate, 0deg)) scale(var(--jci-card-scale, 1));
+    transform-origin: center center;
+    transition: box-shadow 0.5s var(--jci-ease), opacity 0.45s var(--jci-ease);
+    will-change: transform, opacity;
+    pointer-events: none;
+  }
+
+  .jci-best-seller-card.is-current {
+    box-shadow:
+      18px 20px 0 rgb(var(--jci-best-sellers-text-rgb) / 0.1),
+      0 30px 75px rgb(0 0 0 / 0.32);
+    pointer-events: auto;
+  }
+
+  .jci-best-seller-card:focus-visible {
+    outline: 2px solid var(--jci-best-sellers-focus);
+    outline-offset: 6px;
+  }
+
+  .jci-best-seller-card-media {
+    position: relative;
+    display: block;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    background: var(--jci-best-sellers-card-media-bg);
+  }
+
+  .jci-best-seller-card-media::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      180deg,
+      rgb(var(--jci-best-sellers-card-text-rgb) / 0.06),
+      transparent 60%,
+      rgb(var(--jci-best-sellers-card-text-rgb) / 0.25)
+    );
+    pointer-events: none;
+  }
+
+  .jci-best-seller-card-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: grayscale(var(--jci-best-sellers-grayscale)) saturate(0.25) contrast(1.04);
+    transition: transform 0.8s var(--jci-ease), filter 0.6s var(--jci-ease);
+  }
+
+  .jci-best-seller-card:hover .jci-best-seller-card-image,
+  .jci-best-seller-card:focus-visible .jci-best-seller-card-image {
+    filter: grayscale(0) saturate(1.02) contrast(1.04);
+    transform: scale(1.045);
+  }
+
+  .jci-best-seller-card-index,
+  .jci-best-seller-card-badge {
+    position: absolute;
+    z-index: 1;
+    color: var(--jci-best-sellers-text);
+    font-family: var(--jci-font-label);
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .jci-best-seller-card-index {
+    top: 1rem;
+    left: 1rem;
+  }
+
+  .jci-best-seller-card-badge {
+    right: 1rem;
+    bottom: 1rem;
+    padding: 0.4rem 0.5rem;
+    background: var(--jci-best-sellers-bg);
+  }
+
+  .jci-best-seller-card-info {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.15rem 0.5rem 0.8rem;
+  }
+
+  .jci-best-seller-card-details {
+    display: block;
+    min-width: 0;
+  }
+
+  .jci-best-seller-card-eyebrow {
+    display: block;
+    margin-bottom: 0.45rem;
+    color: var(--jci-best-sellers-card-eyebrow);
+    font-size: 12px;
+  }
+
+  .jci-best-seller-card-title {
+    display: block;
+    min-height: 2em;
+    margin-bottom: 0.3rem;
+    font-family: var(--jci-font-display);
+    font-size: 24px;
+    font-weight: 500;
+    line-height: 1;
+  }
+
+  .jci-best-seller-card-subtitle {
+    display: block;
+    min-height: 2.7em;
+    color: var(--jci-best-sellers-card-subtitle);
+    font-family: var(--jci-font-sans);
+    font-size: var(--jci-subtitle-size);
+    line-height: var(--jci-subtitle-leading);
+  }
+
+  .jci-best-seller-card-price {
+    padding-top: 0.15rem;
+    font-family: var(--jci-font-label);
+    font-size: 14px;
+    font-weight: 400;
+    white-space: nowrap;
+  }
+
+  .jci-best-seller-card-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.7rem 0.5rem 0.55rem;
+    border-top: 1px solid var(--jci-line);
+    font-family: var(--jci-font-label);
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .jci-best-seller-card-arrow {
+    flex: 0 0 14px;
+    width: 14px;
+    height: 14px;
+  }
+
+  .jci-best-seller-card:hover .jci-best-seller-card-arrow {
+    transform: translate(3px, -3px);
+  }
+
+  /* -- Controls ---------------------------------------------------------- */
+
+  .jci-best-sellers-controls {
+    position: absolute;
+    z-index: 8;
+    right: 0;
+    bottom: -2.25rem;
+    left: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: min(100%, var(--jci-best-sellers-card-width));
+    margin: 0 auto;
+    padding: 0.7rem 0.75rem;
+    color: var(--jci-best-sellers-live);
+    border: 1px solid rgb(var(--jci-best-sellers-text-rgb) / 0.18);
+    background: rgb(var(--jci-best-sellers-bg-rgb) / 0.72);
+    font-family: var(--jci-font-label);
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+  }
+
+  .jci-best-sellers-control {
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    color: var(--jci-best-sellers-text);
+    border: 1px solid rgb(var(--jci-best-sellers-text-rgb) / 0.25);
+    border-radius: 50%;
+    background: transparent;
+    font-size: 15px;
+    line-height: 1;
+    cursor: pointer;
+    transition: color 0.3s, background 0.3s, transform 0.3s var(--jci-ease);
+  }
+
+  .jci-best-sellers-control:hover {
+    color: var(--jci-best-sellers-bg);
+    background: var(--jci-best-sellers-text);
+    transform: scale(1.08);
+  }
+
+  .jci-best-sellers-control:focus-visible {
+    outline: 2px solid var(--jci-best-sellers-focus);
+    outline-offset: 3px;
+  }
+
+  .jci-best-sellers-counter {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.3rem;
+  }
+
+  .jci-best-sellers-counter-current {
+    color: var(--jci-best-sellers-text);
+    font-size: 12px;
+    font-weight: 400;
+  }
+
+  /* -- Breakpoints (§5 — 900 and 680 only) ------------------------------- */
+
+  @media screen and (max-width: 900px) {
+    .jci-best-sellers-container {
+      grid-template-columns: minmax(250px, 0.65fr) minmax(0, 1.35fr);
+      gap: 3rem;
+    }
+
+    .jci-best-seller-card {
+      width: min(100%, 400px);
+    }
+  }
+
+  @media screen and (max-width: 680px) {
+    /* The stack stops being scroll-driven, so the section no longer needs the
+       tall scroll runway or the sticky pane. */
+    .jci-best-sellers {
+      min-height: auto;
+      overflow: hidden;
+    }
+
+    .jci-best-sellers-container {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 2rem;
+      min-height: auto;
+      padding-block: 4rem;
+    }
+
+    .jci-best-sellers-intro {
+      max-width: 520px;
+    }
+
+    .jci-best-sellers-kicker-row {
+      align-items: flex-start;
+    }
+
+    .jci-best-sellers-live {
+      margin-top: 0.1rem;
+    }
+
+    .jci-best-sellers-title {
+      margin-bottom: 1.2rem;
+    }
+
+    .jci-best-sellers-copy {
+      max-width: 390px;
+    }
+
+    .jci-best-sellers-progress {
+      margin-top: 1.8rem;
+    }
+
+    .jci-best-sellers-stage {
+      flex: 0 0 auto;
+      width: 100%;
+      min-height: clamp(500px, 145vw, 570px);
+    }
+
+    .jci-best-sellers-orbit {
+      right: 0;
+      bottom: 6%;
+      transform: scale(0.8) rotate(-18deg);
+    }
+
+    .jci-best-seller-card {
+      width: min(82vw, 365px);
+      height: min(540px, calc(100svh - 8rem));
+      transition: transform 0.6s var(--jci-ease), box-shadow 0.5s var(--jci-ease),
+        opacity 0.45s var(--jci-ease);
+    }
+
+    .jci-best-sellers-controls {
+      width: min(82vw, 365px);
+    }
+
+    .jci-best-seller-card-title {
+      font-size: 21px;
+    }
+
+    /* Hover is not available, so the greyscale reveal stands down. */
+    .jci-best-seller-card-image {
+      filter: none;
+    }
+
+    .jci-best-seller-card:hover .jci-best-seller-card-image,
+    .jci-best-seller-card:focus-visible .jci-best-seller-card-image {
+      filter: none;
+      transform: none;
+    }
+
+    .jci-best-seller-card:hover .jci-best-seller-card-arrow {
+      transform: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    /* No scroll coupling at all: the stack becomes a plain grid. */
+    .jci-best-sellers {
+      min-height: auto;
+    }
+
+    .jci-best-sellers-container {
+      position: relative;
+      min-height: auto;
+    }
+
+    .jci-best-sellers-stage {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem;
+      min-height: auto;
+    }
+
+    .jci-best-seller-card {
+      position: relative;
+      top: auto;
+      left: auto;
+      width: 100%;
+      height: auto;
+      min-height: 420px;
+      opacity: 1;
+      transform: none;
+      pointer-events: auto;
+    }
+
+    .jci-best-seller-card-image,
+    .jci-best-sellers-track-fill,
+    .jci-best-sellers-control {
+      transition: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) and (max-width: 680px) {
+    .jci-best-sellers-stage {
+      grid-template-columns: 1fr;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Best sellers",
+  "tag": "div",
+  "class": "jci-best-sellers-wrapper",
+  "max_blocks": 8,
+  "settings": [
+    { "type": "header", "content": "Intro" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "The Maison edit" },
+    { "type": "text", "id": "eyebrow_noun", "label": "Eyebrow noun", "default": "pieces", "info": "Follows the piece count." },
+    { "type": "text", "id": "live_label", "label": "Badge", "default": "Curated edit" },
+    { "type": "text", "id": "title_line_one", "label": "Title first line", "default": "Best sellers" },
+    { "type": "text", "id": "title_line_two", "label": "Title second line (italic)", "default": "for every ride." },
+    { "type": "textarea", "id": "body", "label": "Body", "default": "A considered edit of the pieces our riders reach for first — moving with you from the stable to the rest of the day." },
+    { "type": "text", "id": "of_label", "label": "Counter word", "default": "of" },
+    { "type": "text", "id": "progress_hint", "label": "Progress hint", "default": "Scroll to browse" },
+    { "type": "text", "id": "cta_label", "label": "Link label", "default": "Explore all pieces" },
+    { "type": "url", "id": "cta_url", "label": "Link" },
+
+    { "type": "header", "content": "Cards" },
+    { "type": "text", "id": "subtitle_metafield", "label": "Subtitle metafield", "default": "custom.subtitle", "info": "namespace.key on the product." },
+    { "type": "text", "id": "card_link_label", "label": "Card link label", "default": "View the piece" },
+    { "type": "text", "id": "placeholder_title", "label": "Placeholder title", "default": "Choose a product" },
+    { "type": "range", "id": "card_width", "label": "Card width", "min": 300, "max": 600, "step": 5, "unit": "px", "default": 455 },
+    { "type": "range", "id": "card_height", "label": "Card height", "min": 420, "max": 820, "step": 10, "unit": "px", "default": 650 },
+    { "type": "range", "id": "card_grayscale", "label": "Image greyscale at rest", "min": 0, "max": 100, "step": 5, "unit": "%", "default": 100, "info": "Colour returns on hover." },
+
+    { "type": "header", "content": "Colors", "info": "Left empty, each of these follows the theme colour palette." },
+    { "type": "color", "id": "background_color", "label": "Background" },
+    { "type": "color", "id": "text_color", "label": "Text and rules" },
+    { "type": "color", "id": "accent_color", "label": "Accent", "default": "#cdd3b5" },
+    { "type": "color", "id": "body_color", "label": "Body text", "default": "#c4c8bd" },
+    { "type": "color", "id": "meta_color", "label": "Metadata", "default": "#adb4a5" },
+    { "type": "color", "id": "live_color", "label": "Badge text", "default": "#9da692" },
+    { "type": "color", "id": "live_dot_color", "label": "Badge dot", "default": "#bd765b" },
+    { "type": "color", "id": "focus_color", "label": "Focus ring" },
+    { "type": "color", "id": "card_background", "label": "Card background" },
+    { "type": "color", "id": "card_text_color", "label": "Card text" },
+    { "type": "color", "id": "card_media_background", "label": "Card image placeholder" },
+    { "type": "color", "id": "card_eyebrow_color", "label": "Card eyebrow" },
+    { "type": "color", "id": "card_subtitle_color", "label": "Card subtitle", "default": "#70756a" },
+
+    { "type": "header", "content": "Layout" },
+    { "type": "range", "id": "scroll_length", "label": "Scroll length", "min": 120, "max": 400, "step": 10, "unit": "vh", "default": 260, "info": "How far the page scrolls while the stack is dealt." },
+    { "type": "range", "id": "padding_top", "label": "Padding top", "min": 0, "max": 200, "step": 4, "unit": "px", "default": 112 },
+    { "type": "range", "id": "padding_bottom", "label": "Padding bottom", "min": 0, "max": 200, "step": 4, "unit": "px", "default": 112 },
+    { "type": "range", "id": "column_gap", "label": "Column gap", "min": 40, "max": 200, "step": 4, "unit": "px", "default": 144 },
+    { "type": "range", "id": "watermark_opacity", "label": "Monogram opacity", "min": 0, "max": 20, "step": 0.5, "unit": "%", "default": 3.5 },
+
+    { "type": "header", "content": "Accessibility" },
+    { "type": "text", "id": "stage_label", "label": "Stage label", "default": "Best selling Maison Cavallé products" },
+    { "type": "text", "id": "controls_label", "label": "Controls label", "default": "Best sellers navigation" },
+
+    { "type": "header", "content": "Anchor" },
+    { "type": "text", "id": "anchor_id", "label": "Anchor ID", "default": "best-sellers" }
+  ],
+  "blocks": [
+    {
+      "type": "piece",
+      "name": "Piece",
+      "settings": [
+        { "type": "product", "id": "product", "label": "Product" },
+        { "type": "image_picker", "id": "image", "label": "Image", "info": "Replaces the product's featured image." },
+        { "type": "text", "id": "category", "label": "Category", "info": "Left empty, the product type is used." },
+        { "type": "text", "id": "badge", "label": "Corner label", "default": "The Maison edit" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Best sellers",
+      "blocks": [
+        { "type": "piece" },
+        { "type": "piece" },
+        { "type": "piece" },
+        { "type": "piece" }
+      ]
+    }
+  ]
+}
+{% endschema %}

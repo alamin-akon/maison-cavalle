@@ -1,0 +1,402 @@
+{% comment %}
+  Maison Cavallé — newsletter
+  Prototype source: maison-cavalle-main/app.js → renderHome, .newsletter-section
+                    maison-cavalle-main/styles.css → .newsletter-* (409–431,
+                    1432, 1554–1558)
+  Reference: MAISON-CAVALLE-SPEC.md §1
+
+  An ink panel closing the homepage: heading left, sign-up right.
+
+  The prototype's form is a stub that only prints a message. Here it posts to
+  Shopify's customer form, so the address is actually captured, and the success
+  and error states come from the theme's own locale keys.
+
+  The prototype cascades four .newsletter-section rules over each other; the
+  value that survives is what is reproduced below, not the first declaration.
+{% endcomment %}
+
+{% liquid
+  assign s = section.settings
+
+  comment
+    `| t` would run over the setting's own text too, so the fallback is picked
+    before anything is translated.
+  endcomment
+  assign placeholder = s.placeholder
+  if placeholder == blank
+    assign placeholder = 'blocks.email_signup.placeholder' | t
+  endif
+%}
+
+<section
+  class="jci-newsletter"
+  {% if s.anchor_id != blank %}id="{{ s.anchor_id | handleize }}"{% endif %}
+  style="
+    --jci-newsletter-bg: {{ s.background_color | default: settings.color_palette.foreground }};
+    --jci-newsletter-text: {{ s.text_color | default: settings.color_palette.background }};
+    --jci-newsletter-text-rgb: {{ s.text_color.rgb | default: settings.color_palette.background.rgb }};
+    --jci-newsletter-accent: {{ s.accent_color }};
+    --jci-newsletter-body: {{ s.body_color }};
+    --jci-newsletter-ring-rgb: {{ s.ring_color.rgb }};
+    --jci-newsletter-placeholder: {{ s.placeholder_color }};
+    --jci-newsletter-message: {{ s.message_color }};
+    --jci-newsletter-fineprint: {{ s.fineprint_color }};
+    --jci-newsletter-button-bg: {{ s.button_background | default: settings.color_palette.color3 }};
+    --jci-newsletter-button-text: {{ s.button_text_color | default: settings.color_palette.foreground }};
+    --jci-newsletter-button-bg-hover: {{ s.button_background_hover | default: settings.color_palette.color5 }};
+    --jci-newsletter-button-text-hover: {{ s.button_text_hover | default: settings.color_palette.background }};
+    --jci-newsletter-pad-top: {{ s.padding_top }}px;
+    --jci-newsletter-pad-bottom: {{ s.padding_bottom }}px;
+    --jci-newsletter-pad-top-mobile: {{ s.padding_top_mobile }}px;
+    --jci-newsletter-pad-bottom-mobile: {{ s.padding_bottom_mobile }}px;
+    --jci-newsletter-space-above: {{ s.space_above }}px;
+    --jci-newsletter-gap: clamp(3rem, 9vw, {{ s.column_gap }}px);
+    --jci-newsletter-copy-max: {{ s.copy_max_width }}px;
+    --jci-newsletter-frame-inset: {{ s.frame_inset | divided_by: 100.0 }}rem;
+    --jci-newsletter-frame-opacity: {{ s.frame_opacity | divided_by: 100.0 }};
+    --jci-newsletter-ring-size: {{ s.ring_size | divided_by: 10.0 }}rem;
+    {%- if s.background_width == 'full' %}
+      --jci-container-width: 100vw;
+      --jci-container-offset: calc(50% - 50vw);
+    {%- endif %}
+  "
+>
+  <div class="jci-newsletter-container">
+    <div class="jci-newsletter-intro">
+      {%- if s.eyebrow != blank -%}
+        <p class="jci-eyebrow jci-newsletter-eyebrow">{{ s.eyebrow }}</p>
+      {%- endif -%}
+
+      {%- if s.title != blank or s.title_accent != blank -%}
+        <h2 class="jci-newsletter-title">
+          {{- s.title }}
+          {%- if s.title_accent != blank -%}
+            {% if s.title != blank %} {% endif %}
+            <em class="jci-newsletter-title-accent">{{ s.title_accent }}</em>
+          {%- endif -%}
+        </h2>
+      {%- endif -%}
+    </div>
+
+    <div class="jci-newsletter-copy">
+      {%- if s.body != blank -%}
+        <p class="jci-newsletter-text">{{ s.body }}</p>
+      {%- endif -%}
+
+      {%- form 'customer', class: 'jci-newsletter-form' -%}
+        <input type="hidden" name="contact[tags]" value="{{ s.customer_tag | escape }}">
+
+        <label class="jci-sr-only" for="jci-newsletter-email-{{ section.id }}">
+          {{- 'blocks.email_signup.label' | t -}}
+        </label>
+
+        <div class="jci-newsletter-field">
+          <input
+            class="jci-newsletter-input"
+            id="jci-newsletter-email-{{ section.id }}"
+            type="email"
+            name="contact[email]"
+            value="{{ form.email }}"
+            placeholder="{{ placeholder | escape }}"
+            autocorrect="off"
+            autocapitalize="off"
+            autocomplete="email"
+            required
+            {% if form.errors %}
+              aria-invalid="true"
+              aria-describedby="jci-newsletter-message-{{ section.id }}"
+            {% elsif form.posted_successfully? %}
+              aria-describedby="jci-newsletter-message-{{ section.id }}"
+            {% endif %}
+          >
+          <button class="jci-newsletter-button" type="submit" aria-label="{{ s.button_aria_label }}">
+            {{ s.button_label }} {% render 'jci-action-arrow', class: 'jci-newsletter-button-arrow' %}
+          </button>
+        </div>
+
+        {%- comment -%}
+          One message slot for both outcomes, so the layout never shifts as the
+          form goes from empty to answered.
+        {%- endcomment -%}
+        <p class="jci-newsletter-message" id="jci-newsletter-message-{{ section.id }}" role="status" tabindex="-1">
+          {%- if form.errors -%}
+            {{- form.errors.translated_fields.email | capitalize }} {{ form.errors.messages.email -}}
+          {%- elsif form.posted_successfully? -%}
+            {{- 'blocks.email_signup.success' | t -}}
+          {%- endif -%}
+        </p>
+      {%- endform -%}
+
+      {%- if s.fineprint != blank -%}
+        <small class="jci-newsletter-fineprint">{{ s.fineprint }}</small>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+  .jci-newsletter {
+    display: block;
+    margin-block-start: var(--jci-newsletter-space-above);
+  }
+
+  /* Panel, padding and grid on one element — the prototype's four cascading
+     .newsletter-section rules resolve to a full-width box with block padding
+     only, and .newsletter-inner supplies the gutters the container already has. */
+  .jci-newsletter-container {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(300px, 0.85fr);
+    gap: var(--jci-newsletter-gap);
+    align-items: end;
+    overflow: hidden;
+    padding-block: var(--jci-newsletter-pad-top) var(--jci-newsletter-pad-bottom);
+    color: var(--jci-newsletter-text);
+    background: var(--jci-newsletter-bg);
+  }
+
+  /* Hairline frame just inside the panel. */
+  .jci-newsletter-container::before {
+    content: "";
+    position: absolute;
+    inset: var(--jci-newsletter-frame-inset);
+    border: 1px solid rgb(var(--jci-newsletter-text-rgb) / var(--jci-newsletter-frame-opacity));
+    pointer-events: none;
+  }
+
+  /* Ringed circle bleeding out of the top-right corner. */
+  .jci-newsletter-container::after {
+    content: "";
+    position: absolute;
+    top: -10rem;
+    right: -6rem;
+    width: var(--jci-newsletter-ring-size);
+    height: var(--jci-newsletter-ring-size);
+    border: 1px solid rgb(var(--jci-newsletter-ring-rgb) / 0.14);
+    border-radius: 50%;
+    box-shadow:
+      0 0 0 3.5rem rgb(var(--jci-newsletter-ring-rgb) / 0.025),
+      0 0 0 7rem rgb(var(--jci-newsletter-ring-rgb) / 0.018);
+    pointer-events: none;
+  }
+
+  /* -- Intro ------------------------------------------------------------- */
+
+  .jci-newsletter-intro {
+    position: relative;
+    z-index: 1;
+  }
+
+  .jci-newsletter-eyebrow {
+    margin-bottom: 1rem;
+    color: var(--jci-newsletter-accent);
+  }
+
+  .jci-newsletter-title {
+    max-width: 600px;
+    margin: 0;
+    font-family: var(--jci-font-display);
+    font-size: var(--jci-section-title-size);
+    font-weight: 500;
+    line-height: 0.92;
+    letter-spacing: -0.055em;
+  }
+
+  .jci-newsletter-title-accent {
+    color: var(--jci-newsletter-accent);
+    font-style: italic;
+  }
+
+  /* -- Copy and form ----------------------------------------------------- */
+
+  .jci-newsletter-copy {
+    position: relative;
+    z-index: 1;
+    max-width: var(--jci-newsletter-copy-max);
+    margin-left: auto;
+  }
+
+  .jci-newsletter-text {
+    margin: 0 0 1.8rem;
+    color: var(--jci-newsletter-body);
+    font-family: var(--jci-font-sans);
+    font-size: var(--jci-subtitle-size);
+    line-height: var(--jci-subtitle-leading);
+  }
+
+  .jci-newsletter-field {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.35rem 0.4rem 0.35rem 1rem;
+    border: 1px solid rgb(var(--jci-newsletter-text-rgb) / 0.42);
+    border-radius: 0;
+    transition: border-color 0.3s, background 0.3s;
+  }
+
+  .jci-newsletter-field:focus-within {
+    border-color: var(--jci-newsletter-text);
+    background: rgb(var(--jci-newsletter-text-rgb) / 0.07);
+  }
+
+  .jci-newsletter-input {
+    width: 100%;
+    min-width: 0;
+    padding: 0.65rem 0 0.7rem;
+    color: var(--jci-newsletter-text);
+    border: 0;
+    outline: 0;
+    background: transparent;
+    font: inherit;
+  }
+
+  .jci-newsletter-input::placeholder {
+    color: var(--jci-newsletter-placeholder);
+  }
+
+  .jci-newsletter-button {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.75rem 1rem 0.75rem 1.1rem;
+    color: var(--jci-newsletter-button-text);
+    border: 0;
+    border-radius: 0;
+    background: var(--jci-newsletter-button-bg);
+    font-family: var(--jci-font-label);
+    font-size: 14px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: color 0.3s, background 0.3s, transform 0.3s var(--jci-ease);
+  }
+
+  .jci-newsletter-button:hover {
+    color: var(--jci-newsletter-button-text-hover);
+    background: var(--jci-newsletter-button-bg-hover);
+    transform: translateY(-2px);
+  }
+
+  .jci-newsletter-button-arrow {
+    flex: 0 0 14px;
+    width: 14px;
+    height: 14px;
+  }
+
+  .jci-newsletter-message {
+    min-height: 1.4em;
+    margin: 0;
+    padding-top: 0.7rem;
+    color: var(--jci-newsletter-message);
+    font-size: 12px;
+  }
+
+  .jci-newsletter-fineprint {
+    display: block;
+    margin-top: 1rem;
+    color: var(--jci-newsletter-fineprint);
+    font-family: var(--jci-font-label);
+    font-size: 12px;
+    letter-spacing: 0.06em;
+  }
+
+  /* -- Breakpoints (§5 — 900 and 680 only) ------------------------------- */
+
+  @media screen and (max-width: 900px) {
+    .jci-newsletter-container {
+      gap: 3rem;
+    }
+  }
+
+  @media screen and (max-width: 680px) {
+    .jci-newsletter-container {
+      display: block;
+      padding-block: var(--jci-newsletter-pad-top-mobile) var(--jci-newsletter-pad-bottom-mobile);
+    }
+
+    .jci-newsletter-container::before {
+      inset: 0.7rem;
+    }
+
+    .jci-newsletter-title {
+      margin-bottom: 2.4rem;
+    }
+
+    .jci-newsletter-copy {
+      max-width: none;
+      margin: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .jci-newsletter-field,
+    .jci-newsletter-button {
+      transition: none;
+    }
+
+    .jci-newsletter-button:hover {
+      transform: none;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Newsletter",
+  "tag": "div",
+  "class": "jci-newsletter-wrapper",
+  "settings": [
+    { "type": "header", "content": "Copy" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "The Maison letter" },
+    { "type": "text", "id": "title", "label": "Title", "default": "Stay close to the" },
+    { "type": "text", "id": "title_accent", "label": "Title accent (italic)", "default": "Maison." },
+    { "type": "textarea", "id": "body", "label": "Body", "default": "Sign up for first access to new pieces, stories from the stable and thoughtful notes from our world." },
+    { "type": "text", "id": "fineprint", "label": "Fine print", "default": "No noise. Just considered notes from the Maison." },
+
+    { "type": "header", "content": "Form" },
+    { "type": "text", "id": "placeholder", "label": "Field placeholder", "default": "Your email address" },
+    { "type": "text", "id": "button_label", "label": "Button label", "default": "Join" },
+    { "type": "text", "id": "button_aria_label", "label": "Button label for screen readers", "default": "Join the Maison letter" },
+    { "type": "text", "id": "customer_tag", "label": "Customer tag", "default": "newsletter", "info": "Added to the customer record so the sign-up source is traceable." },
+
+    { "type": "header", "content": "Colors", "info": "Left empty, each of these follows the theme colour palette." },
+    { "type": "color", "id": "background_color", "label": "Panel background" },
+    { "type": "color", "id": "text_color", "label": "Text and rules" },
+    { "type": "color", "id": "accent_color", "label": "Eyebrow and accent", "default": "#c6cda9" },
+    { "type": "color", "id": "body_color", "label": "Body text", "default": "#c4c7ba" },
+    { "type": "color", "id": "placeholder_color", "label": "Field placeholder", "default": "#bfc1b7" },
+    { "type": "color", "id": "message_color", "label": "Form message", "default": "#c8d19d" },
+    { "type": "color", "id": "fineprint_color", "label": "Fine print", "default": "#92998b" },
+    { "type": "color", "id": "ring_color", "label": "Corner ring", "default": "#d3d5c9" },
+    { "type": "color", "id": "button_background", "label": "Button background" },
+    { "type": "color", "id": "button_text_color", "label": "Button text" },
+    { "type": "color", "id": "button_background_hover", "label": "Button background on hover" },
+    { "type": "color", "id": "button_text_hover", "label": "Button text on hover" },
+
+    { "type": "header", "content": "Layout" },
+    {
+      "type": "select", "id": "background_width", "label": "Panel width",
+      "options": [
+        { "value": "content", "label": "Content width" },
+        { "value": "full", "label": "Full width" }
+      ],
+      "default": "content"
+    },
+    { "type": "range", "id": "space_above", "label": "Space above the panel", "min": 0, "max": 120, "step": 2, "unit": "px", "default": 32 },
+    { "type": "range", "id": "padding_top", "label": "Padding top", "min": 0, "max": 200, "step": 4, "unit": "px", "default": 96 },
+    { "type": "range", "id": "padding_bottom", "label": "Padding bottom", "min": 0, "max": 200, "step": 4, "unit": "px", "default": 96 },
+    { "type": "range", "id": "padding_top_mobile", "label": "Padding top on mobile", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 52 },
+    { "type": "range", "id": "padding_bottom_mobile", "label": "Padding bottom on mobile", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 52 },
+    { "type": "range", "id": "column_gap", "label": "Column gap", "min": 48, "max": 240, "step": 4, "unit": "px", "default": 160, "info": "The widest step of clamp(3rem, 9vw, X) — 160 is the prototype’s 10rem." },
+    { "type": "range", "id": "copy_max_width", "label": "Sign-up column width", "min": 280, "max": 640, "step": 10, "unit": "px", "default": 420 },
+    { "type": "range", "id": "frame_inset", "label": "Hairline frame inset", "min": 0, "max": 400, "step": 10, "unit": "%", "default": 100, "info": "Hundredths of a rem — 100 is 1rem." },
+    { "type": "range", "id": "frame_opacity", "label": "Hairline frame opacity", "min": 0, "max": 100, "step": 1, "unit": "%", "default": 13 },
+    { "type": "range", "id": "ring_size", "label": "Corner ring size", "min": 100, "max": 600, "step": 10, "unit": "%", "default": 280, "info": "Tenths of a rem — 280 is 28rem." },
+
+    { "type": "header", "content": "Anchor" },
+    { "type": "text", "id": "anchor_id", "label": "Anchor ID", "default": "newsletter" }
+  ],
+  "presets": [{ "name": "Newsletter" }]
+}
+{% endschema %}

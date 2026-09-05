@@ -612,7 +612,9 @@ Other border widths:
 | 6d | `sections/jci-product-section.liquid` + `snippets/jci-product-card.liquid` | done |
 | 6e | `sections/jci-editorial-banner.liquid` — slide blocks, crossfade carousel | done |
 | 6f | `sections/jci-home-faq.liquid` — question blocks, accordion + side card | done |
-| 6g | Best sellers, testimonials, newsletter | |
+| 6g | `sections/jci-newsletter.liquid` — Shopify customer form, ink panel | done |
+| 6h | `sections/jci-best-sellers.liquid` — piece blocks, scroll-dealt card stack | done |
+| 6i | Testimonials | |
 | 7 | Verify in Theme Editor that every value round-trips | pending |
 | 8 | Footer | |
 | 9 | Product + collection templates | |
