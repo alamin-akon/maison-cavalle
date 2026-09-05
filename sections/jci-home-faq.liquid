@@ -114,7 +114,7 @@
             <p class="jci-home-faq-side-text">{{ s.side_text }}</p>
           {%- endif -%}
           {%- if s.side_link_label != blank -%}
-            <a class="jci-text-link jci-home-faq-side-link" href="{{ s.side_link_url | default: '#' }}">
+            <a class="jci-text-link jci-home-faq-side-link" href="{{ s.side_link_url | default: routes.root_url }}">
               {{ s.side_link_label }} <span aria-hidden="true">&#8599;</span>
             </a>
           {%- endif -%}

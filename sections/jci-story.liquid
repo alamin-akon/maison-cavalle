@@ -134,7 +134,7 @@
       {%- if s.link_label != blank or s.scroll_note != blank -%}
         <div class="jci-story-actions">
           {%- if s.link_label != blank -%}
-            <a class="jci-text-link jci-story-link" href="{{ s.link_url | default: '#' }}">
+            <a class="jci-text-link jci-story-link" href="{{ s.link_url | default: routes.root_url }}">
               {{ s.link_label }} <span class="jci-story-link-icon" aria-hidden="true">&#8599;</span>
             </a>
           {%- endif -%}

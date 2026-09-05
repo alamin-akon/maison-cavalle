@@ -251,11 +251,7 @@
           "type": "slide",
           "settings": {
             "video_main_asset": "jci-editorial-stable.mp4",
-            "image_main_asset": "jci-crest-cap-lifestyle.webp",
-            "image_alt_main": "Maison Cavallé Crest Cap in the stable",
             "index_main": "01 / 02",
-            "image_secondary_asset": "jci-crest-cap-front-logo.webp",
-            "image_alt_secondary": "Maison Cavallé Crest Cap with embroidered logo",
             "index_secondary": "02 / 02",
             "note": "Stable / everyday"
           }
@@ -264,11 +260,7 @@
           "type": "slide",
           "settings": {
             "video_main_asset": "jci-editorial-motion.mp4",
-            "image_main_asset": "jci-active-turtleneck-front.webp",
-            "image_alt_main": "Maison Cavallé Active Turtleneck Top, front view",
             "index_main": "01 / 02",
-            "image_secondary_asset": "jci-active-turtleneck-back.webp",
-            "image_alt_secondary": "Maison Cavallé Active Turtleneck Top, back view",
             "index_secondary": "02 / 02",
             "note": "Ease / motion"
           }
@@ -277,11 +269,7 @@
           "type": "slide",
           "settings": {
             "video_main_asset": "jci-editorial-considered.mp4",
-            "image_main_asset": "jci-msfd007-riding.webp",
-            "image_alt_main": "Maison Cavallé Contrast Collar Riding Polo in motion",
             "index_main": "01 / 02",
-            "image_secondary_asset": "jci-msfd007-front.webp",
-            "image_alt_secondary": "Maison Cavallé Contrast Collar Riding Polo",
             "index_secondary": "02 / 02",
             "note": "Made / considered"
           }

@@ -48,7 +48,7 @@
     --jci-editorial-copy-pad-bottom-mobile: {{ s.copy_padding_bottom_mobile }}px;
     --jci-editorial-copy-max: {{ s.copy_max_width }}px;
     --jci-editorial-collage-inset: {{ s.collage_inset }}px;
-    --jci-editorial-collage-gap: {{ s.collage_gap }}px;
+    --jci-editorial-collage-gap: clamp(0.75rem, 1.5vw, {{ s.collage_gap }}px);
 
     {%- comment -%}
       The banner sets its own gutters, so the shared container padding is
@@ -74,36 +74,19 @@
           {%- liquid
             assign b = block.settings
             assign is_first = forloop.first
+            assign product = b.product
 
             comment
-              An assets/ filename wins over the Files picker, so a theme that
-              ships its own imagery renders correctly before anything is
-              uploaded. Same order the story section uses for its poster.
-            endcomment
-            assign main_src = blank
-            if b.image_main_asset != blank
-              assign main_src = b.image_main_asset | strip | asset_url
-            elsif b.image_main != blank
-              assign main_src = b.image_main | image_url: width: 1200
-            endif
+              Both figures resolve the same way, most specific first:
 
-            assign secondary_src = blank
-            if b.image_secondary_asset != blank
-              assign secondary_src = b.image_secondary_asset | strip | asset_url
-            elsif b.image_secondary != blank
-              assign secondary_src = b.image_secondary | image_url: width: 700
-            endif
+                1. a film override — assets/ filename, then a Files upload
+                2. an image override — assets/ filename, then the picker
+                3. the linked product's own image
 
-            comment
-              An asset filename carries no intrinsic size, so the figure's own
-              aspect ratio stands in. Both images are object-fit: cover inside a
-              fixed box, so these only serve as a pre-load hint.
+              So a slide with nothing but a product shows that product, and any
+              override replaces it without the product having to change.
             endcomment
-            comment
-              A film wins over the still on either figure. Files upload first,
-              then an assets/ filename, so a clip can live either side of the
-              20 MB asset cap — the same order the hero and story use.
-            endcomment
+
             assign film_main = blank
             if b.video_main_asset != blank
               assign film_main = b.video_main_asset | strip | asset_url
@@ -128,17 +111,56 @@
               endfor
             endif
 
-            assign main_width = b.image_main.width | default: 1200
-            assign main_height = b.image_main.height | default: 1500
-            assign secondary_width = b.image_secondary.width | default: 700
-            assign secondary_height = b.image_secondary.height | default: 875
+            comment
+              main_image stays set only when the source is a Shopify image, so
+              srcset and the intrinsic size come along. An assets/ filename has
+              neither, and falls back to the figure's own ratio.
+            endcomment
+            assign main_image = blank
+            assign main_src = blank
+            if b.image_main_asset != blank
+              assign main_src = b.image_main_asset | strip | asset_url
+            elsif b.image_main != blank
+              assign main_image = b.image_main
+            elsif product != blank
+              assign main_image = product.featured_image
+            endif
+            if main_image != blank
+              assign main_src = main_image | image_url: width: 1200
+            endif
+
+            assign secondary_image = blank
+            assign secondary_src = blank
+            if b.image_secondary_asset != blank
+              assign secondary_src = b.image_secondary_asset | strip | asset_url
+            elsif b.image_secondary != blank
+              assign secondary_image = b.image_secondary
+            elsif product != blank
+              comment
+                The product's second image, so the pair reads as two views of
+                one piece. A single-image product repeats its own.
+              endcomment
+              assign secondary_image = product.images[1] | default: product.featured_image
+            endif
+            if secondary_image != blank
+              assign secondary_src = secondary_image | image_url: width: 700
+            endif
+
+            assign main_alt = b.image_alt_main | default: product.title
+            assign secondary_alt = b.image_alt_secondary | default: product.title
+            assign slide_label = b.note | default: product.title
+
+            assign main_width = main_image.width | default: 1200
+            assign main_height = main_image.height | default: 1500
+            assign secondary_width = secondary_image.width | default: 700
+            assign secondary_height = secondary_image.height | default: 875
           -%}
           <article
             class="jci-editorial-banner-slide{% if is_first %} is-active{% endif %}"
             data-jci-editorial-slide
             role="group"
             aria-roledescription="slide"
-            aria-label="{{ b.note | escape }}"
+            aria-label="{{ slide_label | escape }}"
             aria-hidden="{% if is_first %}false{% else %}true{% endif %}"
             {{ block.shopify_attributes }}
           >
@@ -146,13 +168,12 @@
               {%- if film_main != blank -%}
                 <video
                   class="jci-editorial-banner-image"
-                  autoplay
                   muted
                   loop
                   playsinline
-                  preload="metadata"
+                  preload="{% if is_first %}auto{% else %}metadata{% endif %}"
                   {% if main_src != blank %}poster="{{ main_src }}"{% endif %}
-                  aria-label="{{ b.image_alt_main | escape }}"
+                  aria-label="{{ main_alt | escape }}"
                 >
                   <source src="{{ film_main }}" type="video/mp4">
                 </video>
@@ -160,15 +181,15 @@
                 <img
                   class="jci-editorial-banner-image"
                   src="{{ main_src }}"
-                  {%- if b.image_main_asset == blank and b.image_main != blank %}
+                  {%- if main_image != blank %}
                     srcset="
-                      {{ b.image_main | image_url: width: 600 }} 600w,
-                      {{ b.image_main | image_url: width: 900 }} 900w,
-                      {{ b.image_main | image_url: width: 1200 }} 1200w
+                      {{ main_image | image_url: width: 600 }} 600w,
+                      {{ main_image | image_url: width: 900 }} 900w,
+                      {{ main_image | image_url: width: 1200 }} 1200w
                     "
                     sizes="(max-width: 680px) 70vw, 40vw"
                   {%- endif %}
-                  alt="{{ b.image_alt_main | escape }}"
+                  alt="{{ main_alt | escape }}"
                   width="{{ main_width }}"
                   height="{{ main_height }}"
                   loading="lazy"
@@ -185,13 +206,12 @@
               {%- if film_secondary != blank -%}
                 <video
                   class="jci-editorial-banner-image jci-editorial-banner-image--secondary"
-                  autoplay
                   muted
                   loop
                   playsinline
-                  preload="metadata"
+                  preload="{% if is_first %}auto{% else %}metadata{% endif %}"
                   {% if secondary_src != blank %}poster="{{ secondary_src }}"{% endif %}
-                  aria-label="{{ b.image_alt_secondary | escape }}"
+                  aria-label="{{ secondary_alt | escape }}"
                 >
                   <source src="{{ film_secondary }}" type="video/mp4">
                 </video>
@@ -199,14 +219,14 @@
                 <img
                   class="jci-editorial-banner-image jci-editorial-banner-image--secondary"
                   src="{{ secondary_src }}"
-                  {%- if b.image_secondary_asset == blank and b.image_secondary != blank %}
+                  {%- if secondary_image != blank %}
                     srcset="
-                      {{ b.image_secondary | image_url: width: 400 }} 400w,
-                      {{ b.image_secondary | image_url: width: 700 }} 700w
+                      {{ secondary_image | image_url: width: 400 }} 400w,
+                      {{ secondary_image | image_url: width: 700 }} 700w
                     "
                     sizes="(max-width: 680px) 26vw, 15vw"
                   {%- endif %}
-                  alt="{{ b.image_alt_secondary | escape }}"
+                  alt="{{ secondary_alt | escape }}"
                   width="{{ secondary_width }}"
                   height="{{ secondary_height }}"
                   loading="lazy"
@@ -273,7 +293,7 @@
       {%- endif -%}
 
       {%- if s.cta_label != blank -%}
-        <a class="jci-button jci-button--light jci-editorial-banner-cta" href="{{ s.cta_url | default: '#' }}">
+        <a class="jci-button jci-button--light jci-editorial-banner-cta" href="{{ s.cta_url | default: routes.all_products_collection_url }}">
           {{ s.cta_label }} <span aria-hidden="true">&#8599;</span>
         </a>
       {%- endif -%}
@@ -488,6 +508,7 @@
     font-size: 12px;
     letter-spacing: 0.1em;
     backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
   }
 
   .jci-editorial-banner-control {
@@ -761,19 +782,26 @@
       "type": "slide",
       "name": "Slide",
       "settings": [
-        { "type": "video", "id": "video_main", "label": "Main video", "info": "Plays in place of the main image. No 20 MB limit." },
-        { "type": "text", "id": "video_main_asset", "label": "Main video asset filename", "info": "A file in assets/. Wins over the video above." },
-        { "type": "image_picker", "id": "image_main", "label": "Main image", "info": "Also used as the video poster." },
-        { "type": "text", "id": "image_main_asset", "label": "Main image asset filename", "info": "A file in assets/. Wins over the image above." },
-        { "type": "text", "id": "image_alt_main", "label": "Main image alt text" },
-        { "type": "text", "id": "index_main", "label": "Main image index", "default": "01 / 02" },
-        { "type": "video", "id": "video_secondary", "label": "Secondary video" },
-        { "type": "text", "id": "video_secondary_asset", "label": "Secondary video asset filename", "info": "A file in assets/. Wins over the video above." },
-        { "type": "image_picker", "id": "image_secondary", "label": "Secondary image", "info": "Also used as the video poster." },
-        { "type": "text", "id": "image_secondary_asset", "label": "Secondary image asset filename", "info": "A file in assets/. Wins over the image above." },
-        { "type": "text", "id": "image_alt_secondary", "label": "Secondary image alt text" },
-        { "type": "text", "id": "index_secondary", "label": "Secondary image index", "default": "02 / 02" },
-        { "type": "text", "id": "note", "label": "Note", "default": "Stable / everyday" }
+        { "type": "product", "id": "product", "label": "Product", "info": "Its featured image fills the large frame and its second image the small one. Everything below overrides that." },
+
+        { "type": "header", "content": "Large frame" },
+        { "type": "video", "id": "video_main", "label": "Video", "info": "Replaces the product image. No 20 MB limit." },
+        { "type": "text", "id": "video_main_asset", "label": "Video asset filename", "info": "A file in assets/. Wins over the video above." },
+        { "type": "image_picker", "id": "image_main", "label": "Image", "info": "Replaces the product image, and is the video poster." },
+        { "type": "text", "id": "image_main_asset", "label": "Image asset filename", "info": "A file in assets/. Wins over the image above." },
+        { "type": "text", "id": "image_alt_main", "label": "Alt text", "info": "Left empty, the product title is used." },
+        { "type": "text", "id": "index_main", "label": "Index label", "default": "01 / 02" },
+
+        { "type": "header", "content": "Small frame" },
+        { "type": "video", "id": "video_secondary", "label": "Video" },
+        { "type": "text", "id": "video_secondary_asset", "label": "Video asset filename", "info": "A file in assets/. Wins over the video above." },
+        { "type": "image_picker", "id": "image_secondary", "label": "Image", "info": "Replaces the product's second image, and is the video poster." },
+        { "type": "text", "id": "image_secondary_asset", "label": "Image asset filename", "info": "A file in assets/. Wins over the image above." },
+        { "type": "text", "id": "image_alt_secondary", "label": "Alt text", "info": "Left empty, the product title is used." },
+        { "type": "text", "id": "index_secondary", "label": "Index label", "default": "02 / 02" },
+
+        { "type": "header", "content": "Caption" },
+        { "type": "text", "id": "note", "label": "Note", "info": "Left empty, the product title is used.", "default": "Stable / everyday" }
       ]
     }
   ],
@@ -781,9 +809,9 @@
     {
       "name": "Editorial banner",
       "blocks": [
-        { "type": "slide", "settings": { "video_main_asset": "jci-editorial-stable.mp4", "image_main_asset": "jci-crest-cap-lifestyle.webp", "image_secondary_asset": "jci-crest-cap-front-logo.webp", "note": "Stable / everyday" } },
-        { "type": "slide", "settings": { "video_main_asset": "jci-editorial-motion.mp4", "image_main_asset": "jci-active-turtleneck-front.webp", "image_secondary_asset": "jci-active-turtleneck-back.webp", "note": "Ease / motion" } },
-        { "type": "slide", "settings": { "video_main_asset": "jci-editorial-considered.mp4", "image_main_asset": "jci-msfd007-riding.webp", "image_secondary_asset": "jci-msfd007-front.webp", "note": "Made / considered" } }
+        { "type": "slide", "settings": { "video_main_asset": "jci-editorial-stable.mp4", "note": "Stable / everyday" } },
+        { "type": "slide", "settings": { "video_main_asset": "jci-editorial-motion.mp4", "note": "Ease / motion" } },
+        { "type": "slide", "settings": { "video_main_asset": "jci-editorial-considered.mp4", "note": "Made / considered" } }
       ]
     }
   ]

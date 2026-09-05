@@ -65,6 +65,12 @@
           data-jci-hero-video-index="{{ forloop.index0 }}"
           muted
           playsinline
+          {%- comment -%}
+            Only the first carries autoplay, as a no-JS fallback. jci-hero.js
+            drives playback once it upgrades, and the rest stay paused so three
+            clips never run at once. No `loop`: the JS advances on `ended`.
+          {%- endcomment -%}
+          {% if forloop.first %}autoplay{% endif %}
           preload="{% if forloop.first %}auto{% else %}metadata{% endif %}"
           {% if poster_src != blank %}poster="{{ poster_src }}"{% endif %}
         >
