@@ -66,7 +66,7 @@
   --button-font-family-secondary: var(--jci-font-label);
   --jci-button-min-height: 46px;
   --jci-button-padding: 0.9rem 1.35rem;
-  --jci-button-size: 10px;
+  --jci-button-size: 14px; /* styles.css:114 — `font: 14px/1 var(--mono)` */
   --jci-button-tracking: 0.13em;
 
   /* ------------------------------------------------------------------------
@@ -80,30 +80,36 @@
    Container defaults (§1)
    Every jci-*-container inherits this. A section overrides it only where the
    prototype genuinely differs.
+
+   [class$="-container"] matches the WHOLE class attribute, not one class in it,
+   so a container element must carry no class after its *-container class. A
+   section that needs a different width, offset or gutter sets the three custom
+   properties below on its root instead of adding a modifier.
    -------------------------------------------------------------------------- */
 [class^="jci-"][class$="-container"],
 [class*=" jci-"][class$="-container"] {
-  width: min(100%, var(--jci-content-max));
-  margin-inline: auto;
-  padding-inline: var(--jci-page-pad);
+  width: var(--jci-container-width, min(100%, var(--jci-content-max)));
+  margin-inline: var(--jci-container-offset, auto) auto;
+  padding-inline: var(--jci-container-pad, var(--jci-page-pad));
 }
 
 /* --------------------------------------------------------------------------
    Shared utilities
    -------------------------------------------------------------------------- */
 
-/* Uppercase mono metadata — eyebrows, kickers, labels. */
+/* Uppercase mono metadata — eyebrows, kickers, labels.
+   styles.css:45 — `font: 500 14px/1.2 var(--mono)`. */
 .jci-eyebrow {
   margin: 0;
   font-family: var(--jci-font-label);
-  font-size: 10px;
+  font-size: 14px;
   font-weight: 500;
   line-height: 1.2;
   letter-spacing: 0.14em;
   text-transform: uppercase;
 }
 
-/* Underlined mono link with the ↗ glyph. */
+/* Underlined mono link with the ↗ glyph. styles.css:120 — `font: 14px`. */
 .jci-text-link {
   display: inline-flex;
   align-items: center;
@@ -112,7 +118,7 @@
   border-bottom: 1px solid currentcolor;
   color: inherit;
   font-family: var(--jci-font-label);
-  font-size: 10px;
+  font-size: 14px;
   letter-spacing: 0.12em;
   text-decoration: none;
   text-transform: uppercase;

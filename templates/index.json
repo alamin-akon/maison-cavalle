@@ -172,11 +172,18 @@
         "media_background": "",
         "intro_color": "#5f6259",
         "subtitle_color": "#6d7066",
-        "padding_scale": "normal",
         "image_ratio": 78,
         "image_zoom": 35,
         "placeholder_subtitle": "Choose a collection to show real products",
-        "anchor_id": "collection"
+        "anchor_id": "collection",
+        "padding_top": 136,
+        "padding_bottom": 136,
+        "padding_top_mobile": 72,
+        "padding_bottom_mobile": 72,
+        "columns_mobile": 2,
+        "header_gap": 40,
+        "grid_gap": 28,
+        "grid_row_gap_mobile": 36
       }
     },
     "jci_story_qPUAMy": {
@@ -218,16 +225,21 @@
         "body_color": "#595d53",
         "meta_color": "#73776c",
         "caption_meta_color": "#d3d5c9",
+        "scrim_color": "#111511",
+        "glow_color": "#e8e0c0",
         "watermark": "MC",
         "watermark_opacity": 5.5,
         "background_width": "content",
-        "padding_scale": "normal",
-        "column_gap": 60,
+        "column_gap": 80,
         "copy_max_width": 560,
         "frame_min_height": 450,
         "enable_reveal": true,
         "enable_tilt": true,
-        "anchor_id": "story"
+        "anchor_id": "story",
+        "padding_top": 136,
+        "padding_bottom": 136,
+        "padding_top_mobile": 72,
+        "padding_bottom_mobile": 72
       }
     },
     "jci_editorial_banner": {
@@ -296,7 +308,14 @@
         "crossfade_duration": 800,
         "carousel_label": "The Maison philosophy image story",
         "controls_label": "Philosophy image controls",
-        "anchor_id": "journal"
+        "anchor_id": "journal",
+        "collage_inset": 72,
+        "collage_gap": 24,
+        "copy_max_width": 660,
+        "copy_padding_top": 96,
+        "copy_padding_bottom": 96,
+        "copy_padding_top_mobile": 48,
+        "copy_padding_bottom_mobile": 48
       }
     }
   },

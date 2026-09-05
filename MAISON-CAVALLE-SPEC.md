@@ -130,6 +130,7 @@ transfers one-to-one:
 | No bare tag styling | `.jci-hero-container h1 { }` is wrong. Give the h1 `class="jci-hero-title"`. |
 | No structural selectors | No `:nth-child`, `>` chains, or descendant-only rules for styling. One class, one rule. |
 | One container per section | Nested containers are not allowed. Full-bleed children break out with the `100vw` pattern (§5). |
+| No class after `-container` | `[class$="-container"]` matches the **whole class attribute**, so `class="jci-x-container jci-x-container--full"` silently loses every container default. A section that needs a different width, offset or gutter sets `--jci-container-width` / `--jci-container-offset` / `--jci-container-pad` on its root instead. |
 | No Horizon class overrides | Never restyle `.section`, `.page-width-*`, `.button` etc. globally. Scope everything under `jci-*`. |
 | File naming | `sections/jci-hero.liquid` → root class `jci-hero` → `assets/jci-hero.css`. All three names match. |
 | CSS location | One file per section: `assets/jci-hero.css`, loaded via the section schema's `stylesheet` attribute. Shared tokens/utilities live in `assets/jci-base.css`. |
@@ -320,9 +321,9 @@ Every size below is taken verbatim from `styles.css`. These are the target.
 | `h4` | `24px` | 24px | `24` — exact |
 | `h5` / label | `14px` | 14px | `14` — exact |
 | `h6` / eyebrow | `10–12px` | 12px | `12` — exact |
-| Eyebrow | `500 10px/1.2` mono, `.14em` | 10px | `.jci-eyebrow` utility |
-| Button | `10px/1` mono, `.13em` | 10px | `--jci-button-size` |
-| Text link | `10px` mono, `.12em` | 10px | `.jci-text-link` |
+| Eyebrow | `500 14px/1.2` mono, `.14em` | 14px | `.jci-eyebrow` utility |
+| Button | `14px/1` mono, `.13em` | 14px | `--jci-button-size` |
+| Text link | `14px` mono, `.12em` | 14px | `.jci-text-link` |
 
 All page heroes — home, collection, story, journal, faq — share
 `--hero-title-size`. Only the product page differs, so it gets
@@ -497,7 +498,11 @@ Prototype `.section` = `clamp(4.5rem, 9vw, 8.5rem)`. Standardise on three steps:
 .jci-section { padding-block: var(--jci-section-pad); }
 ```
 
-Every `jci-*` section uses one of these three. No ad-hoc clamp values.
+These three remain the defaults a new section starts from. Since sections must
+be tunable without touching code, each one also exposes **Padding top**,
+**Padding bottom** and their mobile counterparts as `range` settings, seeded
+with the prototype's values (136px desktop, 72px mobile). The token is the
+starting point; the setting is what ships.
 
 ### Full-bleed breakout
 

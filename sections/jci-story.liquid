@@ -51,17 +51,28 @@
     --jci-story-caption-meta: {{ s.caption_meta_color }};
     --jci-story-mark-opacity: {{ s.watermark_opacity | divided_by: 100.0 }};
     --jci-story-watermark: '{{ s.watermark | replace: "'", "" | escape }}';
+    --jci-story-on-film: {{ s.on_film_color | default: settings.color_palette.background }};
+    --jci-story-on-film-rgb: {{ s.on_film_color.rgb | default: settings.color_palette.background.rgb }};
+    --jci-story-scrim-rgb: {{ s.scrim_color.rgb }};
+    --jci-story-glow-rgb: {{ s.glow_color.rgb }};
     --jci-story-rule: {{ s.rule_color | default: settings.color_palette.color6 }};
     --jci-story-rule-rgb: {{ s.rule_color.rgb | default: settings.color_palette.color6.rgb }};
-    --jci-story-media-gap: {{ s.column_gap | divided_by: 10.0 }}rem;
+    --jci-story-media-gap: clamp(2.5rem, 7vw, {{ s.column_gap | divided_by: 10.0 }}rem);
+    {%- if s.background_width == 'full' %}
+      --jci-container-width: 100vw;
+      --jci-container-offset: calc(50% - 50vw);
+    {%- endif %}
     --jci-story-copy-max: {{ s.copy_max_width }}px;
     --jci-story-frame-min: {{ s.frame_min_height }}px;
     --jci-story-film-saturate: {{ s.film_saturate | divided_by: 100.0 }};
     --jci-story-film-contrast: {{ s.film_contrast | divided_by: 100.0 }};
-    --jci-story-pad: var(--jci-section-pad{% if s.padding_scale != 'normal' %}-{{ s.padding_scale }}{% endif %});
+    --jci-story-pad-top: {{ s.padding_top }}px;
+    --jci-story-pad-bottom: {{ s.padding_bottom }}px;
+    --jci-story-pad-top-mobile: {{ s.padding_top_mobile }}px;
+    --jci-story-pad-bottom-mobile: {{ s.padding_bottom_mobile }}px;
   "
 >
-  <div class="jci-story-container jci-story-container--{{ s.background_width }}">
+  <div class="jci-story-container">
     <div class="jci-story-copy">
       {%- if s.kicker != blank -%}
         <span class="jci-story-kicker">
@@ -224,10 +235,7 @@
 
 {% stylesheet %}
   .jci-story {
-    position: relative;
     display: block;
-    overflow: hidden;
-    padding-block: var(--jci-story-pad);
     opacity: 1;
   }
 
@@ -246,12 +254,18 @@
     transform: none;
   }
 
+  /* The prototype carries padding, background and grid on one element
+     (.story-section = .section + grid), so the cream covers the vertical
+     padding too. Splitting them would leave a page-coloured band above and
+     below the section. */
   .jci-story-container {
     position: relative;
     display: grid;
     grid-template-columns: minmax(0, 0.88fr) minmax(0, 1.12fr);
     gap: var(--jci-story-media-gap);
     align-items: center;
+    overflow: hidden;
+    padding-block: var(--jci-story-pad-top) var(--jci-story-pad-bottom);
     background:
       radial-gradient(
         circle at 92% 10%,
@@ -259,14 +273,6 @@
         transparent 25rem
       ),
       var(--jci-story-bg);
-  }
-
-  /* The prototype's cream block stops at the 1600px content width. Full width
-     is offered as the alternative, breaking out with the §5 pattern. */
-  .jci-story-container--full {
-    width: 100vw;
-    max-width: none;
-    margin-left: calc(50% - 50vw);
   }
 
   /* Oversized MC watermark, ghosted into the top-right corner. */
@@ -380,9 +386,17 @@
     text-transform: uppercase;
   }
 
+  /* styles.css:1248 — Playfair, not the sans the container sets. */
   .jci-story-signoff-tagline {
+    display: inline-block;
+    margin-top: 0.5rem;
     color: var(--jci-story-heading);
+    font-family: var(--jci-font-display);
+    font-size: 18px;
     font-weight: 500;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    text-transform: none;
   }
 
   .jci-story-actions {
@@ -466,7 +480,7 @@
     position: absolute;
     z-index: 2;
     inset: 12px;
-    border: 1px solid rgb(var(--jci-story-bg-rgb) / 0.38);
+    border: 1px solid rgb(var(--jci-story-on-film-rgb) / 0.38);
     pointer-events: none;
   }
 
@@ -476,7 +490,7 @@
     inset: -20%;
     background: radial-gradient(
       circle at 70% 35%,
-      rgb(var(--jci-story-accent-rgb) / 0.2),
+      rgb(var(--jci-story-glow-rgb) / 0.2),
       transparent 45%
     );
     mix-blend-mode: screen;
@@ -503,9 +517,9 @@
     inset: 0;
     background: linear-gradient(
       180deg,
-      rgb(var(--jci-story-heading-rgb) / 0.08),
+      rgb(var(--jci-story-scrim-rgb) / 0.08),
       transparent 48%,
-      rgb(var(--jci-story-heading-rgb) / 0.58)
+      rgb(var(--jci-story-scrim-rgb) / 0.58)
     );
     pointer-events: none;
   }
@@ -518,7 +532,7 @@
     left: 1.3rem;
     display: flex;
     justify-content: space-between;
-    color: rgb(var(--jci-story-bg-rgb) / 0.82);
+    color: rgb(var(--jci-story-on-film-rgb) / 0.82);
     font-family: var(--jci-font-label);
     font-size: 12px;
     letter-spacing: 0.1em;
@@ -534,9 +548,9 @@
     place-items: center;
     width: 46px;
     height: 46px;
-    border: 1px solid rgb(var(--jci-story-bg-rgb) / 0.75);
+    border: 1px solid rgb(var(--jci-story-on-film-rgb) / 0.75);
     border-radius: 50%;
-    color: var(--jci-story-bg);
+    color: var(--jci-story-on-film);
     font-family: var(--jci-font-label);
     font-size: 14px;
     letter-spacing: 0.1em;
@@ -550,7 +564,7 @@
     display: flex;
     flex-direction: column;
     gap: 0.35rem;
-    color: var(--jci-story-bg);
+    color: var(--jci-story-on-film);
   }
 
   .jci-story-caption-label {
@@ -583,7 +597,7 @@
     border: 1px solid rgb(var(--jci-story-heading-rgb) / 0.24);
     border-radius: 50%;
     color: var(--jci-story-heading);
-    background: var(--jci-story-bg);
+    background: var(--jci-story-on-film);
     box-shadow: 0 14px 30px rgb(var(--jci-story-heading-rgb) / 0.12);
     transform: translateZ(60px) rotate(8deg);
   }
@@ -622,6 +636,7 @@
 
   @media screen and (max-width: 680px) {
     .jci-story-container {
+      padding-block: var(--jci-story-pad-top-mobile) var(--jci-story-pad-bottom-mobile);
       display: flex;
       flex-direction: column;
       gap: 3.5rem;
@@ -734,6 +749,9 @@
     { "type": "color", "id": "body_color", "label": "Body text", "default": "#595d53" },
     { "type": "color", "id": "meta_color", "label": "Metadata", "default": "#73776c" },
     { "type": "color", "id": "caption_meta_color", "label": "Caption metadata", "default": "#d3d5c9" },
+    { "type": "color", "id": "on_film_color", "label": "Text over the film" },
+    { "type": "color", "id": "scrim_color", "label": "Film scrim", "default": "#111511" },
+    { "type": "color", "id": "glow_color", "label": "Film glow", "default": "#e8e0c0" },
     { "type": "text", "id": "watermark", "label": "Background watermark", "default": "MC" },
     { "type": "range", "id": "watermark_opacity", "label": "Watermark opacity", "min": 0, "max": 20, "step": 0.5, "unit": "%", "default": 5.5 },
 
@@ -746,16 +764,11 @@
       ],
       "default": "content"
     },
-    {
-      "type": "select", "id": "padding_scale", "label": "Vertical padding",
-      "options": [
-        { "value": "sm", "label": "Small" },
-        { "value": "normal", "label": "Normal" },
-        { "value": "lg", "label": "Large" }
-      ],
-      "default": "normal"
-    },
-    { "type": "range", "id": "column_gap", "label": "Column gap", "min": 10, "max": 120, "step": 2, "unit": "%", "default": 60, "info": "Tenths of a rem — 60 is 6rem." },
+    { "type": "range", "id": "padding_top", "label": "Padding top", "min": 0, "max": 240, "step": 4, "unit": "px", "default": 136 },
+    { "type": "range", "id": "padding_bottom", "label": "Padding bottom", "min": 0, "max": 240, "step": 4, "unit": "px", "default": 136 },
+    { "type": "range", "id": "padding_top_mobile", "label": "Padding top on mobile", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 72 },
+    { "type": "range", "id": "padding_bottom_mobile", "label": "Padding bottom on mobile", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 72 },
+    { "type": "range", "id": "column_gap", "label": "Column gap", "min": 30, "max": 140, "step": 2, "unit": "%", "default": 80, "info": "Tenths of a rem, the widest step of clamp(2.5rem, 7vw, X) — 80 is the prototype\u2019s 8rem." },
     { "type": "range", "id": "copy_max_width", "label": "Copy width", "min": 380, "max": 760, "step": 10, "unit": "px", "default": 560 },
     { "type": "range", "id": "frame_min_height", "label": "Frame minimum height", "min": 300, "max": 800, "step": 10, "unit": "px", "default": 450 },
 

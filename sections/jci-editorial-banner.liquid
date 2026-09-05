@@ -37,13 +37,31 @@
     --jci-editorial-body: {{ s.body_color }};
     --jci-editorial-frame-bg: {{ s.frame_background }};
     --jci-editorial-scrim-rgb: {{ s.scrim_color.rgb }};
+    --jci-editorial-shade: {{ s.shade_color | default: settings.color_palette.foreground }};
     --jci-editorial-shade-rgb: {{ s.shade_color.rgb | default: settings.color_palette.foreground.rgb }};
     --jci-editorial-min-height: clamp({{ s.min_height_min }}px, 50vw, {{ s.min_height_max }}px);
     --jci-editorial-collage-width: {{ s.collage_width }}%;
     --jci-editorial-crossfade: {{ s.crossfade_duration }}ms;
+    --jci-editorial-copy-pad-top: {{ s.copy_padding_top }}px;
+    --jci-editorial-copy-pad-bottom: {{ s.copy_padding_bottom }}px;
+    --jci-editorial-copy-pad-top-mobile: {{ s.copy_padding_top_mobile }}px;
+    --jci-editorial-copy-pad-bottom-mobile: {{ s.copy_padding_bottom_mobile }}px;
+    --jci-editorial-copy-max: {{ s.copy_max_width }}px;
+    --jci-editorial-collage-inset: {{ s.collage_inset }}px;
+    --jci-editorial-collage-gap: {{ s.collage_gap }}px;
+
+    {%- comment -%}
+      The banner sets its own gutters, so the shared container padding is
+      cleared through the token rather than by overriding the rule.
+    {%- endcomment %}
+    --jci-container-pad: 0;
+    {%- if s.background_width == 'full' %}
+      --jci-container-width: 100vw;
+      --jci-container-offset: calc(50% - 50vw);
+    {%- endif %}
   "
 >
-  <div class="jci-editorial-banner-container jci-editorial-banner-container--{{ s.background_width }}">
+  <div class="jci-editorial-banner-container">
     {%- if slides.size > 0 -%}
       <div
         class="jci-editorial-banner-collage"
@@ -225,10 +243,6 @@
     justify-content: flex-start;
     min-height: var(--jci-editorial-min-height);
     overflow: hidden;
-
-    /* The banner manages its own gutters, so the shared container padding is
-       cleared here — one of the §1 overrides the prototype genuinely needs. */
-    padding-inline: 0;
     background:
       radial-gradient(
         circle at 72% 48%,
@@ -236,12 +250,6 @@
         transparent 34%
       ),
       var(--jci-editorial-bg);
-  }
-
-  .jci-editorial-banner-container--full {
-    width: 100vw;
-    max-width: none;
-    margin-left: calc(50% - 50vw);
   }
 
   /* Rotated hairline frame behind the collage. */
@@ -276,9 +284,9 @@
   .jci-editorial-banner-collage {
     position: absolute;
     z-index: 1;
-    top: clamp(2.5rem, 5vw, 4.5rem);
+    top: var(--jci-editorial-collage-inset);
     right: var(--jci-page-pad);
-    bottom: clamp(2.5rem, 5vw, 4.5rem);
+    bottom: var(--jci-editorial-collage-inset);
     display: block;
     width: min(var(--jci-editorial-collage-width), 760px);
     isolation: isolate;
@@ -300,7 +308,7 @@
     inset: 0;
     display: grid;
     grid-template-columns: minmax(0, 1.15fr) minmax(130px, 0.45fr);
-    gap: clamp(0.75rem, 1.5vw, 1.5rem);
+    gap: var(--jci-editorial-collage-gap);
     opacity: 0;
     visibility: hidden;
     transform: translate3d(24px, 0, 0);
@@ -446,9 +454,10 @@
       transform 0.3s var(--jci-ease);
   }
 
+  /* styles.css:394 — ink on paper, not the banner's olive. */
   .jci-editorial-banner-control:hover,
   .jci-editorial-banner-control:focus-visible {
-    color: var(--jci-editorial-bg);
+    color: var(--jci-editorial-shade);
     background: var(--jci-editorial-text);
     transform: scale(1.06);
   }
@@ -471,11 +480,13 @@
   .jci-editorial-banner-copy {
     position: relative;
     z-index: 1;
-    width: min(100%, 660px);
-    max-width: 660px;
+    width: min(100%, var(--jci-editorial-copy-max));
+    max-width: var(--jci-editorial-copy-max);
     margin-right: auto;
     margin-left: var(--jci-page-pad);
-    padding: clamp(3rem, 7vw, 6rem) var(--jci-page-pad) clamp(3rem, 7vw, 6rem) 0;
+    padding:
+      var(--jci-editorial-copy-pad-top) var(--jci-page-pad)
+      var(--jci-editorial-copy-pad-bottom) 0;
   }
 
   /* The prototype staggers these four with :nth-child. Explicit classes carry
@@ -592,7 +603,9 @@
       width: calc(100% - var(--jci-page-pad));
       max-width: none;
       margin-left: var(--jci-page-pad);
-      padding: 3rem var(--jci-page-pad) 3rem 0;
+      padding:
+        var(--jci-editorial-copy-pad-top-mobile) var(--jci-page-pad)
+        var(--jci-editorial-copy-pad-bottom-mobile) 0;
     }
 
     .jci-editorial-banner-title {
@@ -667,6 +680,13 @@
     { "type": "range", "id": "min_height_min", "label": "Minimum height", "min": 320, "max": 800, "step": 10, "unit": "px", "default": 540 },
     { "type": "range", "id": "min_height_max", "label": "Maximum height", "min": 480, "max": 980, "step": 10, "unit": "px", "default": 720 },
     { "type": "range", "id": "collage_width", "label": "Collage width", "min": 30, "max": 70, "step": 1, "unit": "%", "default": 53 },
+    { "type": "range", "id": "collage_inset", "label": "Collage inset from top and bottom", "min": 0, "max": 120, "step": 2, "unit": "px", "default": 72 },
+    { "type": "range", "id": "collage_gap", "label": "Gap between collage images", "min": 0, "max": 48, "step": 1, "unit": "px", "default": 24 },
+    { "type": "range", "id": "copy_max_width", "label": "Copy width", "min": 380, "max": 900, "step": 10, "unit": "px", "default": 660 },
+    { "type": "range", "id": "copy_padding_top", "label": "Copy padding top", "min": 0, "max": 200, "step": 4, "unit": "px", "default": 96 },
+    { "type": "range", "id": "copy_padding_bottom", "label": "Copy padding bottom", "min": 0, "max": 200, "step": 4, "unit": "px", "default": 96 },
+    { "type": "range", "id": "copy_padding_top_mobile", "label": "Copy padding top on mobile", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 48 },
+    { "type": "range", "id": "copy_padding_bottom_mobile", "label": "Copy padding bottom on mobile", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 48 },
 
     { "type": "header", "content": "Motion" },
     { "type": "checkbox", "id": "enable_reveal", "label": "Fade in on scroll", "default": true },
