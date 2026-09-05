@@ -24,7 +24,7 @@ class JciHero extends HTMLElement {
     this.media = this.querySelector('[data-jci-hero-media]');
     this.panel = this.querySelector('[data-jci-hero-panel]');
     this.eyebrow = this.querySelector('[data-jci-hero-eyebrow]');
-    this.title = this.querySelector('[data-jci-hero-title]');
+    this.titleElement = this.querySelector('[data-jci-hero-title]');
     this.copy = this.querySelector('[data-jci-hero-copy]');
     this.descriptor = this.querySelector('[data-jci-hero-descriptor]');
     this.indexLabel = this.querySelector('[data-jci-hero-index]');
@@ -115,18 +115,18 @@ class JciHero extends HTMLElement {
     if (this.descriptor) this.descriptor.textContent = moment.descriptor ?? '';
     if (this.indexLabel) this.indexLabel.textContent = String(index + 1).padStart(2, '0');
 
-    if (this.title) {
+    if (this.titleElement) {
       const markup = this.#titleMarkup(moment);
       window.clearTimeout(this.#titleSwapTimer);
 
       if (!this.reducedMotion && this.#hasRendered) {
         this.panel?.classList.add('is-changing');
         this.#titleSwapTimer = window.setTimeout(() => {
-          this.title.innerHTML = markup;
+          this.titleElement.innerHTML = markup;
           this.panel?.classList.remove('is-changing');
         }, TITLE_SWAP_DELAY);
       } else {
-        this.title.innerHTML = markup;
+        this.titleElement.innerHTML = markup;
       }
     }
 
@@ -164,7 +164,12 @@ class JciHero extends HTMLElement {
     const active = this.slides[this.#index];
     if (!(active instanceof HTMLVideoElement)) return;
 
+    // Keep the programmatic play request eligible for muted mobile autoplay,
+    // even if the browser upgrades the custom element after parsing the video.
+    active.autoplay = true;
+    active.defaultMuted = true;
     active.muted = true;
+    active.playsInline = true;
     const start = () => {
       try {
         if (active.readyState >= 1) active.currentTime = 0;
