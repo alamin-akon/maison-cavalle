@@ -141,7 +141,8 @@
         "background_color": "{{ settings.color_palette.background }}",
         "padding-block-start": 30,
         "padding-block-end": 30
-      }
+      },
+      "disabled": true
     },
     "footer_utilities_jLGE8U": {
       "type": "footer-utilities",
@@ -189,11 +190,59 @@
         "background_color": "{{ settings.color_palette.background }}",
         "padding-block-start": 20,
         "padding-block-end": 48
+      },
+      "disabled": true
+    },
+    "jci_footer": {
+      "type": "jci-footer",
+      "blocks": {
+        "column_explore": {
+          "type": "column",
+          "settings": {
+            "heading": "Explore"
+          }
+        },
+        "column_care": {
+          "type": "column",
+          "settings": {
+            "heading": "Care"
+          }
+        }
+      },
+      "block_order": [
+        "column_explore",
+        "column_care"
+      ],
+      "settings": {
+        "logo_asset": "jci-logo-inverse.svg",
+        "logo_width": 210,
+        "tagline": "Fewer, better pieces.\nBorn from a life with horses.",
+        "signoff_eyebrow": "From the journal",
+        "signoff_title": "Notes from the stable.",
+        "signoff_body": "Stories of horses, craft and the everyday rituals that make a life feel well lived.",
+        "signoff_link_label": "Read the journal",
+        "credit_prefix": "Designed by",
+        "credit_label": "Just Create It",
+        "credit_url": "https://justcreateit.com.au/",
+        "accent_color": "#c6cda9",
+        "body_color": "#bac0b2",
+        "link_color": "#bec3b7",
+        "bottom_color": "#92998b",
+        "rule_opacity": 18,
+        "background_width": "content",
+        "space_above": 32,
+        "padding_top": 96,
+        "padding_bottom": 24,
+        "top_gap": 48,
+        "top_space": 80,
+        "heading_size": 17,
+        "link_size": 12
       }
     }
   },
   "order": [
     "footer_m9NzUG",
-    "footer_utilities_jLGE8U"
+    "footer_utilities_jLGE8U",
+    "jci_footer"
   ]
 }

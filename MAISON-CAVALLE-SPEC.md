@@ -616,7 +616,7 @@ Other border widths:
 | 6h | `sections/jci-best-sellers.liquid` — piece blocks, scroll-dealt card stack | done |
 | 6i | Testimonials | |
 | 7 | Verify in Theme Editor that every value round-trips | pending |
-| 8 | Footer | |
+| 8 | `sections/jci-footer.liquid` — menu-backed link columns, journal sign-off | done |
 | 9 | Product + collection templates | |
 | 10 | Content pages (story, journal, faq, shipping, size guide) | |
 
