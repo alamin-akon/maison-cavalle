@@ -201,3 +201,11 @@
     transition: none;
   }
 }
+
+/* The prototype drops the section headline at the mobile breakpoint.
+   styles.css:1556 — `--section-title-size: clamp(2.4rem, 10vw, 4rem)`. */
+@media screen and (max-width: 680px) {
+  :root {
+    --jci-section-title-size: clamp(2.4rem, 10vw, 4rem); /* 38.4 → 64px */
+  }
+}

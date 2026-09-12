@@ -129,8 +129,8 @@
       ],
       "name": "Marquee band",
       "settings": {
-        "font": "subheading",
-        "font_size": 10,
+        "font": "body",
+        "font_size": 14,
         "text_case": "uppercase",
         "background_color": "{{ settings.color_palette.color5 }}",
         "text_color": "{{ settings.color_palette.background }}",
@@ -203,7 +203,6 @@
     },
     "jci_product_section_ya4nNw": {
       "type": "jci-product-section",
-      "disabled": true,
       "name": "Product section",
       "settings": {
         "eyebrow": "The opening collection",
