@@ -417,6 +417,128 @@
         "anchor_id": "best-sellers"
       }
     },
+    "jci_testimonials_zGWERm": {
+      "type": "jci-testimonials",
+      "blocks": {
+        "quote_QwaChj": {
+          "type": "quote",
+          "settings": {
+            "label": "Maison community",
+            "index": "",
+            "rating": 5,
+            "quote": "The pieces feel as considered as they look. I can ride in them, work around the stable and still feel beautifully put together.",
+            "name": "Georgia W.",
+            "attribution": "Lux Jacket",
+            "tone": "featured"
+          }
+        },
+        "quote_kPXKiY": {
+          "type": "quote",
+          "settings": {
+            "label": "Customer note",
+            "index": "",
+            "rating": 5,
+            "quote": "A calm, flattering fit and genuinely lovely quality. It has become the layer I reach for before every lesson.",
+            "name": "Emma R.",
+            "attribution": "Classic Long Sleeve Base Layer",
+            "tone": "default"
+          }
+        },
+        "quote_MnYhQy": {
+          "type": "quote",
+          "settings": {
+            "label": "From the stable",
+            "index": "",
+            "rating": 5,
+            "quote": "The Groomi is now part of our everyday ritual — easy to hold, easy to use and a little brighter in the wash bay.",
+            "name": "Hannah L.",
+            "attribution": "The Groomi Horse Shedder",
+            "tone": "soft"
+          }
+        },
+        "quote_iezTCc": {
+          "type": "quote",
+          "settings": {
+            "label": "Customer note",
+            "index": "",
+            "rating": 5,
+            "quote": "The breeches move with me without losing their shape. Thoughtful details, a beautiful weight and no fuss in the saddle.",
+            "name": "Sophie M.",
+            "attribution": "Pro-Skin Performance Tights",
+            "tone": "default"
+          }
+        },
+        "quote_iTJ4AU": {
+          "type": "quote",
+          "settings": {
+            "label": "Maison community",
+            "index": "",
+            "rating": 5,
+            "quote": "Beautifully made and genuinely easy to wear. The kind of layer that works from an early lesson to coffee afterwards.",
+            "name": "Olivia T.",
+            "attribution": "Active Turtleneck Top",
+            "tone": "soft"
+          }
+        },
+        "quote_FekkA4": {
+          "type": "quote",
+          "settings": {
+            "label": "From the stable",
+            "index": "",
+            "rating": 5,
+            "quote": "The grooming kit feels like a small daily luxury. Everything has its place, and the brushes are lovely to use.",
+            "name": "Claire B.",
+            "attribution": "Deluxe Grooming Kit",
+            "tone": "default"
+          }
+        }
+      },
+      "block_order": [
+        "quote_QwaChj",
+        "quote_kPXKiY",
+        "quote_MnYhQy",
+        "quote_iezTCc",
+        "quote_iTJ4AU",
+        "quote_FekkA4"
+      ],
+      "name": "Testimonials",
+      "settings": {
+        "eyebrow": "The Maison / In good company",
+        "heading": "Good things,",
+        "heading_accent": "said well.",
+        "intro": "Pieces made for the ride, the stable and every quiet moment around it.",
+        "link_label": "Read more",
+        "link_url": "",
+        "background_color": "",
+        "text_color": "",
+        "eyebrow_color": "",
+        "accent_color": "",
+        "intro_color": "#65695f",
+        "watermark_color": "#737960",
+        "watermark_opacity": 8,
+        "card_background": "",
+        "card_topline_color": "",
+        "card_meta_color": "#72776b",
+        "stars_color": "",
+        "quote_mark_color": "#737960",
+        "quote_mark_opacity": 18,
+        "soft_background": "#e3e2d7",
+        "featured_background": "",
+        "featured_text_color": "",
+        "featured_topline_color": "#dce1c7",
+        "featured_stars_color": "#e4e8c7",
+        "featured_meta_color": "#dce1d0",
+        "header_gap": 128,
+        "card_gap": 24,
+        "card_min_height": 430,
+        "padding_top": 120,
+        "padding_bottom": 120,
+        "padding_top_mobile": 64,
+        "padding_bottom_mobile": 64,
+        "anchor_id": "",
+        "rating_out_of": "out of"
+      }
+    },
     "jci_home_faq": {
       "type": "jci-home-faq",
       "blocks": {
@@ -453,6 +575,7 @@
         "item_delivery",
         "item_returns"
       ],
+      "name": "FAQ",
       "settings": {
         "eyebrow": "The Maison help desk",
         "title_line_one": "Good to know.",
@@ -539,6 +662,7 @@
     "jci_product_section_ya4nNw",
     "jci_editorial_banner",
     "jci_best_sellers",
+    "jci_testimonials_zGWERm",
     "jci_home_faq",
     "jci_newsletter"
   ]

@@ -10,6 +10,8 @@
     badge_text       - text for the badge when the product is not on sale
     badge_source     - "none" | "sale" | "always"
     swatch_option    - option name to read colour swatches from, e.g. "Color"
+    swatch_metafield - "namespace.key" holding "Name:#hex | Name:#hex" pairs,
+                       used only where an option value carries no native swatch
     show_quick_add   - boolean
     quick_add_label  - visible button text
     image_index      - which product image to show, 0-based
@@ -50,6 +52,21 @@
   assign swatch_values = blank
   if swatch_option != blank
     assign swatch_values = product.options_by_name[swatch_option].values
+  endif
+
+  comment
+    Shopify's native option-value swatch is the real source. Where a store has
+    not linked its option values to colour-pattern entries, `value.swatch` is
+    empty, so a metafield of "Name:#hex | Name:#hex" pairs stands in. Native
+    always wins, so setting the real swatches later needs no change here.
+  endcomment
+  assign swatch_pairs = blank
+  if swatch_metafield != blank
+    assign swatch_mf_parts = swatch_metafield | split: '.'
+    assign swatch_raw = product.metafields[swatch_mf_parts[0]][swatch_mf_parts[1]].value
+    if swatch_raw != blank
+      assign swatch_pairs = swatch_raw | split: '|'
+    endif
   endif
 
   assign quick_add_variant = blank
@@ -149,10 +166,29 @@
       {%- if swatch_values != blank -%}
         <div class="jci-product-card-swatches">
           {%- for value in swatch_values -%}
-            {%- if value.swatch.color != blank -%}
+            {%- liquid
+              assign swatch_color = value.swatch.color
+
+              if swatch_color == blank and swatch_pairs != blank
+                capture value_name
+                  echo value
+                endcapture
+                assign value_name = value_name | strip | downcase
+
+                for pair in swatch_pairs
+                  assign pair_parts = pair | split: ':'
+                  assign pair_name = pair_parts[0] | strip | downcase
+                  if pair_name == value_name
+                    assign swatch_color = pair_parts[1] | strip
+                    break
+                  endif
+                endfor
+              endif
+            -%}
+            {%- if swatch_color != blank -%}
               <span
                 class="jci-product-card-swatch"
-                style="--jci-product-card-swatch-color: {{ value.swatch.color }};"
+                style="--jci-product-card-swatch-color: {{ swatch_color }};"
                 title="{{ value | escape }}"
               ></span>
             {%- endif -%}
