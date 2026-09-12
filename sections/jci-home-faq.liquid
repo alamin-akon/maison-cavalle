@@ -39,9 +39,9 @@
     --jci-home-faq-pad-bottom: {{ s.padding_bottom }}px;
     --jci-home-faq-pad-top-mobile: {{ s.padding_top_mobile }}px;
     --jci-home-faq-pad-bottom-mobile: {{ s.padding_bottom_mobile }}px;
-    --jci-home-faq-head-gap: {{ s.head_gap }}px;
+    --jci-home-faq-head-gap: clamp({{ s.head_gap | times: 0.25 | round }}px, 8vw, {{ s.head_gap }}px);
     --jci-home-faq-head-space: {{ s.head_space }}px;
-    --jci-home-faq-grid-gap: {{ s.grid_gap }}px;
+    --jci-home-faq-grid-gap: clamp({{ s.grid_gap | times: 0.25 | round }}px, 8vw, {{ s.grid_gap }}px);
     --jci-home-faq-row-pad: {{ s.row_padding }}px;
     --jci-home-faq-answer-indent: {{ s.answer_indent }}px;
     --jci-home-faq-question-size: clamp({{ s.question_size_min }}px, 2.3vw, {{ s.question_size_max }}px);

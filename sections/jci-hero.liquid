@@ -608,7 +608,8 @@
     display: block;
     width: 0;
     height: 100%;
-    background: var(--jci-hero-accent);
+    /* styles.css — the progress fill is its own value, not `--hero-accent`. */
+    background: #dce2c7;
     transition: width 0.7s var(--jci-ease);
   }
 
@@ -680,15 +681,24 @@
       grid-template-columns: minmax(100px, 0.38fr) minmax(0, 2fr) auto;
       gap: 1rem;
     }
-
-    .jci-hero-fit-card {
-      display: none;
-    }
   }
 
   @media screen and (max-width: 680px) {
     .jci-hero {
       --jci-hero-title-size: clamp(3rem, 12vw, 4.5rem);
+    }
+
+    /* The prototype lifts the card out of the corner and stacks it in flow.
+       styles.css @680 — `.hero-fit-card`. */
+    .jci-hero-fit-card {
+      position: relative;
+      inset-inline-end: auto;
+      inset-block-end: auto;
+      align-self: flex-start;
+      width: min(250px, 100%);
+      min-width: 0;
+      margin: 0 0 1.75rem;
+      padding: 1rem 1.1rem;
     }
 
     .jci-hero-fit-card-title {

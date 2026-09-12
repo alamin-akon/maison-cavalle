@@ -47,7 +47,7 @@
     --jci-editorial-copy-pad-top-mobile: {{ s.copy_padding_top_mobile }}px;
     --jci-editorial-copy-pad-bottom-mobile: {{ s.copy_padding_bottom_mobile }}px;
     --jci-editorial-copy-max: {{ s.copy_max_width }}px;
-    --jci-editorial-collage-inset: {{ s.collage_inset }}px;
+    --jci-editorial-collage-inset: clamp({{ s.collage_inset | times: 0.556 | round }}px, 5vw, {{ s.collage_inset }}px);
     --jci-editorial-collage-gap: clamp(0.75rem, 1.5vw, {{ s.collage_gap }}px);
 
     {%- comment -%}
