@@ -258,10 +258,11 @@
       box-shadow 0.35s var(--jci-ease);
   }
 
-  .jci-header[data-jci-sticky] {
+.jci-header[data-jci-sticky] {
     position: sticky;
     top: 0;
-  }
+    overflow: hidden;
+}
 
   .jci-header.is-scrolled {
     background: rgb(var(--jci-header-bg-rgb) / var(--jci-header-bg-opacity-scrolled));

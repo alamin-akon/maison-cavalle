@@ -236,6 +236,9 @@
 {% stylesheet %}
   .jci-story {
     display: block;
+    /* styles.css `.story-section` — without this the oversized "MC" watermark
+       on .jci-story-container::before escapes and widens the document. */
+    overflow: hidden;
     opacity: 1;
   }
 

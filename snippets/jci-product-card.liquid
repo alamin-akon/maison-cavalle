@@ -9,6 +9,8 @@
     subtitle_key     - "namespace.key" metafield holding the short descriptor
     badge_text       - text for the badge when the product is not on sale
     badge_source     - "none" | "sale" | "always"
+    section_id       - the calling section's id, used for the form id and for
+                       Horizon's section-aware cart refresh
     swatch_option    - option name to read colour swatches from, e.g. "Color"
     swatch_metafield - "namespace.key" holding "Name:#hex | Name:#hex" pairs,
                        used only where an option value carries no native swatch
@@ -75,6 +77,16 @@
       assign quick_add_variant = product.selected_or_first_available_variant
     endif
   endif
+
+  comment
+    Horizon's add-to-cart component preloads this on hover for its fly-to-cart
+    animation, and `product-form-component` needs a unique form id per card.
+  endcomment
+  assign quick_add_form_id = 'jci-quick-add-' | append: section_id | append: '-' | append: product.id
+  assign quick_add_media = quick_add_variant.featured_media.preview_image | image_url: width: 100
+  if quick_add_media == blank
+    assign quick_add_media = product.featured_media.preview_image | image_url: width: 100
+  endif
 %}
 
 <article class="jci-product-card">
@@ -109,20 +121,60 @@
     {%- if show_quick_add -%}
       <div class="jci-product-card-quick-add">
         {%- if quick_add_variant != blank -%}
-          <form action="{{ routes.cart_add_url }}" method="post" enctype="multipart/form-data">
-            <input type="hidden" name="id" value="{{ quick_add_variant.id }}">
-            <input type="hidden" name="quantity" value="1">
-            <button
-              class="jci-product-card-quick-add-button"
-              type="submit"
-              aria-label="{{ 'actions.add_to_cart' | t }} — {{ product.title | escape }}"
-            >
-              <span class="jci-product-card-quick-add-text">
-                {{- quick_add_label }} <span aria-hidden="true">&#65291;</span>
-              </span>
-              {% render 'jci-product-card-bag-icon' %}
-            </button>
-          </form>
+          {%- comment -%}
+            Horizon's own components do the work: `product-form-component`
+            intercepts the submit, posts to the cart and dispatches the cart
+            update event; `cart-drawer-component` carries `auto-open`, so the
+            drawer opens off that event. Writing our own fetch here would add
+            to the cart without the rest of the theme ever hearing about it.
+
+            Only the wiring is Horizon's — the button markup and classes stay
+            ours (§1), so no Horizon button styles come along.
+          {%- endcomment -%}
+          <product-form-component
+            class="jci-product-card-form"
+            data-section-id="{{ section_id }}"
+            data-product-id="{{ product.id }}"
+            on:submit="/handleSubmit"
+          >
+            <div
+              class="jci-product-card-live-region"
+              aria-live="assertive"
+              role="status"
+              aria-atomic="true"
+              ref="liveRegion"
+            ></div>
+
+            {%- form 'product', product, id: quick_add_form_id, novalidate: 'novalidate', data-type: 'add-to-cart-form' -%}
+              <input
+                type="hidden"
+                name="id"
+                ref="variantId"
+                value="{{ quick_add_variant.id }}"
+              >
+              <input type="hidden" name="quantity" value="1">
+
+              <add-to-cart-component
+                ref="addToCartButtonContainer"
+                data-product-variant-media="{{ quick_add_media }}"
+                data-add-to-cart-animation="{{ settings.add_to_cart_animation }}"
+              >
+                <button
+                  class="jci-product-card-quick-add-button"
+                  type="submit"
+                  name="add"
+                  ref="addToCartButton"
+                  on:click="/handleClick"
+                  aria-label="{{ 'actions.add_to_cart' | t }} — {{ product.title | escape }}"
+                >
+                  <span class="jci-product-card-quick-add-text">
+                    {{- quick_add_label }} <span aria-hidden="true">&#65291;</span>
+                  </span>
+                  {% render 'jci-product-card-bag-icon' %}
+                </button>
+              </add-to-cart-component>
+            {%- endform -%}
+          </product-form-component>
         {%- else -%}
           {%- comment -%}
             More than one variant, or sold out. Either way the product page is

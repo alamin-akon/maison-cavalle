@@ -612,7 +612,7 @@
         "question_size_min": 22,
         "question_size_max": 31,
         "toggle_duration": 320,
-        "single_open": false,
+        "single_open": true,
         "anchor_id": "home-faq"
       }
     },

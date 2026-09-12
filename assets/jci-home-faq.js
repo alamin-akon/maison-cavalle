@@ -21,7 +21,13 @@ class JciHomeFaq extends HTMLElement {
     this.duration = Number(this.dataset.jciFaqDuration) || DEFAULT_DURATION;
     this.singleOpen = this.hasAttribute('data-jci-faq-single');
 
-    if (this.reducedMotion) return;
+    // Under reduced motion the height animation is skipped, so <details> is
+    // left to toggle itself. Single-open still has to hold, so it rides the
+    // native toggle event instead of the intercepted click.
+    if (this.reducedMotion) {
+      if (this.singleOpen) this.addEventListener('toggle', this.#handleToggle, true);
+      return;
+    }
 
     for (const item of this.items) {
       item.querySelector('[data-jci-faq-summary]')?.addEventListener('click', this.#handleClick);
@@ -29,10 +35,21 @@ class JciHomeFaq extends HTMLElement {
   }
 
   disconnectedCallback() {
+    this.removeEventListener('toggle', this.#handleToggle, true);
+
     for (const item of this.items ?? []) {
       item.querySelector('[data-jci-faq-summary]')?.removeEventListener('click', this.#handleClick);
     }
   }
+
+  #handleToggle = (event) => {
+    const item = event.target;
+    if (!item.open || !this.items.includes(item)) return;
+
+    for (const other of this.items) {
+      if (other !== item) other.open = false;
+    }
+  };
 
   #handleClick = (event) => {
     // The browser would toggle `open` immediately; the height animation needs
