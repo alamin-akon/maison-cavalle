@@ -25,10 +25,10 @@
   {% if s.enable_pointer_depth %}data-jci-pointer-depth{% endif %}
   {% if s.enable_scroll_depth %}data-jci-scroll-depth{% endif %}
   {% if s.autoplay %}data-jci-autoplay{% endif %}
+  data-jci-slide-interval="{{ s.slide_interval }}"
   style="
-    --jci-hero-min-height: {{ s.min_height }}px;
-    --jci-hero-min-height-mobile: {{ s.min_height_mobile }}px;
-    --jci-hero-offset: {{ s.viewport_offset }}px;
+    --jci-hero-height: {{ s.height }}svh;
+    --jci-hero-height-mobile: {{ s.height_mobile }}svh;
     --jci-hero-text: {{ s.text_color }};
     --jci-hero-accent: {{ s.accent_color }};
     --jci-hero-meta: {{ s.meta_color }};
@@ -232,7 +232,7 @@
   .jci-hero {
     position: relative;
     display: block;
-    min-height: max(var(--jci-hero-min-height), calc(100svh - var(--jci-hero-offset)));
+    min-height: var(--jci-hero-height);
     overflow: hidden;
     isolation: isolate;
     color: var(--jci-hero-text);
@@ -303,7 +303,7 @@
     z-index: 1;
     display: flex;
     flex-direction: column;
-    min-height: max(var(--jci-hero-min-height), calc(100svh - var(--jci-hero-offset)));
+    min-height: var(--jci-hero-height);
     padding-block: clamp(1.4rem, 3vw, 3rem) clamp(1.3rem, 2.8vw, 2.7rem);
   }
 
@@ -707,7 +707,7 @@
 
     .jci-hero,
     .jci-hero-container {
-      min-height: max(var(--jci-hero-min-height-mobile), calc(100svh - var(--jci-hero-offset)));
+      min-height: var(--jci-hero-height-mobile);
     }
 
     .jci-hero-container {
@@ -841,9 +841,10 @@
     { "type": "url", "id": "fit_card_link", "label": "Link" },
 
     { "type": "header", "content": "Size" },
-    { "type": "range", "id": "min_height", "label": "Minimum height", "min": 400, "max": 1000, "step": 10, "unit": "px", "default": 760 },
-    { "type": "range", "id": "min_height_mobile", "label": "Minimum height on mobile", "min": 400, "max": 1000, "step": 10, "unit": "px", "default": 680 },
-    { "type": "range", "id": "viewport_offset", "label": "Viewport offset", "min": 0, "max": 300, "step": 5, "unit": "px", "default": 115, "info": "Height of the announcement bar plus header, subtracted from the viewport." },
+    
+    
+    { "type": "range", "id": "height", "label": "Height", "min": 50, "max": 120, "step": 1, "unit": "svh", "default": 100, "info": "Share of the viewport height. The section never grows past this, so a tall screen and a short one both fit." },
+    { "type": "range", "id": "height_mobile", "label": "Height on mobile", "min": 50, "max": 120, "step": 1, "unit": "svh", "default": 100 },
 
     { "type": "header", "content": "Headline" },
     { "type": "range", "id": "title_size_min", "label": "Smallest size", "min": 2, "max": 8, "step": 0.5, "unit": "rem", "default": 4 },
@@ -866,6 +867,7 @@
 
     { "type": "header", "content": "Motion" },
     { "type": "checkbox", "id": "autoplay", "label": "Advance to the next moment when a video ends", "default": true },
+    { "type": "range", "id": "slide_interval", "label": "Advance every", "min": 0, "max": 20, "step": 1, "unit": "s", "default": 7, "info": "0 waits for the video to end instead — which never happens on a moment that has only an image." },
     { "type": "range", "id": "crossfade_duration", "label": "Crossfade", "min": 200, "max": 2000, "step": 50, "unit": "ms", "default": 1200 },
     { "type": "checkbox", "id": "enable_pointer_depth", "label": "Follow the pointer", "default": true },
     { "type": "checkbox", "id": "enable_scroll_depth", "label": "Drift on scroll", "default": true }

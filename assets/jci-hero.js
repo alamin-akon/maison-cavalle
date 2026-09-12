@@ -2,8 +2,14 @@
  * Maison Cavallé — hero.
  *
  * Three moments crossfade behind the copy. A moment is selected by its tab, or
- * advances on its own when a video ends. Copy swaps with a short fade so the
- * headline does not snap.
+ * advances on its own — when its video ends, or after a set dwell. Copy swaps
+ * with a short fade so the headline does not snap.
+ *
+ * The dwell matters because `ended` only ever fires on a video: a moment
+ * carrying just an image has nothing to end, so without a timer the sequence
+ * stops there. The timer is restarted on every change, including a manual tab
+ * press, so the cadence is measured from what the visitor last saw rather than
+ * from page load.
  *
  * Ported from the prototype's setupHeroVideoSequence and the hero half of
  * activateMotion.
@@ -38,6 +44,7 @@ function scrollTopOf(root) {
 class JciHero extends HTMLElement {
   #index = 0;
   #titleSwapTimer = null;
+  #dwellTimer = null;
   #scrollRafId = null;
   #hasRendered = false;
 
@@ -86,6 +93,7 @@ class JciHero extends HTMLElement {
   disconnectedCallback() {
     document.removeEventListener('scroll', this.#handleScroll, { capture: true });
     window.clearTimeout(this.#titleSwapTimer);
+    window.clearTimeout(this.#dwellTimer);
     if (this.#scrollRafId !== null) cancelAnimationFrame(this.#scrollRafId);
   }
 
@@ -164,6 +172,7 @@ class JciHero extends HTMLElement {
   #show(index) {
     this.#index = this.#normalize(index);
     this.#present(this.#index);
+    this.#restartDwell();
 
     this.slides.forEach((slide, i) => {
       const active = i === this.#index;
@@ -204,6 +213,25 @@ class JciHero extends HTMLElement {
 
     if (active.readyState >= 1) start();
     else active.addEventListener('loadedmetadata', start, { once: true });
+  }
+
+  /**
+   * Restarts the dwell. A video that finishes first still wins — `ended` fires
+   * and moves on — so this is the ceiling on how long one moment can hold.
+   */
+  #restartDwell() {
+    window.clearTimeout(this.#dwellTimer);
+    this.#dwellTimer = null;
+
+    if (this.reducedMotion) return;
+
+    const seconds = Number(this.dataset.jciSlideInterval);
+    if (!Number.isFinite(seconds) || seconds <= 0) return;
+
+    const count = this.moments.length || this.tabs.length || this.slides.length;
+    if (count < 2) return;
+
+    this.#dwellTimer = window.setTimeout(() => this.#show(this.#index + 1), seconds * 1000);
   }
 
   /* --- Events --- */
