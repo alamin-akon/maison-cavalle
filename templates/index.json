@@ -221,7 +221,7 @@
         "badge_source": "sale",
         "badge_text": "Sale",
         "cta_label": "View all pieces",
-        "cta_url": "",
+        "cta_url": "shopify://collections/all",
         "background_color": "",
         "heading_color": "",
         "accent_color": "",
