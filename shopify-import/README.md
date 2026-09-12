@@ -28,6 +28,26 @@ https://maison-cavalle-2.myshopify.com/cdn/shop/files/jci-msfc003-front.webp
 
 All 93 URLs were checked and return `200`, so the file is ready as it is.
 
+### 1. Create the two metafield definitions first
+
+**The import silently drops metafield columns when no definition exists.** This
+is what made the colour swatches and subtitles come through empty: the values
+were in the file, but the store had nowhere to put them.
+
+Shopify admin → **Settings → Custom data → Products → Add definition**:
+
+| Name | Namespace and key | Type |
+|---|---|---|
+| Subtitle | `custom.subtitle` | Single line text |
+| Colour swatches | `custom.colour_swatches` | Single line text |
+
+The namespace and key must match exactly — the CSV column headers are
+`Subtitle (product.metafields.custom.subtitle)` and
+`Colour swatches (product.metafields.custom.colour_swatches)`, which is the
+header format Shopify's own product export uses.
+
+### 2. Import
+
 Shopify admin → **Products → Import** → upload
 `maison-cavalle-products.csv`. Leave *Overwrite products with the same handle*
 on if you are re-running the import.
@@ -38,16 +58,30 @@ on if you are re-running the import.
 node make-products-csv.js "https://YOUR-STORE.myshopify.com/cdn/shop/files" maison-cavalle-products.csv
 ```
 
+Regenerating overwrites the file, so any hand-edits in the CSV are lost. The
+generator writes `Color` as the option name and prices to two decimals; edit
+`catalog-data.js` or the generator rather than the CSV if a change needs to
+survive.
+
 Upload `images/` to that store's Files first, so every filename resolves.
 
 ## After the import
 
-- **Colour swatches.** The CSV cannot carry hex values, so each colour's hex is
-  parked in the `custom.colour_swatches` metafield (`Pink:#d49ca3 | Navy:#1f2d49`).
-  Set the real swatches under **Settings → Custom data → Metaobjects → Color**,
-  or link the `Color` option to the Shopify taxonomy so swatches come through
-  automatically. The product card reads swatches from the option named `Color`
-  (`sections/jci-product-section.liquid` → *Swatch option name*).
+- **Colour swatches.** The CSV cannot carry a native Shopify swatch, so each
+  colour's hex is parked in the `custom.colour_swatches` metafield
+  (`Pink:#d49ca3 | Navy:#1f2d49`). `snippets/jci-product-card.liquid` reads the
+  native option-value swatch first and falls back to this metafield, so the
+  cards render as soon as the definition above exists and the import has run.
+
+  The fallback only dresses our own cards. Shopify's own variant picker and
+  collection filters still show plain text buttons until real swatches exist —
+  set those under **Settings → Custom data → Metaobjects → Color**, or link the
+  colour option to the Shopify taxonomy. Doing that needs no theme change: the
+  card prefers a native swatch wherever it finds one.
+
+  The option name is matched case-insensitively, so `color` and `Color` both
+  work against the section's *Swatch option name*
+  (`sections/jci-product-section.liquid`).
 - **Subtitle.** The mockup's line under the title ("Long-sleeve technical jersey ·
   Five colourways") ships as the `custom.subtitle` metafield, which is the
   section's default *Subtitle metafield*. It is also written to the product Type

@@ -192,8 +192,8 @@ const HEADERS = [
   'Google Shopping / Age Group', 'Google Shopping / MPN', 'Google Shopping / Condition',
   'Google Shopping / Custom Product', 'Variant Image', 'Variant Weight Unit', 'Variant Tax Code',
   'Cost per item', 'Status',
-  'Metafield: custom.subtitle [single_line_text_field]',
-  'Metafield: custom.colour_swatches [single_line_text_field]',
+  'Subtitle (product.metafields.custom.subtitle)',
+  'Colour swatches (product.metafields.custom.colour_swatches)',
 ];
 
 const esc = (v) => {
@@ -275,8 +275,8 @@ ORDER.forEach((id) => {
       'Variant Image': v.image,
       'Variant Weight Unit': 'g',
       Status: first ? 'active' : '',
-      'Metafield: custom.subtitle [single_line_text_field]': first ? p.subtitle : '',
-      'Metafield: custom.colour_swatches [single_line_text_field]': first ? swatches : '',
+      'Subtitle (product.metafields.custom.subtitle)': first ? p.subtitle : '',
+      'Colour swatches (product.metafields.custom.colour_swatches)': first ? swatches : '',
     }));
   });
 
