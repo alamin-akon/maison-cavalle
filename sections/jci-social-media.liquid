@@ -1,0 +1,604 @@
+{% comment %}
+  Maison Cavallé — social media
+  Prototype source: maison-cavalle-main/app.js → socialMediaSection,
+                    activateSocialMediaDrag
+                    maison-cavalle-main/styles.css → .social-media-*
+  Reference: MAISON-CAVALLE-SPEC.md §1
+
+  A drifting, draggable band of tilted film cards under a two-column intro.
+  Each card is a block, so the client sets how many there are, what each links
+  to and which shape it takes.
+
+  Two things the prototype does that §1 does not allow, handled instead of
+  copied:
+
+  1. It staggers the band with `:nth-child(4n)` and `:nth-child(5n)`. Those
+     are structural selectors, so the offset is worked out in Liquid and
+     carried by an explicit class. The 5n rule is declared last in the
+     prototype, so where a card matches both, 5n wins — reproduced here by
+     testing 5 first.
+  2. Its `.social-media-marquee` is a second constrained block beside the
+     intro. §1 allows one container per section, so the marquee sits inside
+     the single container and pulls back out of the gutter, with the track
+     putting the gutter back exactly as the prototype has it.
+
+  Per §0 no `letter-spacing` or `line-height` is authored.
+{% endcomment %}
+
+{% liquid
+  assign s = section.settings
+  assign total = section.blocks.size
+%}
+
+<section
+  class="jci-social-media"
+  {% if s.anchor_id != blank %}id="{{ s.anchor_id | handleize }}"{% endif %}
+  style="
+    --jci-social-bg: {{ s.background_color | default: settings.color_palette.background }};
+    --jci-social-bg-rgb: {{ s.background_color.rgb | default: settings.color_palette.background.rgb }};
+    --jci-social-text: {{ s.text_color | default: settings.color_palette.foreground }};
+    --jci-social-text-rgb: {{ s.text_color.rgb | default: settings.color_palette.foreground.rgb }};
+    --jci-social-eyebrow: {{ s.eyebrow_color | default: settings.color_palette.color5 }};
+    --jci-social-accent: {{ s.accent_color | default: settings.color_palette.color5 }};
+    --jci-social-copy: {{ s.copy_color }};
+    --jci-social-card-bg: {{ s.card_background | default: settings.color_palette.color3 }};
+    --jci-social-card-label: {{ s.card_label_color | default: settings.color_palette.background }};
+    --jci-social-focus: {{ s.focus_color | default: settings.color_palette.color6 }};
+    --jci-social-pad-top: {{ s.padding_top }}px;
+    --jci-social-pad-bottom: {{ s.padding_bottom }}px;
+    --jci-social-pad-top-mobile: {{ s.padding_top_mobile }}px;
+    --jci-social-pad-bottom-mobile: {{ s.padding_bottom_mobile }}px;
+    --jci-social-intro-gap: clamp({{ s.intro_gap | times: 0.22 | round }}px, 8vw, {{ s.intro_gap }}px);
+    --jci-social-card-width: clamp({{ s.card_width | times: 0.6 | round }}px, 19vw, {{ s.card_width }}px);
+    --jci-social-card-gap: clamp(0.45rem, 0.9vw, {{ s.card_gap | divided_by: 10.0 }}rem);
+    --jci-social-speed: {{ s.speed }}s;
+    --jci-social-speed-mobile: {{ s.speed_mobile }}s;
+    --jci-social-fade: clamp(5rem, 13vw, {{ s.fade_width | divided_by: 10.0 }}rem);
+  "
+  {% if s.heading != blank %}aria-labelledby="jci-social-media-title-{{ section.id }}"{% endif %}
+>
+  <div class="jci-social-media-container">
+    <div class="jci-social-media-intro">
+      <div class="jci-social-media-headline">
+        {%- if s.eyebrow != blank -%}
+          <p class="jci-eyebrow jci-social-media-eyebrow">{{ s.eyebrow }}</p>
+        {%- endif -%}
+
+        {%- if s.heading != blank -%}
+          <h2 class="jci-social-media-title" id="jci-social-media-title-{{ section.id }}">
+            {{ s.heading }}
+            {%- if s.heading_accent != blank -%}
+              <em class="jci-social-media-title-accent">{{ s.heading_accent }}</em>
+            {%- endif -%}
+          </h2>
+        {%- endif -%}
+      </div>
+
+      {%- if s.intro != blank or s.instagram_url != blank or s.facebook_url != blank -%}
+        <div class="jci-social-media-copy">
+          {%- if s.intro != blank -%}
+            <p class="jci-social-media-text">{{ s.intro }}</p>
+          {%- endif -%}
+
+          {%- if s.instagram_url != blank or s.facebook_url != blank -%}
+            <div class="jci-social-media-links" aria-label="{{ s.links_label }}">
+              {%- if s.instagram_url != blank -%}
+                <a
+                  class="jci-text-link jci-social-media-link"
+                  href="{{ s.instagram_url }}"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {{ s.instagram_label }} {% render 'jci-action-arrow' %}
+                </a>
+              {%- endif -%}
+
+              {%- if s.facebook_url != blank -%}
+                <a
+                  class="jci-text-link jci-social-media-link"
+                  href="{{ s.facebook_url }}"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {{ s.facebook_label }} {% render 'jci-action-arrow' %}
+                </a>
+              {%- endif -%}
+            </div>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+    </div>
+
+    {%- if total > 0 -%}
+      <div
+        class="jci-social-media-marquee"
+        aria-label="{{ s.marquee_label }}"
+        data-jci-social-marquee
+      >
+        <div class="jci-social-media-track" data-jci-social-track>
+          {%- comment -%}
+            The set is rendered twice so the drift loops seamlessly. The second
+            pass is decorative only — hidden from assistive technology and taken
+            out of the tab order — and reduced motion drops it entirely.
+          {%- endcomment -%}
+          {%- for pass in (1..2) -%}
+            <div
+              class="jci-social-media-set{% if pass == 2 %} jci-social-media-set--duplicate{% endif %}"
+              {% if pass == 2 %}aria-hidden="true" inert{% endif %}
+            >
+              {%- for block in section.blocks -%}
+                {%- liquid
+                  assign b = block.settings
+
+                  assign film = blank
+                  if b.video_asset != blank
+                    assign film = b.video_asset | strip | asset_url
+                  elsif b.video != blank
+                    for source in b.video.sources
+                      if source.format == 'mp4'
+                        assign film = source.url
+                        break
+                      endif
+                    endfor
+                  endif
+
+                  assign poster = blank
+                  if b.image != blank
+                    assign poster = b.image | image_url: width: 900
+                  endif
+
+                  comment
+                    styles.css `:nth-child(5n)` is declared after `:nth-child(4n)`,
+                    so a card matching both takes the 5n offset.
+                  endcomment
+                  assign lift = ''
+                  assign mod5 = forloop.index | modulo: 5
+                  assign mod4 = forloop.index | modulo: 4
+                  if mod5 == 0
+                    assign lift = ' jci-social-media-card--lift-b'
+                  elsif mod4 == 0
+                    assign lift = ' jci-social-media-card--lift-a'
+                  endif
+                -%}
+
+                <a
+                  class="jci-social-media-card jci-social-media-card--{{ b.shape }}{{ lift }}"
+                  href="{{ b.link | default: s.instagram_url }}"
+                  target="_blank"
+                  rel="noreferrer"
+                  {% if pass == 2 %}tabindex="-1"{% endif %}
+                  {% if b.aria_label != blank %}aria-label="{{ b.aria_label | escape }}"{% endif %}
+                  {{ block.shopify_attributes }}
+                >
+                  {%- if film != blank -%}
+                    <video
+                      class="jci-social-media-card-media"
+                      autoplay
+                      muted
+                      loop
+                      playsinline
+                      preload="metadata"
+                      {% if poster != blank %}poster="{{ poster }}"{% endif %}
+                      aria-hidden="true"
+                    >
+                      <source src="{{ film }}" type="video/mp4">
+                    </video>
+                  {%- elsif b.image != blank -%}
+                    <img
+                      class="jci-social-media-card-media"
+                      src="{{ b.image | image_url: width: 900 }}"
+                      srcset="
+                        {{ b.image | image_url: width: 450 }} 450w,
+                        {{ b.image | image_url: width: 900 }} 900w
+                      "
+                      sizes="(max-width: 680px) 55vw, 300px"
+                      alt=""
+                      width="{{ b.image.width }}"
+                      height="{{ b.image.height }}"
+                      loading="lazy"
+                    >
+                  {%- endif -%}
+
+                  {%- if b.label != blank -%}
+                    <span class="jci-social-media-card-label">{{ b.label }}</span>
+                  {%- endif -%}
+                </a>
+              {%- endfor -%}
+            </div>
+          {%- endfor -%}
+        </div>
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+
+<script src="{{ 'jci-social-media.js' | asset_url }}" type="module"></script>
+
+{% stylesheet %}
+  .jci-social-media {
+    position: relative;
+    overflow: hidden;
+    padding-block: var(--jci-social-pad-top) var(--jci-social-pad-bottom);
+    color: var(--jci-social-text);
+    border-block-start: 1px solid rgb(var(--jci-social-text-rgb) / 0.16);
+    background: var(--jci-social-bg);
+  }
+
+  /* Hairline sitting just under the section rule. */
+  .jci-social-media::before {
+    content: "";
+    position: absolute;
+    inset-block-start: 1.2rem;
+    inset-inline: var(--jci-page-pad);
+    height: 1px;
+    background: rgb(var(--jci-social-text-rgb) / 0.16);
+    pointer-events: none;
+  }
+
+  .jci-social-media-container {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* --- Intro --- */
+  .jci-social-media-intro {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(260px, 0.85fr);
+    gap: var(--jci-social-intro-gap);
+    align-items: end;
+    padding-block-start: 1.5rem;
+  }
+
+  .jci-social-media-eyebrow {
+    margin-block-end: 1rem;
+    color: var(--jci-social-eyebrow);
+  }
+
+  .jci-social-media-title {
+    max-width: 620px;
+    margin: 0;
+    font-family: var(--jci-font-display);
+    font-size: var(--jci-section-title-size);
+    font-weight: 500;
+  }
+
+  .jci-social-media-title-accent {
+    color: var(--jci-social-accent);
+    font-style: italic;
+  }
+
+  .jci-social-media-copy {
+    justify-self: end;
+    max-width: 370px;
+  }
+
+  .jci-social-media-text {
+    margin: 0 0 1.35rem;
+    color: var(--jci-social-copy);
+    font-family: var(--jci-font-sans);
+    font-size: var(--jci-subtitle-size);
+  }
+
+  .jci-social-media-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem 1.5rem;
+  }
+
+  .jci-social-media-link {
+    transition: color 0.3s var(--jci-ease), border-color 0.3s var(--jci-ease);
+  }
+
+  .jci-social-media-link:hover,
+  .jci-social-media-link:focus-visible {
+    color: var(--jci-social-accent);
+    border-color: var(--jci-social-accent);
+  }
+
+  /* --- Marquee ---
+     The container supplies the gutter; the band pulls back out of it so the
+     fades sit flush, and the track puts the gutter back (styles.css). */
+  .jci-social-media-marquee {
+    position: relative;
+    z-index: 1;
+    margin-block-start: clamp(2.5rem, 5vw, 5rem);
+    margin-inline: calc(var(--jci-page-pad) * -1);
+    overflow: hidden;
+    isolation: isolate;
+    cursor: grab;
+    touch-action: pan-y;
+    user-select: none;
+  }
+
+  .jci-social-media-marquee.is-dragging {
+    cursor: grabbing;
+  }
+
+  .jci-social-media-marquee.is-dragging .jci-social-media-track {
+    animation-play-state: paused;
+  }
+
+  .jci-social-media-marquee::before,
+  .jci-social-media-marquee::after {
+    content: "";
+    position: absolute;
+    inset-block: 0;
+    z-index: 2;
+    width: var(--jci-social-fade);
+    pointer-events: none;
+  }
+
+  .jci-social-media-marquee::before {
+    inset-inline-start: 0;
+    background: linear-gradient(
+      90deg,
+      var(--jci-social-bg) 0%,
+      rgb(var(--jci-social-bg-rgb) / 0.92) 25%,
+      rgb(var(--jci-social-bg-rgb) / 0) 100%
+    );
+  }
+
+  .jci-social-media-marquee::after {
+    inset-inline-end: 0;
+    background: linear-gradient(
+      270deg,
+      var(--jci-social-bg) 0%,
+      rgb(var(--jci-social-bg-rgb) / 0.92) 25%,
+      rgb(var(--jci-social-bg-rgb) / 0) 100%
+    );
+  }
+
+  .jci-social-media-track {
+    display: flex;
+    width: max-content;
+    padding: 1.25rem var(--jci-page-pad) 2rem;
+    animation: jci-social-media-drift var(--jci-social-speed) linear infinite;
+    will-change: transform;
+  }
+
+  .jci-social-media:hover .jci-social-media-track,
+  .jci-social-media:focus-within .jci-social-media-track {
+    animation-play-state: paused;
+  }
+
+  .jci-social-media-set {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: flex-end;
+    gap: var(--jci-social-card-gap);
+    padding: 0;
+  }
+
+  /* --- Card --- */
+  .jci-social-media-card {
+    position: relative;
+    flex: 0 0 var(--jci-social-card-width);
+    overflow: hidden;
+    aspect-ratio: 0.78;
+    color: var(--jci-social-card-label);
+    border: 1px solid rgb(var(--jci-social-text-rgb) / 0.2);
+    background: var(--jci-social-card-bg);
+    box-shadow: 8px 10px 0 rgb(var(--jci-social-text-rgb) / 0.08);
+    transform: rotate(-2deg);
+    transition: transform 0.5s var(--jci-ease), box-shadow 0.5s var(--jci-ease);
+  }
+
+  .jci-social-media-card--wide {
+    aspect-ratio: 1.12;
+    transform: rotate(1.7deg);
+  }
+
+  .jci-social-media-card--short {
+    aspect-ratio: 0.94;
+    transform: rotate(-1deg);
+  }
+
+  /* styles.css `:nth-child(4n)` and `:nth-child(5n)`, as explicit classes. */
+  .jci-social-media-card--lift-a {
+    transform: translateY(0.9rem) rotate(2.2deg);
+  }
+
+  .jci-social-media-card--lift-b {
+    transform: translateY(-0.5rem) rotate(-3deg);
+  }
+
+  .jci-social-media-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: linear-gradient(
+      180deg,
+      rgb(var(--jci-social-text-rgb) / 0) 42%,
+      rgb(var(--jci-social-text-rgb) / 0.72) 100%
+    );
+    pointer-events: none;
+  }
+
+  .jci-social-media-card-media {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: saturate(0.84) contrast(0.97);
+    transition: transform 0.8s var(--jci-ease), filter 0.5s var(--jci-ease);
+  }
+
+  .jci-social-media-card-label {
+    position: absolute;
+    inset-inline: 1rem;
+    inset-block-end: 0.9rem;
+    z-index: 2;
+    font-family: var(--jci-font-label);
+    font-size: 12px;
+    text-transform: uppercase;
+  }
+
+  .jci-social-media-card:hover,
+  .jci-social-media-card:focus-visible {
+    z-index: 3;
+    box-shadow: 13px 16px 0 rgb(var(--jci-social-text-rgb) / 0.12);
+    transform: translateY(-0.6rem) rotate(0deg);
+  }
+
+  .jci-social-media-card:hover .jci-social-media-card-media,
+  .jci-social-media-card:focus-visible .jci-social-media-card-media {
+    transform: scale(1.06);
+    filter: saturate(0.98) contrast(1);
+  }
+
+  .jci-social-media-card:focus-visible {
+    outline: 2px solid var(--jci-social-focus);
+    outline-offset: 4px;
+  }
+
+  @keyframes jci-social-media-drift {
+    from {
+      transform: translateX(-50%);
+    }
+
+    to {
+      transform: translateX(0);
+    }
+  }
+
+  @media screen and (max-width: 680px) {
+    .jci-social-media {
+      padding-block: var(--jci-social-pad-top-mobile) var(--jci-social-pad-bottom-mobile);
+    }
+
+    .jci-social-media-intro {
+      display: block;
+      padding-block-start: 1.2rem;
+    }
+
+    .jci-social-media-title {
+      max-width: 330px;
+    }
+
+    .jci-social-media-copy {
+      max-width: 300px;
+      margin-block-start: 1.7rem;
+    }
+
+    .jci-social-media-marquee {
+      margin-block-start: 2.2rem;
+    }
+
+    .jci-social-media-track {
+      animation-duration: var(--jci-social-speed-mobile);
+    }
+
+    .jci-social-media-set {
+      gap: 0.45rem;
+      padding: 0;
+    }
+
+    .jci-social-media-card {
+      flex-basis: 55vw;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .jci-social-media-track {
+      animation: none;
+      transform: translateX(0);
+    }
+
+    .jci-social-media-set--duplicate {
+      display: none;
+    }
+
+    .jci-social-media-card,
+    .jci-social-media-card-media {
+      transition: none;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Social media",
+  "tag": "div",
+  "class": "jci-social-media-wrapper",
+  "settings": [
+    { "type": "header", "content": "Intro" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "The Maison / In the field" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Around the" },
+    { "type": "text", "id": "heading_accent", "label": "Heading accent", "default": "Maison.", "info": "Shown in italics in the accent colour." },
+    { "type": "text", "id": "intro", "label": "Intro", "default": "Quiet moments from the stable, the field and the people who make this world feel well lived." },
+
+    { "type": "header", "content": "Links" },
+    { "type": "text", "id": "instagram_label", "label": "Instagram label", "default": "Instagram" },
+    { "type": "url", "id": "instagram_url", "label": "Instagram link" },
+    { "type": "text", "id": "facebook_label", "label": "Facebook label", "default": "Facebook" },
+    { "type": "url", "id": "facebook_url", "label": "Facebook link" },
+    { "type": "text", "id": "links_label", "label": "Links group label", "default": "Follow Maison Cavallé", "info": "Read by screen readers." },
+    { "type": "text", "id": "marquee_label", "label": "Band label", "default": "Maison Cavallé social media highlights", "info": "Read by screen readers." },
+
+    { "type": "header", "content": "Colours" },
+    { "type": "color", "id": "background_color", "label": "Background" },
+    { "type": "color", "id": "text_color", "label": "Text" },
+    { "type": "color", "id": "eyebrow_color", "label": "Eyebrow" },
+    { "type": "color", "id": "accent_color", "label": "Accent" },
+    { "type": "color", "id": "copy_color", "label": "Intro copy", "default": "#62665d" },
+    { "type": "color", "id": "card_background", "label": "Card background" },
+    { "type": "color", "id": "card_label_color", "label": "Card label" },
+    { "type": "color", "id": "focus_color", "label": "Focus outline" },
+
+    { "type": "header", "content": "Band" },
+    { "type": "range", "id": "speed", "label": "Drift duration", "min": 10, "max": 120, "step": 2, "unit": "s", "default": 42 },
+    { "type": "range", "id": "speed_mobile", "label": "Drift duration on mobile", "min": 10, "max": 120, "step": 2, "unit": "s", "default": 34 },
+    { "type": "range", "id": "card_width", "label": "Card width", "min": 160, "max": 420, "step": 10, "unit": "px", "default": 300 },
+    { "type": "range", "id": "card_gap", "label": "Card gap", "min": 2, "max": 40, "step": 1, "unit": "px", "default": 9, "info": "Tenths of a rem." },
+    { "type": "range", "id": "fade_width", "label": "Edge fade width", "min": 40, "max": 240, "step": 2, "unit": "px", "default": 130, "info": "Tenths of a rem." },
+
+    { "type": "header", "content": "Layout" },
+    { "type": "range", "id": "intro_gap", "label": "Intro column gap", "min": 16, "max": 180, "step": 4, "unit": "px", "default": 144 },
+    { "type": "range", "id": "padding_top", "label": "Padding top", "min": 0, "max": 240, "step": 4, "unit": "px", "default": 128 },
+    { "type": "range", "id": "padding_bottom", "label": "Padding bottom", "min": 0, "max": 240, "step": 4, "unit": "px", "default": 96 },
+    { "type": "range", "id": "padding_top_mobile", "label": "Padding top on mobile", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 56 },
+    { "type": "range", "id": "padding_bottom_mobile", "label": "Padding bottom on mobile", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 56 },
+
+    { "type": "header", "content": "Advanced" },
+    { "type": "text", "id": "anchor_id", "label": "Anchor ID", "info": "Lets a link jump straight to this section." }
+  ],
+  "blocks": [
+    {
+      "type": "card",
+      "name": "Card",
+      "settings": [
+        { "type": "video", "id": "video", "label": "Video", "info": "No 20 MB limit." },
+        { "type": "text", "id": "video_asset", "label": "Video asset filename", "info": "A file in assets/. Wins over the video above." },
+        { "type": "image_picker", "id": "image", "label": "Image", "info": "The video poster, or the card itself when there is no video." },
+        { "type": "text", "id": "label", "label": "Label", "default": "Instagram / 01 · Film" },
+        { "type": "url", "id": "link", "label": "Link", "info": "Left empty, the Instagram link above is used." },
+        { "type": "text", "id": "aria_label", "label": "Accessible label", "default": "Instagram video highlight" },
+        {
+          "type": "select", "id": "shape", "label": "Shape", "default": "tall",
+          "options": [
+            { "value": "tall", "label": "Tall" },
+            { "value": "wide", "label": "Wide" },
+            { "value": "short", "label": "Short" }
+          ]
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Social media",
+      "blocks": [
+        { "type": "card", "settings": { "shape": "tall",  "label": "Instagram / 01 · Film", "aria_label": "Instagram video highlight" } },
+        { "type": "card", "settings": { "shape": "wide",  "label": "Facebook / 02 · Film",  "aria_label": "Facebook video highlight" } },
+        { "type": "card", "settings": { "shape": "short", "label": "Instagram / 03 · Film", "aria_label": "Instagram video highlight" } },
+        { "type": "card", "settings": { "shape": "tall",  "label": "Instagram / 04 · Film", "aria_label": "Instagram video highlight" } },
+        { "type": "card", "settings": { "shape": "wide",  "label": "Facebook / 05 · Film",  "aria_label": "Facebook video highlight" } },
+        { "type": "card", "settings": { "shape": "short", "label": "Instagram / 06 · Film", "aria_label": "Instagram video highlight" } },
+        { "type": "card", "settings": { "shape": "tall",  "label": "Instagram / 07 · Film", "aria_label": "Instagram video highlight" } },
+        { "type": "card", "settings": { "shape": "wide",  "label": "Facebook / 08 · Film",  "aria_label": "Facebook video highlight" } },
+        { "type": "card", "settings": { "shape": "short", "label": "Instagram / 09 · Film", "aria_label": "Instagram video highlight" } }
+      ]
+    }
+  ]
+}
+{% endschema %}
