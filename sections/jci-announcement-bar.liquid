@@ -8,8 +8,6 @@
 
 {% liquid
   assign s = section.settings
-  assign tracking = s.letter_spacing | divided_by: 100.0
-  assign leading = s.line_height | divided_by: 100.0
   assign font_family = 'var(--font-[font]--family)' | replace: '[font]', s.font
   assign font_weight = 'var(--font-[font]--weight)' | replace: '[font]', s.font
 
@@ -36,8 +34,6 @@
       --jci-announcement-font-weight: {{ font_weight }};
       --jci-announcement-size: {{ s.font_size }}px;
       --jci-announcement-size-mobile: {{ s.font_size_mobile }}px;
-      --jci-announcement-leading: {{ leading }};
-      --jci-announcement-tracking: {{ tracking }}em;
       --jci-announcement-case: {{ s.text_case }};
       --jci-announcement-align: {{ s.text_align }};
       --jci-announcement-max-width: {% if s.section_width == 'page-width' %}var(--jci-content-max){% else %}100%{% endif %};
@@ -87,8 +83,6 @@
     font-family: var(--jci-announcement-font);
     font-size: var(--jci-announcement-size);
     font-weight: var(--jci-announcement-font-weight);
-    line-height: var(--jci-announcement-leading);
-    letter-spacing: var(--jci-announcement-tracking);
     text-align: var(--jci-announcement-align);
     text-transform: var(--jci-announcement-case);
   }
@@ -129,7 +123,6 @@
     background: transparent;
     font-size: var(--jci-announcement-dismiss-size);
     font-weight: 300;
-    line-height: 1;
     cursor: pointer;
     transform: translateY(-50%);
   }
@@ -219,26 +212,6 @@
       "step": 1,
       "unit": "px",
       "default": 8
-    },
-    {
-      "type": "range",
-      "id": "line_height",
-      "label": "Line height",
-      "min": 100,
-      "max": 200,
-      "step": 5,
-      "unit": "%",
-      "default": 130
-    },
-    {
-      "type": "range",
-      "id": "letter_spacing",
-      "label": "Letter spacing",
-      "min": 0,
-      "max": 30,
-      "step": 1,
-      "unit": "%",
-      "default": 7
     },
     {
       "type": "select",

@@ -57,13 +57,11 @@
     --jci-header-logo-width-mobile: {{ s.logo_width_mobile }}px;
     --jci-header-logo-height-mobile: {{ s.logo_height_mobile }}px;
     --jci-header-nav-size: {{ s.nav_font_size }}px;
-    --jci-header-nav-tracking: {{ s.nav_tracking | divided_by: 100.0 }}em;
     --jci-header-nav-gap: {{ s.nav_gap }}px;
     --jci-header-nav-hover: {{ s.nav_hover_color | default: settings.color_palette.color5 }};
     --jci-header-nav-dot: {{ s.nav_dot_color | default: settings.color_palette.color6 }};
     --jci-header-nav-dot-rgb: {{ s.nav_dot_color.rgb | default: settings.color_palette.color6.rgb }};
     --jci-header-label-size: {{ s.label_size }}px;
-    --jci-header-label-tracking: {{ s.label_tracking | divided_by: 100.0 }}em;
     --jci-header-icon-size: {{ s.icon_size }}px;
     --jci-header-icon-stroke: {{ s.icon_stroke_width | divided_by: 100.0 }};
     --jci-header-badge-size: {{ s.cart_badge_size }}px;
@@ -315,8 +313,6 @@
     color: inherit;
     font-family: var(--jci-font-label);
     font-size: var(--jci-header-nav-size);
-    line-height: 1;
-    letter-spacing: var(--jci-header-nav-tracking);
     text-decoration: none;
     text-transform: uppercase;
     transition: color 0.3s var(--jci-ease), transform 0.3s var(--jci-ease);
@@ -475,8 +471,6 @@
 .jci-header-action-label, .jci-header-menu-label {
     font-family: var(--jci-font-label);
     font-size: var(--jci-header-label-size);
-    line-height: 1;
-    letter-spacing: var(--jci-header-label-tracking);
     text-transform: uppercase;
     FONT-WEIGHT: 400;
 }
@@ -498,7 +492,6 @@
     border-radius: 50%;
     font-family: var(--jci-font-label);
     font-size: 9px;
-    line-height: 1;
     transition: background-color 0.3s var(--jci-ease), transform 0.3s var(--jci-ease);
   }
 
@@ -585,8 +578,6 @@
     font-family: var(--jci-font-display);
     font-size: clamp(14rem, 53vw, 25rem);
     font-weight: 600;
-    line-height: 0.72;
-    letter-spacing: -0.16em;
     pointer-events: none;
   }
 
@@ -614,7 +605,6 @@
     background: transparent;
     font-family: var(--jci-font-label);
     font-size: 9px;
-    letter-spacing: 0.12em;
     text-transform: uppercase;
     cursor: pointer;
   }
@@ -642,7 +632,6 @@
     color: var(--jci-stone);
     font-family: var(--jci-font-label);
     font-size: 8px;
-    letter-spacing: 0.11em;
     text-transform: uppercase;
   }
 
@@ -701,7 +690,6 @@
     border-block-start: 1px solid var(--jci-line);
     font-family: var(--jci-font-label);
     font-size: 9px;
-    letter-spacing: 0.1em;
     text-transform: uppercase;
   }
 
@@ -836,7 +824,6 @@
     { "type": "header", "content": "Navigation" },
     { "type": "link_list", "id": "menu", "label": "Menu", "default": "main-menu" },
     { "type": "range", "id": "nav_font_size", "label": "Link size", "min": 8, "max": 20, "step": 1, "unit": "px", "default": 10 },
-    { "type": "range", "id": "nav_tracking", "label": "Link letter spacing", "min": 0, "max": 30, "step": 1, "unit": "%", "default": 10 },
     { "type": "range", "id": "nav_gap", "label": "Space between links", "min": 8, "max": 60, "step": 1, "unit": "px", "default": 40 },
     { "type": "color", "id": "nav_hover_color", "label": "Hover color", "default": "#737960" },
     { "type": "color", "id": "nav_dot_color", "label": "Hover dot color", "default": "#98634b" },
@@ -853,7 +840,6 @@
     { "type": "checkbox", "id": "show_account", "label": "Show account", "default": true },
     { "type": "checkbox", "id": "show_cart", "label": "Show bag", "default": true },
     { "type": "range", "id": "label_size", "label": "Label size", "min": 8, "max": 20, "step": 1, "unit": "px", "default": 10 },
-    { "type": "range", "id": "label_tracking", "label": "Label letter spacing", "min": 0, "max": 30, "step": 1, "unit": "%", "default": 10 },
     { "type": "checkbox", "id": "hide_labels_tablet", "label": "Hide labels below 900px", "default": true },
     { "type": "checkbox", "id": "hide_account_mobile", "label": "Hide account below 680px", "default": true },
     { "type": "range", "id": "icon_size", "label": "Icon size", "min": 12, "max": 32, "step": 1, "unit": "px", "default": 17 },

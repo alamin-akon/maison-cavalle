@@ -40,8 +40,6 @@
     --jci-hero-video-brightness: {{ s.video_brightness | divided_by: 100.0 }};
     --jci-hero-grain-opacity: {{ s.grain_opacity | divided_by: 100.0 }};
     --jci-hero-title-size: clamp({{ s.title_size_min }}rem, {{ s.title_size_fluid | divided_by: 10.0 }}vw, {{ s.title_size_max }}rem);
-    --jci-hero-title-leading: {{ s.title_leading | divided_by: 100.0 }};
-    --jci-hero-title-tracking: -{{ s.title_tracking | divided_by: 100.0 }}em;
     --jci-hero-crossfade: {{ s.crossfade_duration }}ms;
   "
 >
@@ -327,7 +325,6 @@
   .jci-hero-topline-note {
     font-family: var(--jci-font-label);
     font-size: 12px;
-    letter-spacing: 0.1em;
     text-transform: uppercase;
   }
 
@@ -372,8 +369,6 @@
     font-family: var(--jci-font-display);
     font-size: var(--jci-hero-title-size);
     font-weight: 500;
-    line-height: var(--jci-hero-title-leading);
-    letter-spacing: var(--jci-hero-title-tracking);
     text-wrap: balance;
   }
 
@@ -396,7 +391,6 @@
     color: #e1e0d7;
     font-family: var(--jci-font-sans);
     font-size: var(--jci-subtitle-size);
-    line-height: var(--jci-subtitle-leading);
   }
 
   .jci-hero-cta {
@@ -431,7 +425,6 @@
     color: var(--jci-hero-meta);
     font-family: var(--jci-font-label);
     font-size: 12px;
-    letter-spacing: 0.1em;
     text-transform: uppercase;
     writing-mode: vertical-rl;
     transform: rotate(180deg);
@@ -481,7 +474,6 @@
     color: var(--jci-olive);
     font-family: var(--jci-font-label);
     font-size: 12px;
-    letter-spacing: 0.12em;
     text-transform: uppercase;
   }
 
@@ -494,8 +486,6 @@
     font-family: var(--jci-font-display);
     font-size: 28px;
     font-weight: 500;
-    line-height: 0.94;
-    letter-spacing: -0.045em;
   }
 
   .jci-hero-fit-card-title em {
@@ -512,7 +502,6 @@
     border-block-end: 1px solid currentcolor;
     font-family: var(--jci-font-label);
     font-size: 12px;
-    letter-spacing: 0.1em;
     text-transform: uppercase;
   }
 
@@ -550,7 +539,6 @@
     color: var(--jci-hero-meta);
     font-family: var(--jci-font-label);
     font-size: 12px;
-    letter-spacing: 0.11em;
     text-transform: uppercase;
     white-space: nowrap;
   }
@@ -603,7 +591,6 @@
     overflow: hidden;
     font-family: var(--jci-font-label);
     font-size: 12px;
-    letter-spacing: 0.1em;
     text-overflow: ellipsis;
     text-transform: uppercase;
     white-space: nowrap;
@@ -848,8 +835,6 @@
     { "type": "range", "id": "title_size_min", "label": "Smallest size", "min": 2, "max": 8, "step": 0.5, "unit": "rem", "default": 4 },
     { "type": "range", "id": "title_size_max", "label": "Largest size", "min": 4, "max": 14, "step": 0.5, "unit": "rem", "default": 9 },
     { "type": "range", "id": "title_size_fluid", "label": "Fluid scaling", "min": 20, "max": 160, "step": 5, "unit": "%", "default": 80 },
-    { "type": "range", "id": "title_leading", "label": "Line height", "min": 70, "max": 130, "step": 1, "unit": "%", "default": 84 },
-    { "type": "range", "id": "title_tracking", "label": "Letter spacing (negative)", "min": 0, "max": 15, "step": 1, "unit": "%", "default": 7 },
 
     { "type": "header", "content": "Colors" },
     { "type": "color", "id": "text_color", "label": "Text", "default": "#fbfaf7" },

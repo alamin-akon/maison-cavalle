@@ -50,12 +50,8 @@
 
   /* Leading and tracking the dropdowns cannot express.
      display-tight carries the h2 value; the hero overrides it locally. */
-  --line-height--display-tight: 0.92;
-  --letter-spacing--heading-tight: -0.055em;
-  --line-height--body-loose: 1.55;
 
   --jci-subtitle-size: 14px;
-  --jci-subtitle-leading: 1.55;
 
   /* ------------------------------------------------------------------------
      Buttons (§4)
@@ -67,7 +63,6 @@
   --jci-button-min-height: 46px;
   --jci-button-padding: 0.9rem 1.35rem;
   --jci-button-size: 14px; /* styles.css:114 — `font: 14px/1 var(--mono)` */
-  --jci-button-tracking: 0.13em;
 
   /* ------------------------------------------------------------------------
      Derived colour (§2)
@@ -104,8 +99,6 @@
   font-family: var(--jci-font-label);
   font-size: 14px;
   font-weight: 500;
-  line-height: 1.2;
-  letter-spacing: 0.14em;
   text-transform: uppercase;
 }
 
@@ -120,7 +113,6 @@
   color: inherit;
   font-family: var(--jci-font-label);
   font-size: 14px;
-  letter-spacing: 0.12em;
   text-decoration: none;
   text-transform: uppercase;
 }
@@ -158,8 +150,6 @@
   background: var(--color-foreground);
   font-family: var(--jci-font-label);
   font-size: var(--jci-button-size);
-  line-height: 1;
-  letter-spacing: var(--jci-button-tracking);
   text-decoration: none;
   text-transform: uppercase;
   cursor: pointer;

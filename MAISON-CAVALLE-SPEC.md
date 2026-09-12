@@ -6,6 +6,10 @@ Single source of truth for how the Horizon theme is built from the
 **Source of design truth:** `~/Downloads/maison-cavalle-main/`
 (`styles.css` `:root` block + `.superdesign/init/theme.md`)
 
+**Where it runs:** the build happens directly on the client's store. There is
+no intermediate development store and no theme transfer step, so a Shopify
+**Files** upload is as durable as anything committed to `assets/`.
+
 **Hard rule:** nothing in this file gets hardcoded into a section.
 Colours, fonts, radii and button styling live in **global theme settings**
 (`config/settings_data.json` / `settings_schema.json`) so the client can
@@ -46,6 +50,36 @@ Do **not** silently fix it. Do **not** silently copy it either.
 The one exception is a value that Horizon structurally cannot express
 (§3 line-heights, §5 content width). Those are already resolved in this
 document and need no re-approval.
+
+### When the prototype overrides itself
+
+`styles.css` re-declares the same property for the same element in several
+places — a later rule, a higher-specificity selector, a media query. The value
+we clone is **the one that wins the cascade**, never the first declaration a
+search happens to land on. Resolve the property the way the browser does, then
+copy the winner.
+
+### Letter-spacing and line-height are not authored
+
+Standing developer instruction, and by §0 #1 it outranks the prototype:
+**we never write `letter-spacing` or `line-height`.**
+
+Whatever the mockup declares for either property — negative tracking, sub-1
+leading, a tuned body measure — is not reproduced. Both are left at their
+normal value, and *normal* means **the declaration is absent from our CSS**,
+not written out as `normal`.
+
+The rule covers:
+
+- every `jci-*` section, snippet and `assets/jci-base.css`;
+- the `font:` shorthand, which smuggles line-height in as `14px/1.2` — use
+  `font-size` and `font-weight` separately instead;
+- Horizon's own `--line-height--*` and `--letter-spacing--*` tokens, which are
+  left at their defaults rather than retuned.
+
+This is the one place the clone is deliberately not 1:1, so it needs no
+per-instance report under §0. Everything else about the type — family, size,
+weight, case — is still cloned exactly.
 
 ### Structure is not design
 
@@ -357,31 +391,14 @@ Both are pinned exactly in `assets/jci-base.css`:
 
 ### Values Horizon's dropdowns cannot express
 
-Three prototype values have no matching option. Override the underlying
-tokens once in `assets/jci-base.css` — do not scatter them per section:
+**Void.** This section used to pin the prototype's hero/section leading and
+tracking onto Horizon's tokens. Per §0 those values are no longer authored at
+all — `--line-height--display-tight`, `--letter-spacing--heading-tight` and
+`--line-height--body-loose` keep their Horizon defaults, and no section
+re-declares them.
 
-| Prototype | Horizon token default | Override to |
-|---|---|---|
-| Hero leading `.84` | `--line-height--display-tight: 1` | `0.84` |
-| Section title leading `.92` | (same token) | see note |
-| Hero tracking `-.07em` | `--letter-spacing--heading-tight: -0.03em` | `-0.07em` |
-| Section title tracking `-.055em` | (same token) | see note |
-| Body leading `1.55` | `--line-height--body-loose: 1.6` | `1.55` |
-
-Since h1 and h2 share `display-tight`, set the token to the h2 value and let
-the hero section override locally:
-
-```css
-:root {
-  --line-height--display-tight: 0.92;
-  --letter-spacing--heading-tight: -0.055em;
-  --line-height--body-loose: 1.55;
-}
-.jci-hero-title {
-  line-height: 0.84;
-  letter-spacing: -0.07em;
-}
-```
+The prototype's `.84` / `.92` leading and `-.07em` / `-.055em` tracking are
+recorded in the size table above for reference only. They are not implemented.
 
 ### Eyebrow / label utility
 
@@ -389,11 +406,15 @@ Used everywhere. Define once, never re-declare:
 
 ```css
 .jci-eyebrow {
-  font: 500 10px/1.2 var(--jci-font-mono);
-  letter-spacing: 0.14em;
+  font-family: var(--jci-font-label);
+  font-size: 10px;
+  font-weight: 500;
   text-transform: uppercase;
 }
 ```
+
+No `letter-spacing`, and no `font:` shorthand — the shorthand would carry the
+prototype's `1.2` leading. See §0.
 
 ---
 
@@ -405,8 +426,8 @@ Prototype `.button`:
 min-height: 46px;
 padding: .9rem 1.35rem;      /* 14.4px 21.6px */
 border: 1px solid var(--ink);
-font: 10px/1 var(--mono);
-letter-spacing: .13em;
+font: 10px/1 var(--mono);    /* size + family cloned, the `/1` leading is not */
+letter-spacing: .13em;       /* not cloned — §0 */
 text-transform: uppercase;
 border-radius: 0;            /* sharp corners */
 ```
@@ -441,14 +462,15 @@ Override the token in `assets/jci-base.css`:
 
 ```css
 :root {
-  --button-font-family-primary:   var(--jci-font-mono);
-  --button-font-family-secondary: var(--jci-font-mono);
+  --button-font-family-primary:   var(--jci-font-label);
+  --button-font-family-secondary: var(--jci-font-label);
   --jci-button-min-height: 46px;
   --jci-button-padding:    0.9rem 1.35rem;
-  --jci-button-tracking:   0.13em;
   --jci-button-size:       10px;
 }
 ```
+
+`--jci-button-tracking` is gone with the rest of the tracking (§0).
 
 ### Three variants
 
@@ -592,6 +614,11 @@ Other border widths:
 | "Improving" the prototype unasked | Clone it, report the issue, wait (§0) |
 | Silently copying a prototype bug | Report it, then apply the decision (§0) |
 | Rounding a prototype value | Exact value from `styles.css` |
+| `letter-spacing:` anywhere | Omit the property — normal tracking (§0) |
+| `line-height:` anywhere | Omit the property — normal leading (§0) |
+| `font: 500 14px/1.2 …` shorthand | `font-size` + `font-weight` separately, no leading |
+| Retuning `--line-height--*` / `--letter-spacing--*` | Leave Horizon's defaults alone |
+| Copying the first matching rule in `styles.css` | Copy the value that wins the cascade (§0) |
 | Editing `settings_data.json` by hand for values the editor owns | Change in Theme Editor, then `shopify theme pull` |
 
 ---
@@ -622,13 +649,15 @@ Other border widths:
 
 ### Video
 
-Theme assets cap at **20 MB per file**, so the prototype's 4K/1440p clips are
-re-encoded before they land in `assets/`: H.264, capped at 1920px wide, CRF 30,
-audio stripped, `+faststart`. The four homepage clips go 76 MB → 17.7 MB.
+Because the build runs on the client store, a Shopify **Files** upload is the
+default path for every clip: no size cap, CDN-served, nothing to re-encode.
+Every section that carries a clip still accepts an `assets/` filename as a
+fallback, and the Files upload wins when both are set.
 
-Every section that carries a clip offers both paths — a Shopify **Files**
-upload (no size cap, CDN-served) wins over an `assets/` filename, so a store
-can host the clip either way.
+Anything that does land in `assets/` is capped at **20 MB per file**, so the
+prototype's 4K/1440p clips are re-encoded first: H.264, capped at 1920px wide,
+CRF 30, audio stripped, `+faststart`. The four homepage clips go
+76 MB → 17.7 MB.
 
 Steps 2–3 come before any section work. Sections are written against tokens
 that must already exist.

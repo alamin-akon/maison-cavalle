@@ -26,7 +26,6 @@
       --jci-marquee-weight: var(--font-{{ s.font }}--weight);
       --jci-marquee-size: {{ s.font_size }}px;
       --jci-marquee-separator-size: {{ s.separator_size }}px;
-      --jci-marquee-tracking: {{ s.letter_spacing | divided_by: 100.0 }}em;
       --jci-marquee-case: {{ s.text_case }};
       --jci-marquee-gap: {{ s.gap | divided_by: 10.0 }}rem;
       --jci-marquee-pad: {{ s.padding_block | divided_by: 100.0 }}rem;
@@ -80,7 +79,6 @@
     font-family: var(--jci-marquee-font);
     font-size: var(--jci-marquee-size);
     font-weight: var(--jci-marquee-weight);
-    letter-spacing: var(--jci-marquee-tracking);
     text-transform: var(--jci-marquee-case);
   }
 
@@ -132,7 +130,6 @@
       "default": "subheading"
     },
     { "type": "range", "id": "font_size", "label": "Size", "min": 8, "max": 28, "step": 1, "unit": "px", "default": 10 },
-    { "type": "range", "id": "letter_spacing", "label": "Letter spacing", "min": 0, "max": 30, "step": 1, "unit": "%", "default": 13 },
     {
       "type": "select", "id": "text_case", "label": "Case",
       "options": [

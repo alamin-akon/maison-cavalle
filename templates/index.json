@@ -77,8 +77,6 @@
         "title_size_min": 4,
         "title_size_max": 9,
         "title_size_fluid": 80,
-        "title_leading": 84,
-        "title_tracking": 7,
         "text_color": "#fbfaf7",
         "meta_color": "#d3d5c9",
         "accent_color": "{{ settings.color_palette.color7 }}",
@@ -133,7 +131,6 @@
       "settings": {
         "font": "subheading",
         "font_size": 10,
-        "letter_spacing": 13,
         "text_case": "uppercase",
         "background_color": "{{ settings.color_palette.color5 }}",
         "text_color": "{{ settings.color_palette.background }}",
@@ -206,6 +203,7 @@
     },
     "jci_product_section_ya4nNw": {
       "type": "jci-product-section",
+      "disabled": true,
       "name": "Product section",
       "settings": {
         "eyebrow": "The opening collection",
