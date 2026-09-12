@@ -1,0 +1,488 @@
+{% comment %}
+  Maison Cavallé — testimonials
+  Prototype source: maison-cavalle-main/app.js → testimonialsSection (385–440),
+                    activateTestimonialsDrag (1125–1180)
+                    maison-cavalle-main/styles.css → .testimonials-* /
+                    .testimonial-card-* (and the @680 block at 1643–1648)
+  Reference: MAISON-CAVALLE-SPEC.md §1
+
+  A cream band holding a draggable rail of quote cards. Each card is a block,
+  so the client controls how many there are and which tone each one carries.
+
+  Two deliberate departures from the prototype, both matching what the rest of
+  this theme already does:
+
+  1. The prototype's "Read more" is a stub <button> that goes nowhere. Here it
+     is a real link, so the control does what it looks like it does.
+  2. Every colour, string and the card tone come from settings, so nothing in
+     the stylesheet below is a literal (§7).
+
+  Per §0 no `letter-spacing` or `line-height` is authored, so the prototype's
+  tracking and leading are not reproduced. Everything else — family, size,
+  weight, spacing, borders, shadows, timings — is cloned exactly.
+{% endcomment %}
+
+{% liquid
+  assign s = section.settings
+  assign total = section.blocks.size
+%}
+
+<section
+  class="jci-testimonials"
+  {% if s.anchor_id != blank %}id="{{ s.anchor_id | handleize }}"{% endif %}
+  style="
+    --jci-testimonials-bg: {{ s.background_color | default: settings.color_palette.color3 }};
+    --jci-testimonials-text: {{ s.text_color | default: settings.color_palette.foreground }};
+    --jci-testimonials-eyebrow-color: {{ s.eyebrow_color | default: settings.color_palette.color5 }};
+    --jci-testimonials-accent: {{ s.accent_color | default: settings.color_palette.color5 }};
+    --jci-testimonials-intro-color: {{ s.intro_color }};
+    --jci-testimonials-watermark-rgb: {{ s.watermark_color.rgb }};
+    --jci-testimonials-watermark-opacity: {{ s.watermark_opacity | divided_by: 100.0 }};
+    --jci-testimonials-card-bg: {{ s.card_background | default: settings.color_palette.background }};
+    --jci-testimonials-card-text-rgb: {{ s.text_color.rgb | default: settings.color_palette.foreground.rgb }};
+    --jci-testimonials-card-topline: {{ s.card_topline_color | default: settings.color_palette.color5 }};
+    --jci-testimonials-card-meta: {{ s.card_meta_color }};
+    --jci-testimonials-stars: {{ s.stars_color | default: settings.color_palette.color6 }};
+    --jci-testimonials-quote-mark-rgb: {{ s.quote_mark_color.rgb }};
+    --jci-testimonials-quote-mark-opacity: {{ s.quote_mark_opacity | divided_by: 100.0 }};
+    --jci-testimonials-featured-bg: {{ s.featured_background | default: settings.color_palette.color5 }};
+    --jci-testimonials-featured-text: {{ s.featured_text_color | default: settings.color_palette.background }};
+    --jci-testimonials-featured-text-rgb: {{ s.featured_text_color.rgb | default: settings.color_palette.background.rgb }};
+    --jci-testimonials-featured-topline: {{ s.featured_topline_color }};
+    --jci-testimonials-featured-stars: {{ s.featured_stars_color }};
+    --jci-testimonials-featured-meta: {{ s.featured_meta_color }};
+    --jci-testimonials-soft-bg: {{ s.soft_background }};
+    --jci-testimonials-pad-top: {{ s.padding_top }}px;
+    --jci-testimonials-pad-bottom: {{ s.padding_bottom }}px;
+    --jci-testimonials-pad-top-mobile: {{ s.padding_top_mobile }}px;
+    --jci-testimonials-pad-bottom-mobile: {{ s.padding_bottom_mobile }}px;
+    --jci-testimonials-header-gap: clamp({{ s.header_gap | times: 0.25 | round }}px, 8vw, {{ s.header_gap }}px);
+    --jci-testimonials-card-gap: clamp({{ s.card_gap | times: 0.5 | round }}px, 1.7vw, {{ s.card_gap }}px);
+    --jci-testimonials-card-min-height: clamp({{ s.card_min_height | times: 0.767 | round }}px, 30vw, {{ s.card_min_height }}px);
+  "
+  {% if s.heading != blank %}aria-labelledby="jci-testimonials-title-{{ section.id }}"{% endif %}
+>
+  <div class="jci-testimonials-container">
+    <div class="jci-testimonials-header">
+      <div class="jci-testimonials-headline">
+        {%- if s.eyebrow != blank -%}
+          <p class="jci-eyebrow jci-testimonials-eyebrow">{{ s.eyebrow }}</p>
+        {%- endif -%}
+
+        {%- if s.heading != blank -%}
+          <h2 class="jci-testimonials-title" id="jci-testimonials-title-{{ section.id }}">
+            {{ s.heading }}
+            {%- if s.heading_accent != blank -%}
+              <em class="jci-testimonials-title-accent">{{ s.heading_accent }}</em>
+            {%- endif -%}
+          </h2>
+        {%- endif -%}
+      </div>
+
+      {%- if s.intro != blank or s.link_label != blank -%}
+        <div class="jci-testimonials-header-copy">
+          {%- if s.intro != blank -%}
+            <p class="jci-testimonials-intro">{{ s.intro }}</p>
+          {%- endif -%}
+
+          {%- if s.link_label != blank -%}
+            <a class="jci-text-link jci-testimonials-link" href="{{ s.link_url | default: routes.all_products_collection_url }}">
+              {{ s.link_label }} {% render 'jci-action-arrow' %}
+            </a>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+    </div>
+
+    {%- if total > 0 -%}
+      <div class="jci-testimonials-rail" data-jci-testimonials-rail>
+        <div class="jci-testimonials-track" data-jci-testimonials-track>
+          {%- for block in section.blocks -%}
+            {%- liquid
+              assign b = block.settings
+
+              assign index_label = b.index
+              if index_label == blank
+                assign index_label = forloop.index | prepend: '0' | slice: -2, 2
+              endif
+              assign total_label = total | prepend: '0' | slice: -2, 2
+
+              assign rating = b.rating | at_most: 5 | at_least: 0
+            -%}
+
+            <article
+              class="jci-testimonial-card{% if b.tone == 'featured' %} jci-testimonial-card--featured{% elsif b.tone == 'soft' %} jci-testimonial-card--soft{% endif %}"
+              {{ block.shopify_attributes }}
+            >
+              <div class="jci-testimonial-card-topline">
+                <span class="jci-testimonial-card-label">{{ b.label }}</span>
+                <span class="jci-testimonial-card-index">{{ index_label }} / {{ total_label }}</span>
+              </div>
+
+              {%- if rating > 0 -%}
+                <div
+                  class="jci-testimonial-card-stars"
+                  aria-label="{{ rating }} {{ s.rating_out_of }} 5"
+                >
+                  {%- for i in (1..rating) -%}&#9733;{%- endfor -%}
+                </div>
+              {%- endif -%}
+
+              {%- if b.quote != blank -%}
+                <blockquote class="jci-testimonial-card-quote">{{ b.quote }}</blockquote>
+              {%- endif -%}
+
+              {%- if b.name != blank or b.attribution != blank -%}
+                <footer class="jci-testimonial-card-footer">
+                  {%- if b.name != blank -%}
+                    <strong class="jci-testimonial-card-name">{{ b.name }}</strong>
+                  {%- endif -%}
+                  {%- if b.attribution != blank -%}
+                    <span class="jci-testimonial-card-attribution">{{ b.attribution }}</span>
+                  {%- endif -%}
+                </footer>
+              {%- endif -%}
+            </article>
+          {%- endfor -%}
+        </div>
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+
+<script src="{{ 'jci-testimonials.js' | asset_url }}" type="module"></script>
+
+{% stylesheet %}
+  .jci-testimonials {
+    position: relative;
+    overflow: hidden;
+    padding-block: var(--jci-testimonials-pad-top) var(--jci-testimonials-pad-bottom);
+    color: var(--jci-testimonials-text);
+    background: var(--jci-testimonials-bg);
+  }
+
+  /* Oversized "MC" watermark bleeding off the bottom-right corner. */
+  .jci-testimonials::after {
+    content: "MC";
+    position: absolute;
+    right: 3%;
+    bottom: -8%;
+    color: rgb(var(--jci-testimonials-watermark-rgb) / var(--jci-testimonials-watermark-opacity));
+    font-family: var(--jci-font-display);
+    font-size: clamp(10rem, 23vw, 21rem);
+    font-weight: 600;
+    pointer-events: none;
+  }
+
+  .jci-testimonials-container {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* --- Header --- */
+  .jci-testimonials-header {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(250px, 0.65fr);
+    gap: var(--jci-testimonials-header-gap);
+    align-items: end;
+    margin-block-end: clamp(2.5rem, 5vw, 4.5rem);
+  }
+
+  .jci-testimonials-eyebrow {
+    margin-block-end: 0.9rem;
+    color: var(--jci-testimonials-eyebrow-color);
+  }
+
+  .jci-testimonials-title {
+    max-width: 620px;
+    margin: 0;
+    font-family: var(--jci-font-display);
+    font-size: var(--jci-section-title-size);
+    font-weight: 500;
+  }
+
+  .jci-testimonials-title-accent {
+    color: var(--jci-testimonials-accent);
+    font-style: italic;
+  }
+
+  .jci-testimonials-header-copy {
+    justify-self: end;
+    max-width: 360px;
+  }
+
+  .jci-testimonials-intro {
+    margin: 0 0 1.4rem;
+    color: var(--jci-testimonials-intro-color);
+    font-family: var(--jci-font-sans);
+    font-size: var(--jci-subtitle-size);
+  }
+
+  /* --- Rail --- */
+  .jci-testimonials-rail {
+    overflow: hidden;
+    cursor: grab;
+    touch-action: pan-y;
+    user-select: none;
+  }
+
+  .jci-testimonials-rail.is-dragging {
+    cursor: grabbing;
+  }
+
+  .jci-testimonials-track {
+    display: flex;
+    width: max-content;
+    gap: var(--jci-testimonials-card-gap);
+    transition: transform 0.55s var(--jci-ease);
+  }
+
+  /* --- Card --- */
+  .jci-testimonial-card {
+    position: relative;
+    display: flex;
+    flex: 0 0 clamp(280px, 27vw, 460px);
+    flex-direction: column;
+    min-height: var(--jci-testimonials-card-min-height);
+    padding: clamp(1.2rem, 2.2vw, 2rem);
+    border: 1px solid rgb(var(--jci-testimonials-card-text-rgb) / 0.18);
+    background: var(--jci-testimonials-card-bg);
+    box-shadow: 9px 10px 0 rgb(var(--jci-testimonials-card-text-rgb) / 0.07);
+    transition: transform 0.5s var(--jci-ease), box-shadow 0.5s var(--jci-ease);
+  }
+
+  /* The opening quote mark, set behind the content. */
+  .jci-testimonial-card::before {
+    content: "\201C";
+    position: absolute;
+    top: 0.8rem;
+    right: 1.1rem;
+    color: rgb(var(--jci-testimonials-quote-mark-rgb) / var(--jci-testimonials-quote-mark-opacity));
+    font-family: var(--jci-font-display);
+    font-size: 100px;
+  }
+
+  .jci-testimonial-card:hover {
+    transform: translateY(-7px);
+    box-shadow: 13px 16px 0 rgb(var(--jci-testimonials-card-text-rgb) / 0.1);
+  }
+
+  .jci-testimonial-card--featured {
+    flex-basis: clamp(320px, 31vw, 520px);
+    color: var(--jci-testimonials-featured-text);
+    border-color: var(--jci-testimonials-featured-bg);
+    background: var(--jci-testimonials-featured-bg);
+  }
+
+  .jci-testimonial-card--featured::before {
+    color: rgb(var(--jci-testimonials-featured-text-rgb) / 0.2);
+  }
+
+  .jci-testimonial-card--soft {
+    background: var(--jci-testimonials-soft-bg);
+  }
+
+  .jci-testimonial-card-topline {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    color: var(--jci-testimonials-card-topline);
+    font-family: var(--jci-font-label);
+    font-size: 12px;
+    text-transform: uppercase;
+  }
+
+  .jci-testimonial-card--featured .jci-testimonial-card-topline {
+    color: var(--jci-testimonials-featured-topline);
+  }
+
+  .jci-testimonial-card-stars {
+    position: relative;
+    z-index: 1;
+    margin-block: auto 1.25rem;
+    color: var(--jci-testimonials-stars);
+    font-family: var(--jci-font-sans);
+    font-size: 13px;
+  }
+
+  .jci-testimonial-card--featured .jci-testimonial-card-stars {
+    color: var(--jci-testimonials-featured-stars);
+  }
+
+  .jci-testimonial-card-quote {
+    position: relative;
+    z-index: 1;
+    max-width: 490px;
+    margin: 0;
+    font-family: var(--jci-font-display);
+    font-size: clamp(1.25rem, 1.8vw, 1.85rem);
+    font-weight: 500;
+  }
+
+  .jci-testimonial-card--featured .jci-testimonial-card-quote {
+    font-size: clamp(1.45rem, 2.4vw, 2.45rem);
+  }
+
+  .jci-testimonial-card-footer {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.28rem;
+    margin-block-start: 2rem;
+    padding-block-start: 1rem;
+    border-block-start: 1px solid rgb(var(--jci-testimonials-card-text-rgb) / 0.16);
+    font-family: var(--jci-font-label);
+    font-size: 14px;
+    text-transform: uppercase;
+  }
+
+  .jci-testimonial-card--featured .jci-testimonial-card-footer {
+    border-color: rgb(var(--jci-testimonials-featured-text-rgb) / 0.26);
+  }
+
+  .jci-testimonial-card-attribution {
+    color: var(--jci-testimonials-card-meta);
+    font-size: 12px;
+  }
+
+  .jci-testimonial-card--featured .jci-testimonial-card-attribution {
+    color: var(--jci-testimonials-featured-meta);
+  }
+
+  @media screen and (max-width: 680px) {
+    .jci-testimonials {
+      padding-block: var(--jci-testimonials-pad-top-mobile) var(--jci-testimonials-pad-bottom-mobile);
+    }
+
+    .jci-testimonials-header {
+      display: block;
+      margin-block-end: 2.5rem;
+    }
+
+    .jci-testimonials-header-copy {
+      max-width: 320px;
+      margin-block-start: 1.7rem;
+    }
+
+    .jci-testimonials-track {
+      width: 100%;
+      gap: 0.8rem;
+    }
+
+    .jci-testimonial-card,
+    .jci-testimonial-card--featured {
+      flex-basis: 100%;
+      min-width: 0;
+      min-height: 330px;
+    }
+
+    .jci-testimonial-card-quote,
+    .jci-testimonial-card--featured .jci-testimonial-card-quote {
+      font-size: clamp(1.45rem, 7vw, 2rem);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .jci-testimonials-track,
+    .jci-testimonial-card {
+      transition: none;
+    }
+
+    .jci-testimonial-card:hover {
+      transform: none;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Testimonials",
+  "tag": "div",
+  "class": "jci-testimonials-wrapper",
+  "settings": [
+    { "type": "header", "content": "Header" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "The Maison / In good company" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Good things," },
+    { "type": "text", "id": "heading_accent", "label": "Heading accent", "default": "said well.", "info": "Shown in italics in the accent colour." },
+    { "type": "text", "id": "intro", "label": "Intro", "default": "Pieces made for the ride, the stable and every quiet moment around it." },
+    { "type": "text", "id": "link_label", "label": "Link label", "default": "Read more" },
+    { "type": "url", "id": "link_url", "label": "Link" },
+
+    { "type": "header", "content": "Colours" },
+    { "type": "color", "id": "background_color", "label": "Background" },
+    { "type": "color", "id": "text_color", "label": "Text" },
+    { "type": "color", "id": "eyebrow_color", "label": "Eyebrow" },
+    { "type": "color", "id": "accent_color", "label": "Heading accent" },
+    { "type": "color", "id": "intro_color", "label": "Intro", "default": "#65695f" },
+    { "type": "color", "id": "watermark_color", "label": "Watermark", "default": "#737960" },
+    { "type": "range", "id": "watermark_opacity", "label": "Watermark opacity", "min": 0, "max": 40, "step": 1, "unit": "%", "default": 8 },
+
+    { "type": "header", "content": "Card" },
+    { "type": "color", "id": "card_background", "label": "Card background" },
+    { "type": "color", "id": "card_topline_color", "label": "Card topline" },
+    { "type": "color", "id": "card_meta_color", "label": "Card attribution", "default": "#72776b" },
+    { "type": "color", "id": "stars_color", "label": "Stars" },
+    { "type": "color", "id": "quote_mark_color", "label": "Quote mark", "default": "#737960" },
+    { "type": "range", "id": "quote_mark_opacity", "label": "Quote mark opacity", "min": 0, "max": 60, "step": 1, "unit": "%", "default": 18 },
+    { "type": "color", "id": "soft_background", "label": "Soft card background", "default": "#e3e2d7" },
+
+    { "type": "header", "content": "Featured card" },
+    { "type": "color", "id": "featured_background", "label": "Background" },
+    { "type": "color", "id": "featured_text_color", "label": "Text" },
+    { "type": "color", "id": "featured_topline_color", "label": "Topline", "default": "#dce1c7" },
+    { "type": "color", "id": "featured_stars_color", "label": "Stars", "default": "#e4e8c7" },
+    { "type": "color", "id": "featured_meta_color", "label": "Attribution", "default": "#dce1d0" },
+
+    { "type": "header", "content": "Layout" },
+    { "type": "range", "id": "header_gap", "label": "Header column gap", "min": 16, "max": 160, "step": 4, "unit": "px", "default": 128 },
+    { "type": "range", "id": "card_gap", "label": "Card gap", "min": 8, "max": 64, "step": 2, "unit": "px", "default": 24 },
+    { "type": "range", "id": "card_min_height", "label": "Card minimum height", "min": 260, "max": 620, "step": 10, "unit": "px", "default": 430 },
+    { "type": "range", "id": "padding_top", "label": "Padding top", "min": 0, "max": 240, "step": 4, "unit": "px", "default": 120 },
+    { "type": "range", "id": "padding_bottom", "label": "Padding bottom", "min": 0, "max": 240, "step": 4, "unit": "px", "default": 120 },
+    { "type": "range", "id": "padding_top_mobile", "label": "Padding top on mobile", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 64 },
+    { "type": "range", "id": "padding_bottom_mobile", "label": "Padding bottom on mobile", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 64 },
+
+    { "type": "header", "content": "Advanced" },
+    { "type": "text", "id": "anchor_id", "label": "Anchor ID", "info": "Lets a link jump straight to this section." },
+    { "type": "text", "id": "rating_out_of", "label": "Rating label", "default": "out of", "info": "Read by screen readers as \"5 out of 5\"." }
+  ],
+  "blocks": [
+    {
+      "type": "quote",
+      "name": "Quote",
+      "settings": [
+        { "type": "text", "id": "label", "label": "Label", "default": "Customer note" },
+        { "type": "text", "id": "index", "label": "Index", "info": "Left empty, the position in the list is used." },
+        { "type": "range", "id": "rating", "label": "Rating", "min": 0, "max": 5, "step": 1, "default": 5 },
+        { "type": "textarea", "id": "quote", "label": "Quote", "default": "The pieces feel as considered as they look." },
+        { "type": "text", "id": "name", "label": "Name", "default": "Georgia W." },
+        { "type": "text", "id": "attribution", "label": "Attribution", "info": "The piece the note is about." },
+        {
+          "type": "select", "id": "tone", "label": "Tone", "default": "default",
+          "options": [
+            { "value": "default", "label": "Paper" },
+            { "value": "featured", "label": "Featured" },
+            { "value": "soft", "label": "Soft" }
+          ]
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Testimonials",
+      "blocks": [
+        { "type": "quote", "settings": { "label": "Maison community", "tone": "featured", "quote": "The pieces feel as considered as they look. I can ride in them, work around the stable and still feel beautifully put together.", "name": "Georgia W.", "attribution": "Lux Jacket" } },
+        { "type": "quote", "settings": { "label": "Customer note", "tone": "default", "quote": "A calm, flattering fit and genuinely lovely quality. It has become the layer I reach for before every lesson.", "name": "Emma R.", "attribution": "Classic Long Sleeve Base Layer" } },
+        { "type": "quote", "settings": { "label": "From the stable", "tone": "soft", "quote": "The Groomi is now part of our everyday ritual — easy to hold, easy to use and a little brighter in the wash bay.", "name": "Hannah L.", "attribution": "The Groomi Horse Shedder" } },
+        { "type": "quote", "settings": { "label": "Customer note", "tone": "default", "quote": "The breeches move with me without losing their shape. Thoughtful details, a beautiful weight and no fuss in the saddle.", "name": "Sophie M.", "attribution": "Pro-Skin Performance Tights" } },
+        { "type": "quote", "settings": { "label": "Maison community", "tone": "soft", "quote": "Beautifully made and genuinely easy to wear. The kind of layer that works from an early lesson to coffee afterwards.", "name": "Olivia T.", "attribution": "Active Turtleneck Top" } },
+        { "type": "quote", "settings": { "label": "From the stable", "tone": "default", "quote": "The grooming kit feels like a small daily luxury. Everything has its place, and the brushes are lovely to use.", "name": "Claire B.", "attribution": "Deluxe Grooming Kit" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

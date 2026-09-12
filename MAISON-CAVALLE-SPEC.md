@@ -641,7 +641,7 @@ Other border widths:
 | 6f | `sections/jci-home-faq.liquid` — question blocks, accordion + side card | done |
 | 6g | `sections/jci-newsletter.liquid` — Shopify customer form, ink panel | done |
 | 6h | `sections/jci-best-sellers.liquid` — piece blocks, scroll-dealt card stack | done |
-| 6i | Testimonials | |
+| 6i | `sections/jci-testimonials.liquid` — quote blocks, drag rail | done |
 | 7 | Verify in Theme Editor that every value round-trips | pending |
 | 8 | `sections/jci-footer.liquid` — menu-backed link columns, journal sign-off | done |
 | 9 | Product + collection templates | |
