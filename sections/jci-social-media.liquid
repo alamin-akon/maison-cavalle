@@ -142,9 +142,16 @@
                     endfor
                   endif
 
+                  comment
+                    An image_picker cannot carry a filename default, so a
+                    poster in assets/ is named as text — same shape as the
+                    video above, and the picker still wins once one is chosen.
+                  endcomment
                   assign poster = blank
                   if b.image != blank
                     assign poster = b.image | image_url: width: 900
+                  elsif b.poster_asset != blank
+                    assign poster = b.poster_asset | strip | asset_url
                   endif
 
                   comment
@@ -570,6 +577,7 @@
         { "type": "video", "id": "video", "label": "Video", "info": "No 20 MB limit." },
         { "type": "text", "id": "video_asset", "label": "Video asset filename", "info": "A file in assets/. Wins over the video above." },
         { "type": "image_picker", "id": "image", "label": "Image", "info": "The video poster, or the card itself when there is no video." },
+        { "type": "text", "id": "poster_asset", "label": "Poster asset filename", "info": "A file in assets/, shown while the video loads. The image above wins when one is chosen." },
         { "type": "text", "id": "label", "label": "Label", "default": "Instagram / 01 · Film" },
         { "type": "url", "id": "link", "label": "Link", "info": "Left empty, the Instagram link above is used." },
         { "type": "text", "id": "aria_label", "label": "Accessible label", "default": "Instagram video highlight" },
@@ -588,15 +596,15 @@
     {
       "name": "Social media",
       "blocks": [
-        { "type": "card", "settings": { "shape": "tall",  "label": "Instagram / 01 · Film", "aria_label": "Instagram video highlight" } },
-        { "type": "card", "settings": { "shape": "wide",  "label": "Facebook / 02 · Film",  "aria_label": "Facebook video highlight" } },
-        { "type": "card", "settings": { "shape": "short", "label": "Instagram / 03 · Film", "aria_label": "Instagram video highlight" } },
-        { "type": "card", "settings": { "shape": "tall",  "label": "Instagram / 04 · Film", "aria_label": "Instagram video highlight" } },
-        { "type": "card", "settings": { "shape": "wide",  "label": "Facebook / 05 · Film",  "aria_label": "Facebook video highlight" } },
-        { "type": "card", "settings": { "shape": "short", "label": "Instagram / 06 · Film", "aria_label": "Instagram video highlight" } },
-        { "type": "card", "settings": { "shape": "tall",  "label": "Instagram / 07 · Film", "aria_label": "Instagram video highlight" } },
-        { "type": "card", "settings": { "shape": "wide",  "label": "Facebook / 08 · Film",  "aria_label": "Facebook video highlight" } },
-        { "type": "card", "settings": { "shape": "short", "label": "Instagram / 09 · Film", "aria_label": "Instagram video highlight" } }
+        { "type": "card", "settings": { "shape": "tall", "video_asset": "jci-social-01.mp4", "poster_asset": "jci-editorial-field-note.webp", "label": "Instagram / 01 · Film", "aria_label": "Instagram video highlight" } },
+        { "type": "card", "settings": { "shape": "wide", "video_asset": "jci-social-02.mp4", "poster_asset": "jci-lux-jacket-front-horse.webp", "label": "Facebook / 02 · Film", "aria_label": "Facebook video highlight" } },
+        { "type": "card", "settings": { "shape": "short", "video_asset": "jci-social-03.mp4", "poster_asset": "jci-faq-hero-white-horse.webp", "label": "Instagram / 03 · Film", "aria_label": "Instagram video highlight" } },
+        { "type": "card", "settings": { "shape": "tall", "video_asset": "jci-social-04.mp4", "poster_asset": "jci-editorial-field-note.webp", "label": "Instagram / 04 · Film", "aria_label": "Instagram video highlight" } },
+        { "type": "card", "settings": { "shape": "wide", "video_asset": "jci-social-05.mp4", "poster_asset": "jci-lux-jacket-front-horse.webp", "label": "Facebook / 05 · Film", "aria_label": "Facebook video highlight" } },
+        { "type": "card", "settings": { "shape": "short", "video_asset": "jci-social-06.mp4", "poster_asset": "jci-faq-hero-white-horse.webp", "label": "Instagram / 06 · Film", "aria_label": "Instagram video highlight" } },
+        { "type": "card", "settings": { "shape": "tall", "video_asset": "jci-social-07.mp4", "poster_asset": "jci-editorial-field-note.webp", "label": "Instagram / 07 · Film", "aria_label": "Instagram video highlight" } },
+        { "type": "card", "settings": { "shape": "wide", "video_asset": "jci-social-08.mp4", "poster_asset": "jci-faq-hero-white-horse.webp", "label": "Facebook / 08 · Film", "aria_label": "Facebook video highlight" } },
+        { "type": "card", "settings": { "shape": "short", "video_asset": "jci-social-09.mp4", "poster_asset": "jci-editorial-field-note.webp", "label": "Instagram / 09 · Film", "aria_label": "Instagram video highlight" } }
       ]
     }
   ]
