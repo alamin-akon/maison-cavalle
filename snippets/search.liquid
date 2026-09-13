@@ -19,12 +19,17 @@
       aria-label="{{ 'content.search_input_label' | t }}"
       aria-haspopup="dialog"
     >
-      <span class="{% if display_style == 'icon' %}hidden{% else %}mobile:hidden{% endif %}">
-        {{ 'content.search' | t }}
+      {% comment %}
+        Maison Cavalle: the prototype shows the icon and its label together,
+        so neither half is hidden on desktop. styles.css:54-56; the label
+        still drops on mobile, which is what mobile:hidden already does.
+      {% endcomment %}
+      <span class="svg-wrapper">
+        {{ 'icon-search.svg' | inline_asset_content }}
       </span>
 
-      <span class="svg-wrapper {% if display_style != 'icon' %}desktop:hidden{% endif %}">
-        {{ 'icon-search.svg' | inline_asset_content }}
+      <span class="header-actions__label mobile:hidden">
+        {{ 'content.search' | t }}
       </span>
     </button>
   </search-button>
@@ -54,17 +59,11 @@
     }
   }
 
-  [data-menu-style='menu'] .header__column--left .search-action {
-    @media screen and (min-width: 750px) {
-      margin-inline: calc(var(--padding-lg) * -1);
-    }
-  }
-
-  .header__column--right .search-action {
-    @media screen and (min-width: 750px) {
-      margin-inline: calc(var(--gap-md) * -1) calc(var(--gap-xs) * -1);
-    }
-  }
+  /* Maison Cavalle: the negative inline margins are gone. They pulled the
+     search action -0.9rem/-0.5rem to sit flush when it was a loose child of
+     a header column; inside .header-actions__list they dragged it over its
+     neighbours, which is what clipped the pill on hover. The list's own gap
+     does the spacing now. */
 
   @media screen and (min-width: 750px) {
     .header__column--right .search-action--text {

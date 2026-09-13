@@ -7,6 +7,8 @@
   @param {block} [block] - The block object, used for Shopify editor attributes.
   @param {string} [display_style] - Controls display mode for header actions: 'icon' or 'text'.
   @param {string} [customer_account_menu] - The menu handle passed to the shopify-account component.
+  @param {string} [cart_label] - Maison Cavalle: the cart action's visible label. Falls back to `content.cart_title`.
+  @param {string} [search_action] - Maison Cavalle: the rendered search button, placed as the list's first item.
 
   @example
   {% render 'header-actions', section: section %}
@@ -23,15 +25,20 @@
     class="header-actions__cart-icon{% if display_style == 'text' %} header-actions__cart-icon--text{% endif %}{% unless cart == empty %} header-actions__cart-icon--has-cart{% endunless %}"
     data-testid="cart-icon"
   >
-    <span class="{% if display_style == 'icon' %}hidden{% else %}mobile:hidden{% endif %}">
-      {{ 'content.cart_title' | t }}
+    {% comment %}
+      Maison Cavalle: icon and label together, per styles.css:54-56. The
+      prototype's label for the cart is "Bag", which comes in as cart_label.
+    {% endcomment %}
+    <span class="svg-wrapper" aria-hidden="true">
+      {{ 'icon-cart.svg' | inline_asset_content }}
     </span>
 
-    <span
-      class="svg-wrapper {% if display_style != 'icon' %}desktop:hidden{% endif %}"
-      aria-hidden="true"
-    >
-      {{ 'icon-cart.svg' | inline_asset_content }}
+    <span class="header-actions__label mobile:hidden">
+      {%- if cart_label != blank -%}
+        {{ cart_label }}
+      {%- else -%}
+        {{ 'content.cart_title' | t }}
+      {%- endif -%}
     </span>
 
     {% render 'cart-bubble', limit: 100 %}
@@ -41,18 +48,24 @@
 {% capture account_icon %}
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    width="15"
-    height="17"
-    viewBox="0 0 15 17"
+    viewBox="0 0 24 24"
     fill="none"
     slot="signed-out-avatar"
     class="account-button__icon"
   >
+    <circle
+      cx="12"
+      cy="8"
+      r="3.2"
+      stroke="currentColor"
+      stroke-width="var(--icon-stroke-width)"
+    />
     <path
       stroke="currentColor"
+      stroke-linecap="round"
       stroke-linejoin="round"
       stroke-width="var(--icon-stroke-width)"
-      d="M10.375 3.813a3.063 3.063 0 1 1-6.125 0 3.063 3.063 0 0 1 6.125 0ZM7.313 9.5c-3.667 0-6.24 2.691-6.563 6.125h13.125C13.552 12.191 10.979 9.5 7.312 9.5Z"
+      d="M5.8 20c.7-3.3 2.7-5 6.2-5s5.5 1.7 6.2 5"
     />
   </svg>
 {% endcapture %}
@@ -63,6 +76,16 @@
   {% endif %}
   {{- block.shopify_attributes -}}
 >
+  {% comment %}
+    Maison Cavalle: the prototype's three actions are one list - search,
+    account, bag - so they sit in a single ul with an li each rather than as
+    loose siblings. styles.css:55 (.header-actions).
+  {% endcomment %}
+  <ul class="header-actions__list" role="list">
+    {% if search_action != blank %}
+      <li class="header-actions__item">{{ search_action }}</li>
+    {% endif %}
+
   {% if shop.customer_accounts_enabled %}
     {% liquid
       assign account_actions_style = ''
@@ -82,6 +105,7 @@
         assign account_actions_style = '--header-actions-font-family: ' | append: font_family_safe | append: '; --header-actions-font-weight: ' | append: font_obj.weight | append: ';'
       endif
     %}
+    <li class="header-actions__item">
     <div
       class="account-button header-actions__action{% if display_style == 'text' %} account-button--text{% endif %} color-custom-popover"
     >
@@ -94,25 +118,30 @@
         {% if customer %}
           <div class="account-button__fallback"></div>
         {% else %}
+          {% comment %}
+            Maison Cavalle: icon and label together, per styles.css:54-56.
+          {% endcomment %}
           <span
             slot="signed-out-avatar"
-            class="account-button__text header-actions__text-style {% if display_style == 'icon' %}hidden{% else %}mobile:hidden{% endif %}"
-          >
-            {{ 'content.account_title' | t }}
-          </span>
-
-          <span
-            slot="signed-out-avatar"
-            class="{% if display_style != 'icon' %}desktop:hidden{% endif %}"
+            class="svg-wrapper"
             aria-hidden="true"
           >
             {{ account_icon }}
           </span>
+
+          <span
+            slot="signed-out-avatar"
+            class="account-button__text header-actions__label mobile:hidden"
+          >
+            {{ 'content.account_title' | t }}
+          </span>
         {% endif %}
       </shopify-account>
     </div>
+    </li>
   {% endif %}
 
+  <li class="header-actions__item">
   {% if settings.cart_type == 'drawer' and template.name != 'cart' %}
     <button
       class="header-actions__action button-unstyled{% if display_style == 'text' %} header-actions__text-style{% endif %}"
@@ -136,6 +165,8 @@
       {{ cart_icon }}
     </a>
   {% endif %}
+  </li>
+  </ul>
 
   <span
     ref="liveRegion"
@@ -163,14 +194,24 @@
   }
 
   .account-button {
+    min-width: 0;
+    min-height: 0;
+}
+
+
+  .account-button {
     /* Remove the background color from the color scheme, we want to inherit the color of the header */
     background: transparent;
   }
 
   .account-button__icon,
   .account-button__text {
-    color: var(--color-account-icon);
-    transition: color var(--header-content-transition-timing);
+    /* Maison Cavalle: these were pinned to var(--color-account-icon) with a
+       0s transition, which outranked the inherited colour - so the account
+       action stayed dark while search and bag turned olive on hover. They
+       inherit now, and .header-actions__action drives both colour and
+       timing. styles.css:69. */
+    color: inherit;
     -webkit-font-smoothing: antialiased;
   }
 
@@ -243,23 +284,43 @@
     justify-self: flex-end;
   }
 
-  .header__column--right header-actions {
-    margin-inline-start: calc(var(--gap-md) * -1);
-  }
+  /* Maison Cavalle: the -0.9rem start margin is gone. It pulled the actions
+     group leftwards to close the gap left by search sitting outside it; with
+     search inside .header-actions__list it just shifted the group under its
+     neighbour and clipped the first pill. */
 
+  /* Maison Cavalle: styles.css:81 - the count is a 15px pill that sits
+     inline after the label, not parked over the bag. */
   .header-actions__cart-icon {
-    --cart-bubble-size: 20px;
-    --cart-bubble-top: 4.5px;
-    --cart-bubble-right: 2.5px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.48rem;
 
-    position: relative;
+    --cart-bubble-size: 15px;
   }
 
   .header-actions__cart-icon .cart-bubble {
-    position: absolute;
-    width: var(--cart-bubble-size, 20px);
-    top: var(--cart-bubble-top);
-    right: var(--cart-bubble-right);
+    position: relative;
+    top: auto;
+    right: auto;
+    min-width: var(--cart-bubble-size);
+    width: auto;
+    height: var(--cart-bubble-size);
+    margin-inline-start: -0.25rem;
+    transition:
+      background-color 0.3s var(--jci-ease),
+      transform 0.3s var(--jci-ease);
+  }
+
+  /* styles.css:82 */
+  .header-actions__action:hover .cart-bubble__background,
+  .header-actions__action:focus-visible .cart-bubble__background {
+    background-color: var(--jci-rust);
+  }
+
+  .header-actions__action:hover .cart-bubble,
+  .header-actions__action:focus-visible .cart-bubble {
+    transform: translate(1px, -2px);
   }
 
   @media screen and (min-width: 750px) {
@@ -274,15 +335,8 @@
     font-weight: var(--font-paragraph--weight);
   }
 
-  .header-actions__cart-icon.header-actions__cart-icon--has-cart svg {
-    /* Create donut mask where the cart bubble sits */
-    mask: radial-gradient(
-      calc(var(--cart-bubble-size) + 2px) at calc(100% - var(--cart-bubble-right)) var(--cart-bubble-top),
-      transparent 45.45%,
-      #fff 45.45%,
-      #fff 100%
-    );
-  }
+  /* The donut mask cut a hole in the bag for the bubble to sit in. With the
+     count inline there is nothing to cut around. */
 
   .cart-bubble.cart-bubble--animating .cart-bubble__background {
     animation: grow var(--animation-speed) var(--animation-easing);
