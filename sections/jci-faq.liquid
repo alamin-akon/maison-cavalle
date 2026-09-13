@@ -56,6 +56,8 @@
     --jci-faq-pad-top-mobile: {{ s.padding_top_mobile }}px;
     --jci-faq-pad-bottom-mobile: {{ s.padding_bottom_mobile }}px;
     --jci-faq-sticky-top: {{ s.nav_sticky_top }}px;
+    --jci-faq-index-width: {{ s.index_width }}px;
+    --jci-faq-summary-gap: {{ s.summary_gap | divided_by: 100.0 }}rem;
     --jci-faq-scroll-margin: {{ s.scroll_margin }}px;
   "
 >
@@ -474,8 +476,8 @@
 
   .jci-faq-item-summary {
     display: grid;
-    grid-template-columns: 34px 1fr auto;
-    gap: 1rem;
+    grid-template-columns: var(--jci-faq-index-width) 1fr auto;
+    gap: var(--jci-faq-summary-gap);
     align-items: center;
     padding-block: 1.2rem;
     list-style: none;
@@ -522,7 +524,12 @@
     overflow: hidden;
     display: grid;
     gap: 1rem;
-    padding: 0 0 1.35rem;
+
+    /* The answer starts where the question starts. styles.css:1040 leaves it
+       flush left, one index column short of its own question - aligning the
+       two is a standing instruction, and deriving the indent from the same
+       tokens as the summary grid keeps them from drifting apart. */
+    padding: 0 0 1.35rem calc(var(--jci-faq-index-width) + var(--jci-faq-summary-gap));
   }
 
   .jci-faq-item-answer-text {
@@ -606,9 +613,9 @@
       grid-template-columns: 30px 1fr;
     }
 
-    .jci-faq-item-summary {
-      grid-template-columns: 25px 1fr auto;
-      gap: 0.7rem;
+    .jci-faq {
+      --jci-faq-index-width: 25px;
+      --jci-faq-summary-gap: 0.7rem;
     }
 
     .jci-faq-item-question {
@@ -653,6 +660,10 @@
     { "type": "header", "content": "Header" },
     { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Find your answer" },
     { "type": "text", "id": "title", "label": "Title", "default": "Questions, considered." },
+
+    { "type": "header", "content": "Question row" },
+    { "type": "range", "id": "index_width", "label": "Number column width", "min": 20, "max": 80, "step": 1, "unit": "px", "default": 34, "info": "The answer is indented to match, so both stay aligned." },
+    { "type": "range", "id": "summary_gap", "label": "Gap after the number", "min": 0, "max": 300, "step": 5, "unit": "%", "default": 100, "info": "Hundredths of a rem — 100 is 1rem." },
 
     { "type": "header", "content": "Open and close" },
     { "type": "range", "id": "toggle_duration", "label": "Open/close speed", "min": 100, "max": 800, "step": 20, "unit": "ms", "default": 320 },

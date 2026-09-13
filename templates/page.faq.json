@@ -258,7 +258,9 @@
         "padding_bottom_mobile": 72,
         "anchor_id": "faq-content",
         "toggle_duration": 320,
-        "single_open": false
+        "single_open": false,
+        "index_width": 34,
+        "summary_gap": 100
       }
     },
     "jci_faq_assurance": {
