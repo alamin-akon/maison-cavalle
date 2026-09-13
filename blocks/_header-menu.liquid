@@ -301,13 +301,14 @@
     justify-content: var(--grid-area-alignment);
   }
 
-  .menu-list__list-item {
+.menu-list__list-item {
     flex-shrink: 0;
     white-space: nowrap;
     display: flex;
     align-items: center;
     height: 100%;
-  }
+    justify-content: center;
+}
 
   .menu-list__list-item[aria-hidden='true'] {
     visibility: hidden;
@@ -319,7 +320,7 @@
     font-family: var(--font-subheading--family);
     font-style: var(--menu-top-level-font-style);
     font-weight: 500;
-    font-size: 12px;
+    font-size: 12px !important;
     text-transform: uppercase;
     color: var(--menu-top-level-font-color);
     text-decoration: none;
@@ -404,7 +405,11 @@
     transform: rotate(180deg);
   }
 .menu-list__link-title {
-    padding-inline: var(--gap-sm);
+    /* Maison Cavalle: the inline padding here used to create the gap between
+       links, which left the rust dot stranded outside it and touching the
+       previous label. The gap is on the list now (see ::part(list) below) and
+       the title stays tight to its text, as styles.css:57 has it. */
+    padding-inline: 0;
     text-transform: uppercase;
 }
   [slot='overflow'] .menu-list__link-title {
@@ -467,18 +472,24 @@
     transition: transform 0.4s var(--jci-ease);
   }
 
-  .menu-list__link:hover,
-  .menu-list__link:focus-visible {
+  /* The hover is triggered from the list item, not the link. The link lifts
+     2px, and when the pointer sat near its lower edge that lift carried the
+     link out from under it - hover dropped, the link fell back, hover caught
+     again, and the whole thing flickered. The item is full row height and
+     never moves, so it is a stable target. Keyboard focus stays on the link.
+     styles.css:60-62. */
+ .menu-list__list-item:hover .menu-list__link, .menu-list__link:focus-visible {
     color: var(--jci-olive);
     transform: translateY(-2px);
-  }
+    transition: 0.5s;
+}
 
-  .menu-list__link:hover .menu-list__link-title::before,
+  .menu-list__list-item:hover .menu-list__link-title::before,
   .menu-list__link:focus-visible .menu-list__link-title::before {
     transform: translateY(-50%) scale(1);
   }
 
-  .menu-list__link:hover .menu-list__link-title::after,
+  .menu-list__list-item:hover .menu-list__link-title::after,
   .menu-list__link:focus-visible .menu-list__link-title::after {
     transform: scaleX(1);
   }
@@ -492,8 +503,10 @@
        0.65rem outside the link and flattened the 2px hover lift. */
     overflow: visible;
 
-    gap: 0;
-    margin-inline: calc(-1 * var(--menu-horizontal-gap) / 2);
+    /* styles.css:54 (.desktop-nav). The negative margin is gone with the
+       title padding it used to cancel out. */
+    gap: clamp(1rem, 2.4vw, 2.5rem);
+    margin-inline: 0;
   }
 
   .overflow-menu {

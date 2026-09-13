@@ -151,6 +151,16 @@ class JciHomeFaq extends HTMLElement {
     this.#open(item);
   };
 
+  /**
+   * The answer's resting bottom padding, which has to travel with the height.
+   * Under `box-sizing: border-box` an element at `height: 0` is still as tall
+   * as its padding, so animating height alone left a padding-tall strip that
+   * only vanished when `open` came off - the jolt on close.
+   */
+  #padBottom(answer) {
+    return getComputedStyle(answer).paddingBottom || '0px';
+  }
+
   #open(item) {
     const answer = item.querySelector('[data-jci-faq-answer]');
     if (!answer) {
@@ -161,13 +171,42 @@ class JciHomeFaq extends HTMLElement {
     this.#animations.get(answer)?.cancel();
     item.open = true;
 
+    const pad = this.#padBottom(answer);
     const animation = answer.animate(
-      { height: ['0px', `${answer.scrollHeight}px`], opacity: [0, 1] },
+      {
+        height: ['0px', `${answer.scrollHeight}px`],
+        paddingBottom: ['0px', pad],
+        opacity: [0, 1],
+      },
       { duration: this.duration, easing: EASING }
     );
 
+    this.#settle(answer, animation, item, true);
+  }
+
+  /**
+   * Applies the intended `open` state once the animation lands, and only if
+   * this animation is still the current one.
+   *
+   * `cancel()` fires `cancel`, never `finish`, so a listener on `finish` alone
+   * was dropped whenever a second click - or a remeasure - interrupted the
+   * first. A close interrupted that way left `open` true with the inline
+   * height gone, and the row snapped to full height.
+   */
+  #settle(answer, animation, item, open) {
     this.#animations.set(answer, animation);
-    animation.addEventListener('finish', () => this.#animations.delete(answer), { once: true });
+
+    animation.finished
+      .then(() => {
+        if (this.#animations.get(answer) !== animation) return;
+        item.open = open;
+      })
+      .catch(() => {
+        /* cancelled - whichever click replaced it owns the state now */
+      })
+      .finally(() => {
+        if (this.#animations.get(answer) === animation) this.#animations.delete(answer);
+      });
   }
 
   #close(item) {
@@ -179,23 +218,24 @@ class JciHomeFaq extends HTMLElement {
 
     this.#animations.get(answer)?.cancel();
 
+    // Measured, not read off scrollHeight: a cancelled animation can leave an
+    // inline height behind, and collapsing from the wrong start point is what
+    // makes the row kick.
+    const from = answer.getBoundingClientRect().height || answer.scrollHeight;
+    const pad = this.#padBottom(answer);
+
     const animation = answer.animate(
-      { height: [`${answer.scrollHeight}px`, '0px'], opacity: [1, 0] },
+      {
+        height: [`${from}px`, '0px'],
+        paddingBottom: [pad, '0px'],
+        opacity: [1, 0],
+      },
       { duration: this.duration, easing: EASING }
     );
 
-    this.#animations.set(answer, animation);
-
     // `open` comes off only once the answer has finished collapsing, so the
     // row never jumps ahead of the animation.
-    animation.addEventListener(
-      'finish',
-      () => {
-        this.#animations.delete(answer);
-        item.open = false;
-      },
-      { once: true }
-    );
+    this.#settle(answer, animation, item, false);
   }
 }
 

@@ -41,6 +41,11 @@
     --jci-hero-grain-opacity: {{ s.grain_opacity | divided_by: 100.0 }};
     --jci-hero-title-size-desktop: clamp({{ s.title_size_min }}rem, {{ s.title_size_fluid | divided_by: 10.0 }}vw, {{ s.title_size_max }}rem);
     --jci-hero-crossfade: {{ s.crossfade_duration }}ms;
+    {%- comment -%}
+      §1: a section that needs its own content width sets the container token
+      on its root rather than adding a class to the container.
+    {%- endcomment -%}
+    --jci-container-width: min(100%, {{ s.content_width }}px);
   "
 >
   <div class="jci-hero-media" data-jci-hero-media aria-hidden="true">
@@ -367,7 +372,7 @@
   }
 
   .jci-hero-title {
-    max-width: 740px;
+    max-width: 780px;
     margin: 0 0 1.65rem;
     font-family: var(--jci-font-display);
     font-size: var(--jci-hero-title-size);
@@ -746,7 +751,7 @@
     }
 
     .jci-hero-title {
-      max-width: 520px;
+      max-width: 580px;
       margin-block-end: 1.3rem;
     }
 
@@ -849,6 +854,7 @@
     { "type": "url", "id": "fit_card_link", "label": "Link" },
 
     { "type": "header", "content": "Size" },
+    { "type": "range", "id": "content_width", "label": "Content width", "min": 800, "max": 2000, "step": 20, "unit": "px", "default": 1600, "info": "Width of the hero's content column. The section itself stays full-bleed." },
     
     
     { "type": "range", "id": "height", "label": "Height", "min": 50, "max": 120, "step": 1, "unit": "svh", "default": 100, "info": "Share of the viewport height. The section never grows past this, so a tall screen and a short one both fit." },

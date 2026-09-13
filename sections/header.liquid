@@ -521,12 +521,12 @@
     contain: layout style;
     background: transparent;
 
-    /* Maison Cavalle: .header-actions__action is out of this reset. It set
-       `transition: color 0s, border-color 0s` at a higher specificity than
-       the action's own rule, which killed the prototype's colour fade and
-       left its lift untransitioned. The action now owns its transition -
-       styles.css:65. */
-    a,
+    /* Maison Cavalle: .header-actions__action and .menu-list__link are both
+       out of this reset. It set `transition: color 0s, border-color 0s`, and
+       as `.header a` it outranked their own single-class rules - so the
+       colour snapped and the 2px lift had no transition at all, in or out.
+       Each now owns its transition - styles.css:57, 65. */
+    a:not(.menu-list__link),
     .button,
     .button-secondary {
       /* reset style from base.css */
