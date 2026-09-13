@@ -1,0 +1,707 @@
+{% comment %}
+  Maison Cavallé — FAQ questions
+
+  Prototype source: maison-cavalle-main/index.html  → section.faq-section
+                    maison-cavalle-main/styles.css  → .info-list/.info-row
+                                                      (722-727), .faq-*
+                                                      (1003-1042, 1054)
+                    maison-cavalle-main/app.js      → FAQ search filter
+  Reference: MAISON-CAVALLE-SPEC.md §1, §3, §5, §7
+
+  Blocks are flat: a `group` opens a topic, and every `question` after it
+  belongs to that group until the next one. Nested blocks would put the
+  questions a level deeper in the editor for no gain, and the topic nav is
+  built from the groups themselves rather than duplicated as settings.
+
+  Per §0 no letter-spacing or line-height is authored, and the prototype's
+  `font:` shorthands are split. Colours are palette entries or opacity steps
+  off one (§7).
+{% endcomment %}
+
+{%- liquid
+  assign s = section.settings
+
+  comment
+    Walk the blocks once, collecting each group with the questions that follow
+    it, so the nav and the groups render from the same pass.
+  endcomment
+  assign group_count = 0
+  for block in section.blocks
+    if block.type == 'group'
+      assign group_count = group_count | plus: 1
+    endif
+  endfor
+-%}
+
+<section
+  class="jci-faq"
+  {% if s.anchor_id != blank %}id="{{ s.anchor_id }}"{% endif %}
+  data-jci-faq
+  {{ section.shopify_attributes }}
+  style="
+    --jci-faq-bg: {{ s.background_color | default: settings.color_palette.background }};
+    --jci-faq-heading: {{ s.heading_color | default: settings.color_palette.foreground }};
+    --jci-faq-accent: {{ s.accent_color | default: settings.color_palette.color5 }};
+    --jci-faq-index: {{ s.index_color | default: settings.color_palette.color6 }};
+    --jci-faq-body: {% if s.body_color != blank %}{{ s.body_color }}{% else %}rgb(var(--jci-ink-rgb) / 0.74){% endif %};
+    --jci-faq-nav-idle: {% if s.nav_color != blank %}{{ s.nav_color }}{% else %}rgb(var(--jci-ink-rgb) / 0.68){% endif %};
+    --jci-faq-card-bg: {{ s.card_background | default: settings.color_palette.foreground }};
+    --jci-faq-card-text: {{ s.card_text_color | default: settings.color_palette.background }};
+    --jci-faq-card-body: {% if s.card_body_color != blank %}{{ s.card_body_color }}{% else %}rgb(var(--jci-paper-rgb) / 0.72){% endif %};
+    --jci-faq-content-max: {{ s.content_width }}px;
+    --jci-faq-pad-top: {{ s.padding_top }}px;
+    --jci-faq-pad-bottom: {{ s.padding_bottom }}px;
+    --jci-faq-pad-top-mobile: {{ s.padding_top_mobile }}px;
+    --jci-faq-pad-bottom-mobile: {{ s.padding_bottom_mobile }}px;
+    --jci-faq-sticky-top: {{ s.nav_sticky_top }}px;
+    --jci-faq-scroll-margin: {{ s.scroll_margin }}px;
+  "
+>
+  <div class="jci-faq-container">
+    <div class="jci-faq-head">
+      <div class="jci-faq-head-copy">
+        {%- if s.eyebrow != blank -%}
+          <p class="jci-eyebrow jci-faq-eyebrow">{{ s.eyebrow }}</p>
+        {%- endif -%}
+        {%- if s.title != blank -%}
+          <h2 class="jci-faq-title">{{ s.title }}</h2>
+        {%- endif -%}
+      </div>
+
+      {%- if s.show_search -%}
+        <label class="jci-faq-search">
+          <span class="jci-faq-search-label">{{ s.search_label }}</span>
+
+          <svg class="jci-faq-search-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <circle cx="10.8" cy="10.8" r="6.2"></circle>
+            <path d="m16 16 4.2 4.2"></path>
+          </svg>
+
+          <input
+            class="jci-faq-search-input"
+            type="search"
+            placeholder="{{ s.search_placeholder | escape }}"
+            autocomplete="off"
+            data-jci-faq-search
+          >
+
+          <button
+            class="jci-faq-search-clear"
+            type="button"
+            data-jci-faq-clear
+            aria-label="{{ s.search_clear_label | escape }}"
+          >
+            &times;
+          </button>
+        </label>
+      {%- endif -%}
+    </div>
+
+    <div class="jci-faq-layout">
+      {%- if s.show_nav and group_count > 0 -%}
+        <aside class="jci-faq-nav" aria-label="{{ s.nav_label | escape }}">
+          {%- if s.nav_eyebrow != blank -%}
+            <p class="jci-eyebrow jci-faq-nav-eyebrow">{{ s.nav_eyebrow }}</p>
+          {%- endif -%}
+
+          <nav class="jci-faq-nav-list">
+            {%- assign nav_index = 0 -%}
+            {%- for block in section.blocks -%}
+              {%- if block.type != 'group' -%}{%- continue -%}{%- endif -%}
+              {%- assign nav_index = nav_index | plus: 1 -%}
+              {%- assign group_anchor = block.settings.anchor | default: block.id -%}
+              <a class="jci-faq-nav-link" href="#{{ group_anchor }}" data-jci-faq-anchor>
+                <span class="jci-faq-nav-link-index">
+                  {{- nav_index | prepend: '0' | slice: -2, 2 -}}
+                </span>
+                <span class="jci-faq-nav-link-label">{{ block.settings.topic }}</span>
+                {%- render 'jci-action-arrow', direction: 'down-right', class: 'jci-faq-nav-link-arrow' -%}
+              </a>
+            {%- endfor -%}
+          </nav>
+
+          {%- if s.card_title != blank or s.card_text != blank -%}
+            <div class="jci-faq-contact-card">
+              {%- if s.card_eyebrow != blank -%}
+                <p class="jci-eyebrow jci-faq-contact-eyebrow">{{ s.card_eyebrow }}</p>
+              {%- endif -%}
+              {%- if s.card_title != blank -%}
+                <h3 class="jci-faq-contact-title">{{ s.card_title }}</h3>
+              {%- endif -%}
+              {%- if s.card_text != blank -%}
+                <p class="jci-faq-contact-text">{{ s.card_text }}</p>
+              {%- endif -%}
+              {%- if s.card_link_label != blank -%}
+                <a class="jci-text-link jci-faq-contact-link" href="{{ s.card_link | default: '#' }}">
+                  {{- s.card_link_label }}
+                  {%- render 'jci-action-arrow' -%}
+                </a>
+              {%- endif -%}
+            </div>
+          {%- endif -%}
+        </aside>
+      {%- endif -%}
+
+      <div class="jci-faq-groups">
+        {%- comment -%}
+          The blocks are flat, so each group takes the questions that follow it
+          and stops at the next group. Nesting the loop this way keeps every
+          tag opened and closed in one place - streaming an opening tag in one
+          iteration and its closing tag in another reads as unbalanced markup
+          and is a pain to change later.
+        {%- endcomment -%}
+        {%- assign group_index = 0 -%}
+        {%- for block in section.blocks -%}
+          {%- if block.type != 'group' -%}{%- continue -%}{%- endif -%}
+
+          {%- liquid
+            assign group_start = forloop.index0
+            assign group_index = group_index | plus: 1
+            assign group_anchor = block.settings.anchor | default: block.id
+          -%}
+
+          <section
+            class="jci-faq-group"
+            id="{{ group_anchor }}"
+            data-jci-faq-group
+            {{ block.shopify_attributes }}
+          >
+            <div class="jci-faq-group-heading">
+              <span class="jci-faq-group-index">
+                {{- group_index | prepend: '0' | slice: -2, 2 -}}
+              </span>
+              <div class="jci-faq-group-heading-copy">
+                {%- if block.settings.topic != blank -%}
+                  <p class="jci-eyebrow jci-faq-group-eyebrow">{{ block.settings.topic }}</p>
+                {%- endif -%}
+                {%- if block.settings.title != blank -%}
+                  <h3 class="jci-faq-group-title">{{ block.settings.title }}</h3>
+                {%- endif -%}
+              </div>
+            </div>
+
+            <div class="jci-faq-list">
+              {%- assign question_index = 0 -%}
+              {%- for question in section.blocks -%}
+                {%- if forloop.index0 <= group_start -%}{%- continue -%}{%- endif -%}
+                {%- if question.type == 'group' -%}{%- break -%}{%- endif -%}
+                {%- if question.type != 'question' -%}{%- continue -%}{%- endif -%}
+
+                {%- liquid
+                  assign question_index = question_index | plus: 1
+                  assign answer = question.settings.answer
+                  assign answer = answer | replace: '<p>', '<p class="jci-faq-item-answer-text">'
+                  assign answer = answer | replace: '<a ', '<a class="jci-faq-item-answer-link" '
+                -%}
+
+                <details class="jci-faq-item" data-jci-faq-item {{ question.shopify_attributes }}>
+                  <summary class="jci-faq-item-summary">
+                    <span class="jci-faq-item-index">
+                      {{- question.settings.index | default: question_index | prepend: '0' | slice: -2, 2 -}}
+                    </span>
+                    <h4 class="jci-faq-item-question">{{ question.settings.question }}</h4>
+                    {%- comment -%}
+                      styles.css:1036-1037 swaps the glyph outright, + to -.
+                      Both are rendered and one is shown, so no CSS `content`
+                      is needed and the entities stay in the markup.
+                    {%- endcomment -%}
+                    <b class="jci-faq-item-toggle" aria-hidden="true">
+                      <span class="jci-faq-item-toggle-plus">&#65291;</span>
+                      <span class="jci-faq-item-toggle-minus">&#8722;</span>
+                    </b>
+                  </summary>
+                  <div class="jci-faq-item-answer">{{ answer }}</div>
+                </details>
+              {%- endfor -%}
+            </div>
+          </section>
+        {%- endfor -%}
+      </div>
+    </div>
+
+    {%- comment -%}
+      Filled in by jci-faq.js from the search term, so the copy stays a
+      setting rather than a string in the script.
+    {%- endcomment -%}
+    <p class="jci-faq-empty" data-jci-faq-empty data-jci-faq-empty-template="{{ s.empty_message | escape }}" hidden></p>
+  </div>
+</section>
+
+<script src="{{ 'jci-faq.js' | asset_url }}" type="module"></script>
+
+{% stylesheet %}
+  /* styles.css:1003 */
+  .jci-faq {
+    background: var(--jci-faq-bg);
+  }
+
+  .jci-faq-container {
+    padding-block: var(--jci-faq-pad-top) var(--jci-faq-pad-bottom);
+  }
+
+  /* styles.css:1004-1005 */
+  .jci-faq-head {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 2rem;
+    max-width: var(--jci-faq-content-max);
+    margin: 0 auto 3.5rem;
+  }
+
+  .jci-faq-eyebrow {
+    color: var(--jci-faq-accent);
+  }
+
+  .jci-faq-title {
+    margin: 0.8rem 0 0;
+    color: var(--jci-faq-heading);
+    font-family: var(--jci-font-display);
+    font-size: var(--jci-section-title-size);
+    font-weight: 500;
+  }
+
+  /* styles.css:1006-1011 */
+  .jci-faq-search {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    width: min(100%, 350px);
+    padding-block: 0.7rem;
+    border-bottom: 1px solid var(--jci-faq-heading);
+  }
+
+  .jci-faq-search-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .jci-faq-search-icon {
+    width: 18px;
+    height: 18px;
+    flex: 0 0 18px;
+    fill: none;
+    stroke: var(--jci-faq-accent);
+    stroke-width: 1.4;
+  }
+
+  .jci-faq-search-input {
+    width: 100%;
+    border: 0;
+    outline: 0;
+    color: var(--jci-faq-heading);
+    background: transparent;
+    font-family: var(--jci-font-sans);
+    font-size: 12px;
+  }
+
+  .jci-faq-search-input::placeholder {
+    color: rgb(var(--jci-ink-rgb) / 0.52);
+  }
+
+  /* The clear button only appears once there is something to clear. */
+  .jci-faq-search-clear {
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    border: 0;
+    color: var(--jci-faq-accent);
+    background: transparent;
+    font-size: 20px;
+    opacity: 0;
+    pointer-events: none;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+
+  .jci-faq-search:focus-within .jci-faq-search-clear,
+  .jci-faq-search-input:not(:placeholder-shown) + .jci-faq-search-clear {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* styles.css:1012-1013 */
+  .jci-faq-layout {
+    display: grid;
+    grid-template-columns: minmax(190px, 0.32fr) minmax(0, 1fr);
+    gap: clamp(2.5rem, 7vw, 8rem);
+    max-width: var(--jci-faq-content-max);
+    margin: 0 auto;
+  }
+
+  .jci-faq-groups,
+  .jci-faq-group,
+  .jci-faq-list,
+  .jci-faq-item,
+  .jci-faq-item-answer {
+    min-width: 0;
+  }
+
+  /* styles.css:1014-1020 */
+  .jci-faq-nav {
+    position: sticky;
+    top: var(--jci-faq-sticky-top);
+    align-self: start;
+  }
+
+  .jci-faq-nav-eyebrow {
+    margin-block-end: 1rem;
+    color: var(--jci-faq-accent);
+  }
+
+  .jci-faq-nav-list {
+    display: flex;
+    flex-direction: column;
+    border-top: 1px solid var(--jci-line);
+  }
+
+  .jci-faq-nav-link {
+    display: grid;
+    grid-template-columns: 26px 1fr auto;
+    gap: 0.5rem;
+    align-items: center;
+    padding-block: 0.85rem;
+    border-bottom: 1px solid var(--jci-line);
+    color: var(--jci-faq-nav-idle);
+    font-family: var(--jci-font-label);
+    font-size: 14px;
+    text-decoration: none;
+    text-transform: uppercase;
+    transition:
+      color 0.25s,
+      padding 0.25s var(--jci-ease);
+  }
+
+  .jci-faq-nav-link-index {
+    color: var(--jci-faq-index);
+    font-size: 12px;
+  }
+
+  .jci-faq-nav-link-arrow {
+    width: 14px;
+    height: 14px;
+  }
+
+  .jci-faq-nav-link:hover,
+  .jci-faq-nav-link:focus-visible {
+    padding-inline-start: 0.45rem;
+    color: var(--jci-faq-heading);
+  }
+
+  /* styles.css:1021-1025 */
+  .jci-faq-contact-card {
+    margin-block-start: 3rem;
+    padding: 1.25rem;
+    color: var(--jci-faq-card-text);
+    background: var(--jci-faq-card-bg);
+  }
+
+  .jci-faq-contact-eyebrow {
+    color: var(--jci-faq-accent);
+  }
+
+  .jci-faq-contact-title {
+    margin: 0.8rem 0 0.55rem;
+    font-family: var(--jci-font-display);
+    font-size: 25px;
+    font-weight: 400;
+  }
+
+  .jci-faq-contact-text {
+    margin: 0;
+    color: var(--jci-faq-card-body);
+    font-family: var(--jci-font-sans);
+    font-size: var(--jci-subtitle-size);
+  }
+
+  .jci-faq-contact-link {
+    margin-block-start: 1.1rem;
+  }
+
+  /* styles.css:1026-1030 */
+  .jci-faq-group {
+    margin-block-end: 4.5rem;
+    scroll-margin-block-start: var(--jci-faq-scroll-margin);
+  }
+
+  .jci-faq-group-heading {
+    display: grid;
+    grid-template-columns: 45px 1fr;
+    gap: 1rem;
+    align-items: start;
+    margin-block-end: 1.1rem;
+  }
+
+  .jci-faq-group-index {
+    color: var(--jci-faq-index);
+    font-family: var(--jci-font-label);
+    font-size: 14px;
+  }
+
+  .jci-faq-group-eyebrow {
+    margin-block-end: 0.55rem;
+    color: var(--jci-faq-accent);
+  }
+
+  .jci-faq-group-title {
+    margin: 0;
+    color: var(--jci-faq-heading);
+    font-family: var(--jci-font-display);
+    font-size: clamp(28px, 3.4vw, 48px);
+    font-weight: 500;
+  }
+
+  /* styles.css:1031-1039 */
+  .jci-faq-list {
+    border-top: 1px solid var(--jci-faq-heading);
+  }
+
+  .jci-faq-item {
+    padding: 0;
+    border-bottom: 1px solid var(--jci-line);
+  }
+
+  .jci-faq-item[hidden],
+  .jci-faq-group[hidden] {
+    display: none;
+  }
+
+  .jci-faq-item-summary {
+    display: grid;
+    grid-template-columns: 34px 1fr auto;
+    gap: 1rem;
+    align-items: center;
+    padding-block: 1.2rem;
+    list-style: none;
+    cursor: pointer;
+  }
+
+  .jci-faq-item-summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .jci-faq-item-index {
+    color: rgb(var(--jci-ink-rgb) / 0.46);
+    font-family: var(--jci-font-label);
+    font-size: 12px;
+  }
+
+  .jci-faq-item-question {
+    margin: 0;
+    color: var(--jci-faq-heading);
+    font-family: var(--jci-font-display);
+    font-size: 20px;
+    font-weight: 500;
+  }
+
+  .jci-faq-item-toggle {
+    color: var(--jci-faq-accent);
+    font-family: var(--jci-font-sans);
+    font-size: 19px;
+    font-weight: 400;
+  }
+
+  .jci-faq-item-toggle-minus,
+  .jci-faq-item[open] .jci-faq-item-toggle-plus {
+    display: none;
+  }
+
+  .jci-faq-item[open] .jci-faq-item-toggle-minus {
+    display: inline;
+  }
+
+  /* styles.css:1040-1041 */
+  .jci-faq-item-answer {
+    display: grid;
+    gap: 1rem;
+    padding: 0 0 1.35rem;
+  }
+
+  .jci-faq-item-answer-text {
+    width: 100%;
+    min-width: 0;
+    max-width: 720px;
+    margin: 0;
+    color: var(--jci-faq-body);
+    font-family: var(--jci-font-sans);
+    font-size: var(--jci-subtitle-size);
+  }
+
+  .jci-faq-item-answer-link {
+    color: inherit;
+    text-decoration: underline;
+  }
+
+  /* styles.css:1042 */
+  .jci-faq-empty {
+    max-width: var(--jci-faq-content-max);
+    margin: 0 auto;
+    padding-block: 2rem;
+    color: var(--jci-faq-accent);
+    font-family: var(--jci-font-label);
+    font-size: 14px;
+    text-transform: uppercase;
+  }
+
+  /* styles.css:1054 */
+  .jci-faq-nav-link:focus-visible,
+  .jci-faq-item-summary:focus-visible,
+  .jci-faq-search-input:focus-visible,
+  .jci-faq-search-clear:focus-visible {
+    outline: 2px solid var(--jci-faq-index);
+    outline-offset: 4px;
+  }
+
+  /* styles.css:@680 */
+  @media screen and (max-width: 680px) {
+    .jci-faq-container {
+      padding-block: var(--jci-faq-pad-top-mobile) var(--jci-faq-pad-bottom-mobile);
+    }
+
+    .jci-faq-head {
+      display: block;
+      margin-block-end: 2.4rem;
+    }
+
+    .jci-faq-title {
+      margin-block-end: 1.7rem;
+    }
+
+    .jci-faq-search {
+      width: 100%;
+    }
+
+    .jci-faq-layout {
+      display: block;
+    }
+
+    .jci-faq-nav {
+      position: static;
+      margin-block-end: 3rem;
+    }
+
+    .jci-faq-nav-list {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0 0.8rem;
+    }
+
+    .jci-faq-contact-card {
+      margin-block-start: 2rem;
+    }
+
+    .jci-faq-group {
+      margin-block-end: 3.5rem;
+    }
+
+    .jci-faq-group-heading {
+      grid-template-columns: 30px 1fr;
+    }
+
+    .jci-faq-item-summary {
+      grid-template-columns: 25px 1fr auto;
+      gap: 0.7rem;
+    }
+
+    .jci-faq-item-question {
+      font-size: 18px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .jci-faq-nav-link,
+    .jci-faq-search-clear {
+      transition: none;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "FAQ questions",
+  "tag": "section",
+  "class": "jci-faq-section",
+  "blocks": [
+    {
+      "type": "group",
+      "name": "Topic",
+      "settings": [
+        { "type": "text", "id": "topic", "label": "Topic", "default": "About the Maison" },
+        { "type": "text", "id": "title", "label": "Title", "default": "A life shaped by horses." },
+        { "type": "text", "id": "anchor", "label": "Anchor ID", "info": "Used by the topic nav link. Leave empty to generate one." }
+      ]
+    },
+    {
+      "type": "question",
+      "name": "Question",
+      "settings": [
+        { "type": "text", "id": "index", "label": "Number", "info": "Leave empty to number automatically within the topic." },
+        { "type": "text", "id": "question", "label": "Question", "default": "What is Maison Cavallé?" },
+        { "type": "richtext", "id": "answer", "label": "Answer", "default": "<p>An Australian boutique equestrian apparel brand born from more than fifty years of life with horses.</p>" }
+      ]
+    }
+  ],
+  "settings": [
+    { "type": "header", "content": "Header" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Find your answer" },
+    { "type": "text", "id": "title", "label": "Title", "default": "Questions, considered." },
+
+    { "type": "header", "content": "Search" },
+    { "type": "checkbox", "id": "show_search", "label": "Show search", "default": true },
+    { "type": "text", "id": "search_label", "label": "Search label for screen readers", "default": "Search frequently asked questions" },
+    { "type": "text", "id": "search_placeholder", "label": "Placeholder", "default": "Search fit, delivery or returns" },
+    { "type": "text", "id": "search_clear_label", "label": "Clear button label", "default": "Clear FAQ search" },
+    { "type": "text", "id": "empty_message", "label": "No results message", "default": "No answers for “[query]”. Try “size”, “shipping” or “returns”.", "info": "[query] is replaced with what was typed." },
+
+    { "type": "header", "content": "Topic nav" },
+    { "type": "checkbox", "id": "show_nav", "label": "Show the topic nav", "default": true },
+    { "type": "text", "id": "nav_eyebrow", "label": "Nav eyebrow", "default": "Browse by topic" },
+    { "type": "text", "id": "nav_label", "label": "Nav label for screen readers", "default": "FAQ sections" },
+    { "type": "range", "id": "nav_sticky_top", "label": "Nav sticky offset", "min": 0, "max": 200, "step": 5, "unit": "px", "default": 110 },
+    { "type": "range", "id": "scroll_margin", "label": "Topic scroll offset", "min": 0, "max": 200, "step": 5, "unit": "px", "default": 120 },
+
+    { "type": "header", "content": "Contact card" },
+    { "type": "text", "id": "card_eyebrow", "label": "Eyebrow", "default": "Still wondering?" },
+    { "type": "text", "id": "card_title", "label": "Title", "default": "Ask the Maison." },
+    { "type": "textarea", "id": "card_text", "label": "Body", "default": "We aim to respond to enquiries within 1–2 business days." },
+    { "type": "text", "id": "card_link_label", "label": "Link label", "default": "Contact us" },
+    { "type": "url", "id": "card_link", "label": "Link" },
+
+    { "type": "header", "content": "Colors", "info": "Left empty, each of these follows the theme colour palette." },
+    { "type": "color", "id": "background_color", "label": "Background" },
+    { "type": "color", "id": "heading_color", "label": "Heading" },
+    { "type": "color", "id": "accent_color", "label": "Accent" },
+    { "type": "color", "id": "index_color", "label": "Numbers" },
+    { "type": "color", "id": "body_color", "label": "Answer text" },
+    { "type": "color", "id": "nav_color", "label": "Nav link" },
+    { "type": "color", "id": "card_background", "label": "Card background" },
+    { "type": "color", "id": "card_text_color", "label": "Card heading" },
+    { "type": "color", "id": "card_body_color", "label": "Card body" },
+
+    { "type": "header", "content": "Layout" },
+    { "type": "range", "id": "content_width", "label": "Content width", "min": 800, "max": 1600, "step": 20, "unit": "px", "default": 1280 },
+    { "type": "range", "id": "padding_top", "label": "Padding top", "min": 0, "max": 240, "step": 4, "unit": "px", "default": 136 },
+    { "type": "range", "id": "padding_bottom", "label": "Padding bottom", "min": 0, "max": 240, "step": 4, "unit": "px", "default": 136 },
+    { "type": "range", "id": "padding_top_mobile", "label": "Padding top on mobile", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 72 },
+    { "type": "range", "id": "padding_bottom_mobile", "label": "Padding bottom on mobile", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 72 },
+
+    { "type": "header", "content": "Anchor" },
+    { "type": "text", "id": "anchor_id", "label": "Anchor ID", "default": "faq-content" }
+  ],
+  "presets": [
+    {
+      "name": "FAQ questions",
+      "blocks": [
+        { "type": "group", "settings": { "topic": "About the Maison", "title": "A life shaped by horses.", "anchor": "faq-about" } },
+        { "type": "question", "settings": { "question": "What is Maison Cavallé?", "answer": "<p>Maison Cavallé is an Australian boutique equestrian apparel brand born from more than fifty years of life with horses.</p>" } },
+        { "type": "group", "settings": { "topic": "Fit & care", "title": "Keep good pieces well.", "anchor": "faq-fit-care" } },
+        { "type": "question", "settings": { "question": "How do I choose the right size?", "answer": "<p>Please refer to the individual size guide provided on each product page before ordering.</p>" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

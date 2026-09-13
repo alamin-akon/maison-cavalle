@@ -9,51 +9,6 @@
  */
 {
   "sections": {
-    "main": {
-      "type": "main-page",
-      "blocks": {
-        "heading": {
-          "type": "text",
-          "name": "t:names.title",
-          "settings": {
-            "text": "<h1>{{ closest.page.title }}</h1>",
-            "width": "100%",
-            "max_width": "normal",
-            "alignment": "left",
-            "type_preset": "h2",
-            "font": "var(--font-body--family)",
-            "line_height": "normal",
-            "letter_spacing": "normal",
-            "case": "none",
-            "wrap": "pretty",
-            "background": false,
-            "background_color": "#00000026",
-            "corner_radius": 0,
-            "padding-block-start": 0,
-            "padding-block-end": 0,
-            "padding-inline-start": 0,
-            "padding-inline-end": 0
-          },
-          "blocks": {}
-        },
-        "page-content": {
-          "type": "page-content",
-          "settings": {},
-          "blocks": {}
-        }
-      },
-      "block_order": [
-        "heading",
-        "page-content"
-      ],
-      "settings": {
-        "content_direction": "column",
-        "gap": 32,
-        "background_color": "{{ settings.color_palette.background }}",
-        "padding-block-start": 40,
-        "padding-block-end": 80
-      }
-    },
     "jci_faq_hero": {
       "type": "jci-faq-hero",
       "blocks": {
@@ -102,6 +57,11 @@
         "image_brightness": 82,
         "enable_tilt": true,
         "tilt_strength": 6,
+        "background_color": "",
+        "text_color": "",
+        "accent_color": "",
+        "body_color": "",
+        "meta_color": "",
         "min_height": 540,
         "padding_top": 96,
         "padding_bottom": 96,
@@ -109,10 +69,250 @@
         "padding_bottom_mobile": 64,
         "anchor_id": "faq-hero"
       }
+    },
+    "main": {
+      "type": "main-page",
+      "blocks": {
+        "heading": {
+          "type": "text",
+          "name": "t:names.title",
+          "settings": {
+            "text": "<h1>{{ closest.page.title }}</h1>",
+            "width": "100%",
+            "max_width": "normal",
+            "alignment": "left",
+            "type_preset": "h2",
+            "font": "var(--font-body--family)",
+            "font_size": "1rem",
+            "line_height": "normal",
+            "letter_spacing": "normal",
+            "case": "none",
+            "wrap": "pretty",
+            "text_color": "",
+            "background": false,
+            "background_color": "#00000026",
+            "corner_radius": 0,
+            "padding-block-start": 0,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {}
+        },
+        "page-content": {
+          "type": "page-content",
+          "settings": {
+            "text_color": ""
+          },
+          "blocks": {}
+        }
+      },
+      "block_order": [
+        "heading",
+        "page-content"
+      ],
+      "disabled": true,
+      "settings": {
+        "content_direction": "column",
+        "gap": 32,
+        "background_color": "{{ settings.color_palette.background }}",
+        "padding-block-start": 40,
+        "padding-block-end": 80
+      }
+    },
+    "jci_faq": {
+      "type": "jci-faq",
+      "blocks": {
+        "g1": {
+          "type": "group",
+          "settings": {
+            "topic": "About the Maison",
+            "title": "A life shaped by horses.",
+            "anchor": "faq-about"
+          }
+        },
+        "g1q1": {
+          "type": "question",
+          "settings": {
+            "question": "What is Maison Cavallé?",
+            "answer": "<p>Maison Cavallé is an Australian boutique equestrian apparel brand born from more than fifty years of life with horses. Our collections combine genuine equestrian heritage with considered design, quality fabrics and timeless style — creating pieces designed to be worn and loved both in and beyond the saddle.</p>"
+          }
+        },
+        "g1q2": {
+          "type": "question",
+          "settings": {
+            "question": "What does Maison Cavallé mean?",
+            "answer": "<p>The name is deeply personal to our story. MC represents the initials of our founder, Miriam Claire, while Maison Cavallé reflects the idea of a House of Horse — a home for equestrian clothing shaped by heritage, quality and a lifelong connection with horses.</p>"
+          }
+        },
+        "g1q3": {
+          "type": "question",
+          "settings": {
+            "question": "Where is Maison Cavallé based?",
+            "answer": "<p>Maison Cavallé is based in Queensland, Australia.</p>"
+          }
+        },
+        "g2": {
+          "type": "group",
+          "settings": {
+            "topic": "Fit &amp; care",
+            "title": "Keep good pieces well.",
+            "anchor": "faq-fit-care"
+          }
+        },
+        "g2q1": {
+          "type": "question",
+          "settings": {
+            "question": "How do I choose the right size?",
+            "answer": "<p>Please refer to the individual size guide provided on each product page before ordering. As the fit may vary slightly between styles, we recommend checking the measurements for the particular garment you are considering. If you’re unsure, please contact us before ordering and we’ll be happy to help.</p>"
+          }
+        },
+        "g2q2": {
+          "type": "question",
+          "settings": {
+            "question": "How should I care for my Maison Cavallé pieces?",
+            "answer": "<p>Each garment has been selected with quality and longevity in mind. Always follow the care instructions on the garment label. Where appropriate, we recommend gentle washing, avoiding harsh detergents and allowing garments to air dry to help preserve their shape, colour and finish.</p>"
+          }
+        },
+        "g2q3": {
+          "type": "question",
+          "settings": {
+            "question": "Will sold-out items be restocked?",
+            "answer": "<p>Maison Cavallé collections may be produced in considered quantities rather than continuously mass-produced. Selected pieces may be restocked depending on demand and availability. We recommend joining our mailing list and following Maison Cavallé on Instagram for restock announcements and new collection releases.</p>"
+          }
+        },
+        "g3": {
+          "type": "group",
+          "settings": {
+            "topic": "Orders &amp; delivery",
+            "title": "From the Maison to your door.",
+            "anchor": "faq-ordering"
+          }
+        },
+        "g3q1": {
+          "type": "question",
+          "settings": {
+            "question": "Can I change or cancel my order?",
+            "answer": "<p>We begin preparing orders as quickly as possible. If you need to make a change, please contact us immediately after placing your order. While we cannot guarantee changes once an order has entered processing, we will always do our best to assist.</p>"
+          }
+        },
+        "g3q2": {
+          "type": "question",
+          "settings": {
+            "question": "Do you ship throughout Australia?",
+            "answer": "<p>Yes. Maison Cavallé ships throughout Australia.</p>"
+          }
+        },
+        "g3q3": {
+          "type": "question",
+          "settings": {
+            "question": "Will Maison Cavallé ship internationally?",
+            "answer": "<p>International shipping availability and destinations will be displayed at checkout. Please note that international customers may be responsible for any applicable duties, taxes or customs charges imposed by their country.</p>"
+          }
+        },
+        "g3q4": {
+          "type": "question",
+          "settings": {
+            "question": "How can I contact Maison Cavallé?",
+            "answer": "<p>For assistance with an order, sizing or anything else Maison Cavallé, please contact us through our website. We would be delighted to help.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "g1",
+        "g1q1",
+        "g1q2",
+        "g1q3",
+        "g2",
+        "g2q1",
+        "g2q2",
+        "g2q3",
+        "g3",
+        "g3q1",
+        "g3q2",
+        "g3q3",
+        "g3q4"
+      ],
+      "settings": {
+        "eyebrow": "Find your answer",
+        "title": "Questions, considered.",
+        "show_search": true,
+        "search_label": "Search frequently asked questions",
+        "search_placeholder": "Search fit, delivery or returns",
+        "search_clear_label": "Clear FAQ search",
+        "empty_message": "No answers for “[query]”. Try “size”, “shipping” or “returns”.",
+        "show_nav": true,
+        "nav_eyebrow": "Browse by topic",
+        "nav_label": "FAQ sections",
+        "nav_sticky_top": 110,
+        "scroll_margin": 120,
+        "card_eyebrow": "Still wondering?",
+        "card_title": "Ask the Maison.",
+        "card_text": "We aim to respond to enquiries within 1–2 business days.",
+        "card_link_label": "Contact us",
+        "card_link": "/pages/contact",
+        "content_width": 1280,
+        "padding_top": 136,
+        "padding_bottom": 136,
+        "padding_top_mobile": 72,
+        "padding_bottom_mobile": 72,
+        "anchor_id": "faq-content"
+      }
+    },
+    "jci_faq_assurance": {
+      "type": "jci-faq-assurance",
+      "blocks": {
+        "c1": {
+          "type": "card",
+          "settings": {
+            "index": "01",
+            "title": "Shipping & returns",
+            "text": "Simple delivery, clear next steps.",
+            "link": "/pages/shipping"
+          }
+        },
+        "c2": {
+          "type": "card",
+          "settings": {
+            "index": "02",
+            "title": "Find your fit",
+            "text": "Measurements and guidance, made easy.",
+            "link": "/pages/size-guide"
+          }
+        },
+        "c3": {
+          "type": "card",
+          "settings": {
+            "index": "03",
+            "title": "Ask the Maison",
+            "text": "Personal help when you need it.",
+            "link": "/pages/contact"
+          }
+        }
+      },
+      "block_order": [
+        "c1",
+        "c2",
+        "c3"
+      ],
+      "settings": {
+        "eyebrow": "The Maison promise",
+        "title": "Small details. A smoother day.",
+        "card_min_height": 180,
+        "card_min_height_mobile": 145,
+        "hover_lift": 5,
+        "padding_top": 136,
+        "padding_bottom": 136,
+        "padding_top_mobile": 72,
+        "padding_bottom_mobile": 72,
+        "anchor_id": "faq-assurance"
+      }
     }
   },
   "order": [
     "jci_faq_hero",
+    "jci_faq",
+    "jci_faq_assurance",
     "main"
   ]
 }
