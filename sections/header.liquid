@@ -1020,6 +1020,12 @@
     padding: 0.4rem 0;
     color: var(--button-color);
     cursor: pointer;
+
+    /* base.css:942 gives .button-unstyled `overflow: hidden`, which clipped
+       the hover pill flat on both sides - the pill sits 0.35rem outside the
+       button. Only search and bag carry that class, which is why the account
+       action was the one that looked right. */
+    overflow: visible;
     transition:
       color 0.3s var(--jci-ease),
       transform 0.35s var(--jci-ease);

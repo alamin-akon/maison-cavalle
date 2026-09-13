@@ -193,23 +193,7 @@
     }
   }
 
-.account-button {
-    --hover-opacity: 0;
-    --clamped-avatar-size: clamp( 24px, var(--shopify-account-signed-in-avatar-size), 32px );
-    appearance: none;
-    border: 0px solid transparent;
-    background-color: transparent;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: currentColor;
-    text-decoration: none;
-    cursor: pointer;
-    min-width: 0 !important;
-    min-height: 0 !important;
-}
+
 
 
   .account-button {
@@ -228,7 +212,33 @@
     -webkit-font-smoothing: antialiased;
   }
 
+  /* Maison Cavalle: <shopify-store> is a data-only element with no visuals,
+     but as the first child of an inline-flex action it still counts as a flex
+     item - so the row's 0.48rem gap was being spent on nothing and pushed the
+     account's icon and label off-centre inside its pill. */
+  .account-button shopify-store {
+    display: none;
+  }
+
+  /* The icon and label are slotted into <shopify-account>, so the action's
+     own `gap` never falls between them - it applies between shopify-store and
+     shopify-account instead. The slotted label carries the gap itself. */
+  .account-button__text {
+    margin-inline-start: 0.48rem;
+  }
+
   shopify-account {
+    /* The component sizes its internal button from this token, defaulting to
+       calc(clamp(24px, ..., 32px) * 1.57) - up to ~50px, which made the
+       account action twice the height of search and bag and gave it a much
+       taller hover pill. Its own min-height lives in the component's shadow
+       DOM, where a theme rule cannot reach it; this custom property can,
+       because custom properties inherit through the shadow boundary. */
+    --shopify-account-avatar-size: 17px;
+
+    display: flex;
+    align-items: center;
+
     --shopify-account-font-heading: var(--font-heading--family);
     --shopify-account-font-heading-weight: var(--font-heading--weight);
     --shopify-account-font-body: var(--font-body--family);
