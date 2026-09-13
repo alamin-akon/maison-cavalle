@@ -71,6 +71,8 @@
         "fit_card_title": "<p>Choose your <em>usual size.</em></p>",
         "fit_card_link_label": "View the guide",
         "fit_card_link": "",
+        "height": 100,
+        "height_mobile": 100,
         "title_size_min": 4,
         "title_size_max": 9,
         "title_size_fluid": 80,
@@ -85,6 +87,7 @@
         "video_brightness": 86,
         "grain_opacity": 15,
         "autoplay": true,
+        "slide_interval": 7,
         "crossfade_duration": 1200,
         "enable_pointer_depth": true,
         "enable_scroll_depth": true
@@ -213,6 +216,7 @@
         "image_index": 0,
         "subtitle_metafield": "custom.subtitle",
         "swatch_option": "Color",
+        "swatch_metafield": "custom.colour_swatches",
         "show_quick_add": true,
         "quick_add_label": "Quick add",
         "badge_source": "sale",
@@ -613,6 +617,153 @@
         "anchor_id": "home-faq"
       }
     },
+    "jci_social_media_Pj7UYJ": {
+      "type": "jci-social-media",
+      "blocks": {
+        "card_YzqeRQ": {
+          "type": "card",
+          "settings": {
+            "video_asset": "jci-social-01.mp4",
+            "poster_asset": "jci-editorial-field-note.webp",
+            "label": "Instagram / 01 · Film",
+            "link": "",
+            "aria_label": "Instagram video highlight",
+            "shape": "tall"
+          }
+        },
+        "card_njdA8z": {
+          "type": "card",
+          "settings": {
+            "video_asset": "jci-social-02.mp4",
+            "poster_asset": "jci-lux-jacket-front-horse.webp",
+            "label": "Facebook / 02 · Film",
+            "link": "",
+            "aria_label": "Facebook video highlight",
+            "shape": "wide"
+          }
+        },
+        "card_YMwTqG": {
+          "type": "card",
+          "settings": {
+            "video_asset": "jci-social-03.mp4",
+            "poster_asset": "jci-faq-hero-white-horse.webp",
+            "label": "Instagram / 03 · Film",
+            "link": "",
+            "aria_label": "Instagram video highlight",
+            "shape": "short"
+          }
+        },
+        "card_P96iPr": {
+          "type": "card",
+          "settings": {
+            "video_asset": "jci-social-04.mp4",
+            "poster_asset": "jci-editorial-field-note.webp",
+            "label": "Instagram / 04 · Film",
+            "link": "",
+            "aria_label": "Instagram video highlight",
+            "shape": "tall"
+          }
+        },
+        "card_nTcBRi": {
+          "type": "card",
+          "settings": {
+            "video_asset": "jci-social-05.mp4",
+            "poster_asset": "jci-lux-jacket-front-horse.webp",
+            "label": "Facebook / 05 · Film",
+            "link": "",
+            "aria_label": "Facebook video highlight",
+            "shape": "wide"
+          }
+        },
+        "card_MnGPPL": {
+          "type": "card",
+          "settings": {
+            "video_asset": "jci-social-06.mp4",
+            "poster_asset": "jci-faq-hero-white-horse.webp",
+            "label": "Instagram / 06 · Film",
+            "link": "",
+            "aria_label": "Instagram video highlight",
+            "shape": "short"
+          }
+        },
+        "card_9MWphj": {
+          "type": "card",
+          "settings": {
+            "video_asset": "jci-social-07.mp4",
+            "poster_asset": "jci-editorial-field-note.webp",
+            "label": "Instagram / 07 · Film",
+            "link": "",
+            "aria_label": "Instagram video highlight",
+            "shape": "tall"
+          }
+        },
+        "card_QpgrXT": {
+          "type": "card",
+          "settings": {
+            "video_asset": "jci-social-08.mp4",
+            "poster_asset": "jci-faq-hero-white-horse.webp",
+            "label": "Facebook / 08 · Film",
+            "link": "",
+            "aria_label": "Facebook video highlight",
+            "shape": "wide"
+          }
+        },
+        "card_a6JeBN": {
+          "type": "card",
+          "settings": {
+            "video_asset": "jci-social-09.mp4",
+            "poster_asset": "jci-editorial-field-note.webp",
+            "label": "Instagram / 09 · Film",
+            "link": "",
+            "aria_label": "Instagram video highlight",
+            "shape": "short"
+          }
+        }
+      },
+      "block_order": [
+        "card_YzqeRQ",
+        "card_njdA8z",
+        "card_YMwTqG",
+        "card_P96iPr",
+        "card_nTcBRi",
+        "card_MnGPPL",
+        "card_9MWphj",
+        "card_QpgrXT",
+        "card_a6JeBN"
+      ],
+      "name": "Social media",
+      "settings": {
+        "eyebrow": "The Maison / In the field",
+        "heading": "Around the",
+        "heading_accent": "Maison.",
+        "intro": "Quiet moments from the stable, the field and the people who make this world feel well lived.",
+        "instagram_label": "Instagram",
+        "instagram_url": "",
+        "facebook_label": "Facebook",
+        "facebook_url": "",
+        "links_label": "Follow Maison Cavallé",
+        "marquee_label": "Maison Cavallé social media highlights",
+        "background_color": "",
+        "text_color": "",
+        "eyebrow_color": "",
+        "accent_color": "",
+        "copy_color": "#62665d",
+        "card_background": "",
+        "card_label_color": "",
+        "focus_color": "",
+        "speed": 42,
+        "speed_mobile": 34,
+        "card_width": 300,
+        "card_gap": 9,
+        "fade_width": 130,
+        "intro_gap": 144,
+        "padding_top": 128,
+        "padding_bottom": 96,
+        "padding_top_mobile": 56,
+        "padding_bottom_mobile": 56,
+        "anchor_id": ""
+      }
+    },
     "jci_newsletter": {
       "type": "jci-newsletter",
       "settings": {
@@ -661,6 +812,7 @@
     "jci_best_sellers",
     "jci_testimonials_zGWERm",
     "jci_home_faq",
+    "jci_social_media_Pj7UYJ",
     "jci_newsletter"
   ]
 }

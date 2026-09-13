@@ -195,7 +195,10 @@
     assign collapse_header_paddings_class = 'header--collapse-row-paddings'
   endif
 
-  assign class = 'header'
+  # Maison Cavalle scope. Per MAISON-CAVALLE-SPEC.md §1, a modified Horizon
+  # section carries `jci-{name}` on its root and every override is reached
+  # through that scope only - never by restyling Horizon's own classes.
+  assign class = 'header jci-header'
 
   if header_height_class
     assign class = class | append: ' ' | append: header_height_class
@@ -1231,6 +1234,197 @@
   .dropdown-localization:not(dropdown-localization-component) .language-selector {
     font-family: var(--menu-localization-font);
     font-size: var(--menu-localization-font-size);
+  }
+  /* ====================================================================== *
+   * Maison Cavalle — header actions                                        *
+   *                                                                        *
+   * Reference: MAISON-CAVALLE-SPEC.md §1 (modified Horizon section), §7.   *
+   * jci-header renders the actions as icon + uppercase label with an inline
+   * bag count. Horizon renders one or the other: its `icon` mode marks the
+   * labels `.hidden`, its `text` mode marks the icons `desktop:hidden`. Both
+   * utilities are `display: none !important`, so showing the pair needs
+   * `!important` back — the only place this file uses it.
+   *
+   * Every selector is scoped under .jci-header; no Horizon class is restyled
+   * on its own.
+   * ====================================================================== */
+
+  .jci-header {
+    /* The prototype's values, matching jci-header's own setting defaults. */
+    --jci-header-icon-size: 17px;
+
+    /* Horizon's icons carry stroke-width="var(--icon-stroke-width)" on the
+       svg's children, so the weight is set through that token, not by a
+       stroke-width on the svg itself. 1.35px is the prototype's value. */
+    --icon-stroke-width: 1.35px;
+    --jci-header-label-size: 10px;
+    --jci-header-badge-size: 15px;
+    --jci-header-action-gap: clamp(0.75rem, 1.7vw, 1.5rem);
+  }
+
+  .jci-header .header__column--right {
+    gap: var(--jci-header-action-gap);
+  }
+
+  .jci-header header-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--jci-header-action-gap);
+  }
+
+  /* --- Action: icon + label ------------------------------------------- */
+
+  .jci-header .header-actions__action {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.48rem;
+    padding-block: 0.4rem;
+    color: inherit;
+    border: 0;
+    background: transparent;
+    text-decoration: none;
+    cursor: pointer;
+    transition:
+      color 0.3s var(--jci-ease),
+      transform 0.35s var(--jci-ease);
+  }
+
+  /* Pill that fades in behind a hovered action. */
+  .jci-header .header-actions__action::before {
+    content: '';
+    position: absolute;
+    inset: 0.1rem -0.35rem;
+    z-index: 0;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    background: rgb(var(--jci-olive-rgb) / 0);
+    pointer-events: none;
+    transform: scale(0.85);
+    transition:
+      border-color 0.3s var(--jci-ease),
+      background-color 0.3s var(--jci-ease),
+      transform 0.35s var(--jci-ease);
+  }
+
+  .jci-header .header-actions__action > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  .jci-header .header-actions__action:hover,
+  .jci-header .header-actions__action:focus-visible {
+    color: var(--jci-olive);
+    transform: translateY(-2px);
+  }
+
+  .jci-header .header-actions__action:hover::before,
+  .jci-header .header-actions__action:focus-visible::before {
+    border-color: rgb(var(--jci-olive-rgb) / 0.35);
+    background: rgb(var(--jci-olive-rgb) / 0.07);
+    transform: scale(1);
+  }
+
+  /* --- Icons ---------------------------------------------------------- */
+
+  .jci-header .header-actions__action svg {
+    width: var(--jci-header-icon-size);
+    height: var(--jci-header-icon-size);
+    fill: none;
+    stroke: currentcolor;
+    transition: transform 0.35s var(--jci-ease);
+  }
+
+  .jci-header .header-actions__action:hover svg,
+  .jci-header .header-actions__action:focus-visible svg {
+    transform: scale(1.08) rotate(-6deg);
+  }
+
+  /* --- Labels --------------------------------------------------------- *
+   * `.cart-bubble__text-count` also carries `.hidden` when the cart is
+   * empty, so it is excluded — revealing it would print an empty badge.   */
+
+  .jci-header .header-actions__action .hidden:not(.cart-bubble__text-count),
+  .jci-header .account-button__text {
+    display: inline !important;
+    color: inherit;
+    font-family: var(--jci-font-label);
+    font-size: var(--jci-header-label-size);
+    font-weight: 400;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  /* --- Bag count ------------------------------------------------------ *
+   * Horizon parks the bubble over the bag and masks a donut out of the
+   * icon to sit it in. The prototype sets it inline after the label, so
+   * the mask comes off and the bubble returns to the flow.               */
+
+  .jci-header .header-actions__cart-icon {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.48rem;
+  }
+
+  .jci-header .header-actions__cart-icon.header-actions__cart-icon--has-cart svg {
+    mask: none;
+  }
+
+  .jci-header .header-actions__cart-icon .cart-bubble {
+    position: static;
+    width: auto;
+    min-width: var(--jci-header-badge-size);
+    height: var(--jci-header-badge-size);
+    aspect-ratio: auto;
+    margin-inline-start: -0.25rem;
+    padding-inline: 0.2rem;
+  }
+
+  .jci-header .cart-bubble__background {
+    background-color: var(--jci-ink);
+    border-radius: 50%;
+    transition: background-color 0.3s var(--jci-ease);
+  }
+
+  .jci-header .header-actions__cart-icon .cart-bubble__text {
+    color: var(--jci-paper);
+    font-family: var(--jci-font-label);
+    font-size: 9px;
+    font-weight: 400;
+  }
+
+  .jci-header .header-actions__action:hover .cart-bubble__background,
+  .jci-header .header-actions__action:focus-visible .cart-bubble__background {
+    background-color: var(--jci-rust);
+  }
+
+  /* --- Mobile --------------------------------------------------------- *
+   * The prototype drops the labels and shrinks the icons at 680px.       */
+
+  @media screen and (max-width: 680px) {
+    .jci-header {
+      --jci-header-action-gap: 0.55rem;
+      --jci-header-icon-size: 18px;
+    }
+
+    .jci-header .header-actions__action .hidden:not(.cart-bubble__text-count),
+    .jci-header .account-button__text {
+      display: none !important;
+    }
+
+    .jci-header .header-actions__action {
+      justify-content: center;
+      min-width: 34px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .jci-header .header-actions__action,
+    .jci-header .header-actions__action::before,
+    .jci-header .header-actions__action svg,
+    .jci-header .cart-bubble__background {
+      transition: none;
+    }
   }
 {% endstylesheet %}
 

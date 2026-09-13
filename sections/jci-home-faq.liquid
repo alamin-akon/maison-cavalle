@@ -183,7 +183,11 @@
     margin: 0;
   }
 
+  /* The list holds the height of its tallest open state, measured by
+     jci-home-faq.js, so opening or closing a question never resizes the
+     section and nothing below it shifts. */
   .jci-home-faq-list {
+    min-height: var(--jci-home-faq-reserve, auto);
     border-top: 1px solid var(--jci-home-faq-heading);
   }
 

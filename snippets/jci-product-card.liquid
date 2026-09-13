@@ -19,8 +19,9 @@
     image_index      - which product image to show, 0-based
     lazy             - boolean, false for above-the-fold cards
 
-  A single-variant product adds straight to cart. Anything with choices sends
-  the shopper to the product page instead, so no variant is guessed for them.
+  A single-variant product adds straight to cart. Anything with choices opens
+  Horizon's quick-add modal, so the shopper picks the variant rather than
+  having one guessed for them.
 {% endcomment %}
 
 {% liquid
@@ -71,10 +72,32 @@
     endif
   endif
 
+  comment
+    Three shapes, matching Horizon's own quick-add:
+      add    - one variant, so it posts straight to the cart
+      choose - more than one, so Horizon's modal picks the variant
+      soldout- nothing to add, so the button renders disabled
+    Selling plans are handed to quick-add-component, which sends those to the
+    product page since subscription widgets only run there.
+  endcomment
   assign quick_add_variant = blank
-  if show_quick_add and product.available
-    if product.variants.size == 1
+  assign quick_add_mode = 'none'
+  assign quick_add_purchasable = false
+  assign quick_add_selling_plans = false
+
+  if product.requires_selling_plan or product.selling_plan_groups.size > 0
+    assign quick_add_selling_plans = true
+  endif
+
+  if show_quick_add
+    if product.available == false
+      assign quick_add_mode = 'soldout'
+    elsif product.variants.size == 1
+      assign quick_add_mode = 'add'
       assign quick_add_variant = product.selected_or_first_available_variant
+      assign quick_add_purchasable = quick_add_variant.available
+    else
+      assign quick_add_mode = 'choose'
     endif
   endif
 
@@ -89,10 +112,18 @@
   endif
 %}
 
-<article class="jci-product-card">
+{%- comment -%}
+  Horizon's <product-card> is the root: quick-add-component takes the product
+  URL from it, and ProductCard prefetches the product page on hover so the
+  quick-add modal opens without a fetch wait. It needs one ref -
+  productCardLink - and no-ops its own card-click navigation unless that link
+  carries an id, so our own link behaviour is untouched.
+{%- endcomment -%}
+<product-card class="jci-product-card">
   <div class="jci-product-card-media">
     <a
       class="jci-product-card-link"
+      ref="productCardLink"
       href="{{ product.url }}"
       aria-label="{{ product.title | escape }}"
     >
@@ -118,88 +149,86 @@
       {%- endif -%}
     </a>
 
-    {%- if show_quick_add -%}
+    {%- if show_quick_add and quick_add_mode != 'none' -%}
+      {%- comment -%}
+        The whole button is Horizon's: `quick-add-component` carries the
+        choose -> modal path, `product-form-component` posts the add without a
+        reload, and `add-to-cart-button` brings the refs, the disabled state
+        and the checkmark burst that `animateAddToCart()` drives off
+        `[data-added]`. Our own markup had none of that last part, which is why
+        an add looked like nothing had happened.
+
+        Only the label is ours. It is passed through `add_to_cart_text` as
+        markup so the mockup's text span and bag icon survive inside Horizon's
+        button — the mobile card hides the span and shows the icon (§1).
+      {%- endcomment -%}
+      {%- capture quick_add_inner -%}
+        <span class="jci-product-card-quick-add-text add-to-cart-text">
+          {{- quick_add_label }} <span aria-hidden="true">&#65291;</span>
+        </span>
+        {%- render 'jci-product-card-bag-icon' -%}
+      {%- endcapture -%}
+
       <div class="jci-product-card-quick-add">
-        {%- if quick_add_variant != blank -%}
-          {%- comment -%}
-            Horizon's own components do the work: `product-form-component`
-            intercepts the submit, posts to the cart and dispatches the cart
-            update event; `cart-drawer-component` carries `auto-open`, so the
-            drawer opens off that event. Writing our own fetch here would add
-            to the cart without the rest of the theme ever hearing about it.
+        <quick-add-component
+          class="jci-product-card-quick-add-component"
+          ref="quickAdd"
+          data-product-title="{{ product.title | escape }}"
+          data-product-id="{{ product.id }}"
+          data-quick-add-button="{% if quick_add_mode == 'choose' %}choose{% else %}add{% endif %}"
+          data-product-options-count="{{ product.options.size }}"
+          data-uses-selling-plans="{{ quick_add_selling_plans }}"
+        >
+          {%- if quick_add_mode == 'choose' -%}
+            <button
+              class="jci-product-card-quick-add-button add-to-cart-button"
+              type="button"
+              name="add"
+              on:click="quick-add-component/handleClick"
+              aria-label="{{ 'actions.show_all_options' | t }} — {{ product.title | escape }}"
+            >
+              {{ quick_add_inner }}
+            </button>
+          {%- else -%}
+            <product-form-component
+              class="jci-product-card-form"
+              data-section-id="{{ section_id }}"
+              data-product-id="{{ product.id }}"
+              on:submit="/handleSubmit"
+            >
+              <div
+                class="jci-product-card-live-region"
+                aria-live="assertive"
+                role="status"
+                aria-atomic="true"
+                ref="liveRegion"
+              ></div>
 
-            Only the wiring is Horizon's — the button markup and classes stay
-            ours (§1), so no Horizon button styles come along.
-          {%- endcomment -%}
-          <product-form-component
-            class="jci-product-card-form"
-            data-section-id="{{ section_id }}"
-            data-product-id="{{ product.id }}"
-            on:submit="/handleSubmit"
-          >
-            <div
-              class="jci-product-card-live-region"
-              aria-live="assertive"
-              role="status"
-              aria-atomic="true"
-              ref="liveRegion"
-            ></div>
-
-            {%- form 'product', product, id: quick_add_form_id, novalidate: 'novalidate', data-type: 'add-to-cart-form' -%}
-              <input
-                type="hidden"
-                name="id"
-                ref="variantId"
-                value="{{ quick_add_variant.id }}"
-              >
-              <input type="hidden" name="quantity" value="1">
-
-              <add-to-cart-component
-                ref="addToCartButtonContainer"
-                data-product-variant-media="{{ quick_add_media }}"
-                data-add-to-cart-animation="{{ settings.add_to_cart_animation }}"
-              >
-                <button
-                  class="jci-product-card-quick-add-button"
-                  type="submit"
-                  name="add"
-                  ref="addToCartButton"
-                  on:click="/handleClick"
-                  aria-label="{{ 'actions.add_to_cart' | t }} — {{ product.title | escape }}"
+              {%- form 'product', product, id: quick_add_form_id, novalidate: 'novalidate', data-type: 'add-to-cart-form' -%}
+                <input
+                  type="hidden"
+                  name="id"
+                  ref="variantId"
+                  value="{{ quick_add_variant.id }}"
+                  {% if quick_add_purchasable == false %}disabled{% endif %}
                 >
-                  <span class="jci-product-card-quick-add-text">
-                    {{- quick_add_label }} <span aria-hidden="true">&#65291;</span>
-                  </span>
-                  {% render 'jci-product-card-bag-icon' %}
-                </button>
-              </add-to-cart-component>
-            {%- endform -%}
-          </product-form-component>
-        {%- else -%}
-          {%- comment -%}
-            More than one variant, or sold out. Either way the product page is
-            the honest destination.
+                <input type="hidden" name="quantity" value="1">
 
-            The prototype's button always reads "Quick add", so the visible
-            label matches it and the aria-label carries what actually happens —
-            nobody is told a variant was picked for them.
-          {%- endcomment -%}
-          <a
-            class="jci-product-card-quick-add-button"
-            href="{{ product.url }}"
-            aria-label="{{ 'actions.show_all_options' | t }} — {{ product.title | escape }}"
-          >
-            <span class="jci-product-card-quick-add-text">
-              {%- if product.available -%}
-                {{ quick_add_label }} <span aria-hidden="true">&#65291;</span>
-              {%- else -%}
-                {{ 'products.product.sold_out' | t }}
-              {%- endif -%}
-            </span>
-            {% render 'jci-product-card-bag-icon' %}
-          </a>
-        {%- endif -%}
+                {%- render 'add-to-cart-button',
+                  add_to_cart_text: quick_add_inner,
+                  class: 'jci-product-card-quick-add-button add-to-cart-button',
+                  can_add_to_cart: quick_add_purchasable,
+                  show_icon: false,
+                  product: product
+                -%}
+              {%- endform -%}
+            </product-form-component>
+          {%- endif -%}
+        </quick-add-component>
       </div>
+
+      {%- comment -%} Carries the [data-added] feedback our button now uses. {%- endcomment -%}
+      {%- render 'add-to-cart-button-styles' -%}
     {%- endif -%}
   </div>
 
@@ -256,4 +285,4 @@
       {%- endif -%}
     </span>
   </div>
-</article>
+</product-card>

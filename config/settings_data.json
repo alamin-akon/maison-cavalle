@@ -9,8 +9,9 @@
  */
 {
   "current": {
-    "logo_height": 36,
-    "logo_height_mobile": 28,
+    "logo": "shopify://shop_images/logo.svg",
+    "logo_height": 78,
+    "logo_height_mobile": 50,
     "page_text_color": "{{ settings.color_palette.foreground }}",
     "type_body_font": "work_sans_n4",
     "type_subheading_font": "work_sans_n5",

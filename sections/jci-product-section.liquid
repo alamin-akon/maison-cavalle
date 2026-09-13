@@ -178,6 +178,9 @@
   }
 
   .jci-product-card {
+    /* <product-card> is a custom element, so it has no block display of its
+       own the way the article it replaced did. */
+    display: block;
     min-width: 0;
   }
 
@@ -263,6 +266,34 @@
     fill: none;
     stroke: currentcolor;
     stroke-width: 1.5;
+  }
+
+  /* Horizon's add-to-cart button carries `.button`'s box (24px/16px padding)
+     and the checkmark burst. The box is reset to the prototype's slim bar and
+     the burst is sized to it. Reached only inside our own scope, per §1. */
+  .jci-product-card-quick-add .jci-product-card-quick-add-button {
+    padding: 0;
+  }
+
+  .jci-product-card-quick-add .add-to-cart__added-icon {
+    width: 22px;
+    height: 22px;
+  }
+
+  /* The component wrappers are plumbing; they must not form a box of their
+     own or the button stops filling the bar. */
+  .jci-product-card-quick-add-component,
+  .jci-product-card-form {
+    display: block;
+  }
+
+  .jci-product-card-live-region {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
   }
 
   /* -- Info row ---------------------------------------------------------- */
