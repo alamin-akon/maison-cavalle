@@ -222,14 +222,14 @@
         "column_explore": {
           "type": "column",
           "settings": {
-            "menu": "main-menu",
+            "menu": "jci-footer-menu-copy",
             "heading": "Explore"
           }
         },
         "column_care": {
           "type": "column",
           "settings": {
-            "menu": "footer",
+            "menu": "jci-footer-menu",
             "heading": "Care"
           }
         }

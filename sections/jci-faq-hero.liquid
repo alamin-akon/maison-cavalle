@@ -1,0 +1,444 @@
+{% comment %}
+  Maison Cavallé — FAQ page hero
+
+  Prototype source: maison-cavalle-main/index.html  → section.faq-hero
+                    maison-cavalle-main/styles.css  → .faq-hero (981-1002),
+                                                      @680 block (1554+)
+  Reference: MAISON-CAVALLE-SPEC.md §1, §3, §5, §7
+
+  Per §0 no letter-spacing or line-height is authored, and the prototype's
+  `font:` shorthands are split into font-size / font-weight. Colours are
+  palette entries or opacity steps off one, never baked hex (§7).
+{% endcomment %}
+
+{%- liquid
+  assign s = section.settings
+  assign meta = section.blocks | where: 'type', 'meta'
+
+  assign hero_image = s.image
+  assign image_asset = s.image_asset | strip
+-%}
+
+<section
+  class="jci-faq-hero"
+  {% if s.anchor_id != blank %}id="{{ s.anchor_id }}"{% endif %}
+  {% if s.enable_tilt %}data-jci-tilt{% endif %}
+  data-jci-tilt-strength="{{ s.tilt_strength }}"
+  {{ section.shopify_attributes }}
+  style="
+    --jci-faq-hero-bg: {{ s.background_color | default: settings.color_palette.foreground }};
+    --jci-faq-hero-text: {{ s.text_color | default: settings.color_palette.background }};
+    --jci-faq-hero-accent: {{ s.accent_color | default: settings.color_palette.color7 }};
+    --jci-faq-hero-body: {% if s.body_color != blank %}{{ s.body_color }}{% else %}rgb(var(--jci-paper-rgb) / 0.78){% endif %};
+    --jci-faq-hero-meta: {% if s.meta_color != blank %}{{ s.meta_color }}{% else %}rgb(var(--jci-paper-rgb) / 0.64){% endif %};
+    --jci-faq-hero-min-height: {{ s.min_height }}px;
+    --jci-faq-hero-pad-top: {{ s.padding_top }}px;
+    --jci-faq-hero-pad-bottom: {{ s.padding_bottom }}px;
+    --jci-faq-hero-pad-top-mobile: {{ s.padding_top_mobile }}px;
+    --jci-faq-hero-pad-bottom-mobile: {{ s.padding_bottom_mobile }}px;
+    --jci-faq-hero-image-ratio: {{ s.image_ratio | divided_by: 100.0 }};
+    --jci-faq-hero-image-ratio-mobile: {{ s.image_ratio_mobile | divided_by: 100.0 }};
+    --jci-faq-hero-image-saturate: {{ s.image_saturate | divided_by: 100.0 }};
+    --jci-faq-hero-image-brightness: {{ s.image_brightness | divided_by: 100.0 }};
+    --jci-faq-hero-stamp-size: {{ s.stamp_size }}px;
+  "
+>
+  <div class="jci-faq-hero-container">
+    <div class="jci-faq-hero-copy">
+      {%- if s.eyebrow != blank -%}
+        <p class="jci-eyebrow jci-faq-hero-eyebrow">{{ s.eyebrow }}</p>
+      {%- endif -%}
+
+      {%- if s.title_line_one != blank or s.title_line_two != blank -%}
+        <h1 class="jci-faq-hero-title">
+          {{- s.title_line_one -}}
+          {%- if s.title_line_one != blank and s.title_line_two != blank -%}<br>{%- endif -%}
+          {%- if s.title_line_two != blank -%}
+            <em class="jci-faq-hero-title-accent">{{ s.title_line_two }}</em>
+          {%- endif -%}
+        </h1>
+      {%- endif -%}
+
+      {%- if s.intro != blank -%}
+        <p class="jci-faq-hero-text">{{ s.intro }}</p>
+      {%- endif -%}
+
+      {%- if meta.size > 0 -%}
+        <div class="jci-faq-hero-meta">
+          {%- for block in meta -%}
+            <span class="jci-faq-hero-meta-item" {{ block.shopify_attributes }}>
+              <strong class="jci-faq-hero-meta-index">
+                {{- block.settings.index | default: forloop.index | prepend: '0' | slice: -2, 2 -}}
+              </strong>
+              <small class="jci-faq-hero-meta-label">{{ block.settings.label }}</small>
+            </span>
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+    </div>
+
+    {%- comment -%}
+      The tilt is pointer-driven, so the element keeps its own two custom
+      properties rather than a class. JS hooks target data-jci-*, never a
+      jci- class (§1).
+    {%- endcomment -%}
+    <div class="jci-faq-hero-visual" data-jci-faq-hero-visual>
+      {%- if image_asset != blank -%}
+        <img
+          class="jci-faq-hero-image"
+          src="{{ image_asset | asset_url }}"
+          alt="{{ s.image_alt | escape }}"
+          width="720"
+          height="818"
+          loading="eager"
+          fetchpriority="high"
+        >
+      {%- elsif hero_image != blank -%}
+        <img
+          class="jci-faq-hero-image"
+          src="{{ hero_image | image_url: width: 1000 }}"
+          srcset="
+            {{ hero_image | image_url: width: 500 }} 500w,
+            {{ hero_image | image_url: width: 750 }} 750w,
+            {{ hero_image | image_url: width: 1000 }} 1000w
+          "
+          sizes="(max-width: 680px) 92vw, 44vw"
+          alt="{{ hero_image.alt | escape | default: s.image_alt | escape }}"
+          width="{{ hero_image.width }}"
+          height="{{ hero_image.height }}"
+          loading="eager"
+          fetchpriority="high"
+        >
+      {%- endif -%}
+
+      {%- if s.overlay_kicker != blank or s.overlay_title != blank -%}
+        <div class="jci-faq-hero-overlay">
+          {%- if s.overlay_kicker != blank -%}
+            <span class="jci-faq-hero-overlay-kicker">{{ s.overlay_kicker }}</span>
+          {%- endif -%}
+          {%- if s.overlay_title != blank -%}
+            <strong class="jci-faq-hero-overlay-title">{{ s.overlay_title }}</strong>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+
+      {%- if s.stamp_mark != blank -%}
+        <span class="jci-faq-hero-stamp">
+          <span class="jci-faq-hero-stamp-mark">{{ s.stamp_mark }}</span>
+          {%- if s.stamp_note != blank -%}
+            <small class="jci-faq-hero-stamp-note">{{ s.stamp_note }}</small>
+          {%- endif -%}
+        </span>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+<script src="{{ 'jci-faq-hero.js' | asset_url }}" type="module"></script>
+
+{% stylesheet %}
+  /* styles.css:981 */
+  .jci-faq-hero {
+    position: relative;
+    overflow: hidden;
+    color: var(--jci-faq-hero-text);
+    background: var(--jci-faq-hero-bg);
+  }
+
+  /* styles.css:982 */
+  .jci-faq-hero-container {
+    display: grid;
+    grid-template-columns: minmax(0, 0.86fr) minmax(360px, 0.84fr);
+    gap: clamp(2.5rem, 7vw, 8rem);
+    align-items: center;
+    min-height: var(--jci-faq-hero-min-height);
+    padding-block: var(--jci-faq-hero-pad-top) var(--jci-faq-hero-pad-bottom);
+  }
+
+  /* styles.css:983 */
+  .jci-faq-hero-copy {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* styles.css:984 */
+  .jci-faq-hero-eyebrow {
+    margin-block-end: 1.5rem;
+    color: var(--jci-faq-hero-accent);
+  }
+
+  /* styles.css:985-986. All page heroes share the hero title size (§3). */
+  .jci-faq-hero-title {
+    max-width: 680px;
+    margin: 0;
+    font-family: var(--jci-font-display);
+    font-size: var(--jci-hero-title-size);
+    font-weight: 500;
+  }
+
+  .jci-faq-hero-title-accent {
+    color: var(--jci-faq-hero-accent);
+    font-style: italic;
+  }
+
+  /* styles.css:987 */
+  .jci-faq-hero-text {
+    max-width: 390px;
+    margin: 1.6rem 0 0;
+    color: var(--jci-faq-hero-body);
+    font-family: var(--jci-font-sans);
+    font-size: var(--jci-subtitle-size);
+  }
+
+  /* styles.css:988-991 */
+  .jci-faq-hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: clamp(1.5rem, 4vw, 3.5rem);
+    margin-block-start: 3rem;
+    padding-block-start: 1rem;
+    border-top: 1px solid rgb(var(--jci-paper-rgb) / 0.2);
+  }
+
+  .jci-faq-hero-meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .jci-faq-hero-meta-index {
+    color: var(--jci-faq-hero-accent);
+    font-family: var(--jci-font-label);
+    font-size: 14px;
+    font-weight: 400;
+  }
+
+  .jci-faq-hero-meta-label {
+    color: var(--jci-faq-hero-meta);
+    font-family: var(--jci-font-label);
+    font-size: 14px;
+    text-transform: uppercase;
+  }
+
+  /* styles.css:992 */
+  .jci-faq-hero-visual {
+    position: relative;
+    aspect-ratio: var(--jci-faq-hero-image-ratio);
+    overflow: hidden;
+    transform: perspective(1100px) rotateX(var(--jci-tilt-x, 0deg)) rotateY(var(--jci-tilt-y, 0deg));
+    transform-style: preserve-3d;
+    box-shadow:
+      22px 25px 0 rgb(var(--jci-paper-rgb) / 0.08),
+      0 25px 60px rgb(0 0 0 / 0.2);
+    transition:
+      transform 0.6s var(--jci-ease),
+      box-shadow 0.6s var(--jci-ease);
+  }
+
+  /* styles.css:993 — inner rule */
+  .jci-faq-hero-visual::before {
+    content: '';
+    position: absolute;
+    inset: 14px;
+    z-index: 2;
+    border: 1px solid rgb(var(--jci-paper-rgb) / 0.35);
+    pointer-events: none;
+  }
+
+  /* styles.css:994 — scrim up from the base */
+  .jci-faq-hero-visual::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgb(17 21 17 / 0.04) 35%, rgb(17 21 17 / 0.8));
+    pointer-events: none;
+  }
+
+  /* styles.css:995 */
+  .jci-faq-hero-image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter:
+      saturate(var(--jci-faq-hero-image-saturate))
+      brightness(var(--jci-faq-hero-image-brightness));
+    transition:
+      transform 0.9s var(--jci-ease),
+      filter 0.6s var(--jci-ease);
+  }
+
+  /* styles.css:996-997 */
+  .jci-faq-hero-visual:hover {
+    box-shadow:
+      28px 31px 0 rgb(var(--jci-paper-rgb) / 0.1),
+      0 28px 70px rgb(0 0 0 / 0.28);
+  }
+
+  .jci-faq-hero-visual:hover .jci-faq-hero-image {
+    filter:
+      saturate(calc(var(--jci-faq-hero-image-saturate) * 1.26))
+      brightness(calc(var(--jci-faq-hero-image-brightness) * 1.1));
+    transform: scale(1.05);
+  }
+
+  /* styles.css:998-1000 */
+  .jci-faq-hero-overlay {
+    position: absolute;
+    bottom: 1.8rem;
+    left: 2rem;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+  }
+
+  .jci-faq-hero-overlay-kicker {
+    color: var(--jci-faq-hero-accent);
+    font-family: var(--jci-font-label);
+    font-size: 12px;
+    text-transform: uppercase;
+  }
+
+  .jci-faq-hero-overlay-title {
+    color: var(--jci-faq-hero-text);
+    font-family: var(--jci-font-display);
+    font-size: clamp(25px, 3vw, 43px);
+    font-weight: 500;
+  }
+
+  /* styles.css:1001-1002 */
+  .jci-faq-hero-stamp {
+    position: absolute;
+    right: 1.5rem;
+    bottom: 1.4rem;
+    z-index: 3;
+    display: grid;
+    place-items: center;
+    width: var(--jci-faq-hero-stamp-size);
+    height: var(--jci-faq-hero-stamp-size);
+    border: 1px solid rgb(var(--jci-paper-rgb) / 0.65);
+    border-radius: 50%;
+    color: var(--jci-faq-hero-text);
+    font-family: var(--jci-font-label);
+    font-size: 12px;
+    text-align: center;
+  }
+
+  .jci-faq-hero-stamp-mark {
+    display: block;
+  }
+
+  .jci-faq-hero-stamp-note {
+    display: block;
+    color: var(--jci-faq-hero-accent);
+    font-size: 10px;
+    text-transform: uppercase;
+  }
+
+  /* styles.css:@680 — the two columns stack and the film pulls to the right. */
+  @media screen and (max-width: 680px) {
+    .jci-faq-hero-container {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 2.5rem;
+      min-height: auto;
+      padding-block: var(--jci-faq-hero-pad-top-mobile) var(--jci-faq-hero-pad-bottom-mobile);
+    }
+
+    .jci-faq-hero-meta {
+      margin-block-start: 2rem;
+    }
+
+    .jci-faq-hero-visual {
+      width: calc(100% - 0.75rem);
+      margin-inline-start: auto;
+      aspect-ratio: var(--jci-faq-hero-image-ratio-mobile);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .jci-faq-hero-visual,
+    .jci-faq-hero-image {
+      transition: none;
+    }
+
+    .jci-faq-hero-visual:hover .jci-faq-hero-image {
+      transform: none;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "FAQ hero",
+  "tag": "section",
+  "class": "jci-faq-hero-section",
+  "max_blocks": 4,
+  "blocks": [
+    {
+      "type": "meta",
+      "name": "Meta item",
+      "settings": [
+        { "type": "text", "id": "index", "label": "Number", "info": "Leave empty to number automatically." },
+        { "type": "text", "id": "label", "label": "Label", "default": "Fit & care" }
+      ]
+    }
+  ],
+  "settings": [
+    { "type": "header", "content": "Copy" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "The Maison help desk" },
+    { "type": "text", "id": "title_line_one", "label": "Title first line", "default": "Good to know." },
+    { "type": "text", "id": "title_line_two", "label": "Title second line (italic)", "default": "Easy to find." },
+    { "type": "textarea", "id": "intro", "label": "Intro", "default": "Clear answers for the moments before the ride, after checkout and everywhere in between." },
+
+    { "type": "header", "content": "Film" },
+    { "type": "text", "id": "image_asset", "label": "Image file in theme assets", "info": "Filename only, e.g. jci-faq-hero-white-horse.webp. Takes priority over the picker below.", "default": "jci-faq-hero-white-horse.webp" },
+    { "type": "image_picker", "id": "image", "label": "Image" },
+    { "type": "text", "id": "image_alt", "label": "Image description", "default": "White horse and rider moving through a forest" },
+    { "type": "text", "id": "overlay_kicker", "label": "Overlay kicker", "default": "Maison Cavallé / support" },
+    { "type": "text", "id": "overlay_title", "label": "Overlay title", "default": "Here when you need us." },
+    { "type": "text", "id": "stamp_mark", "label": "Stamp mark", "default": "MC" },
+    { "type": "text", "id": "stamp_note", "label": "Stamp note", "default": "help / 2026" },
+    { "type": "range", "id": "stamp_size", "label": "Stamp size", "min": 40, "max": 120, "step": 2, "unit": "px", "default": 74 },
+
+    { "type": "header", "content": "Media treatment" },
+    { "type": "range", "id": "image_ratio", "label": "Image ratio", "min": 60, "max": 140, "step": 2, "unit": "%", "default": 88, "info": "Width over height — 88 is the prototype's 0.88." },
+    { "type": "range", "id": "image_ratio_mobile", "label": "Image ratio on mobile", "min": 60, "max": 140, "step": 2, "unit": "%", "default": 86 },
+    { "type": "range", "id": "image_saturate", "label": "Saturation", "min": 0, "max": 200, "step": 2, "unit": "%", "default": 62 },
+    { "type": "range", "id": "image_brightness", "label": "Brightness", "min": 20, "max": 150, "step": 2, "unit": "%", "default": 82 },
+
+    { "type": "header", "content": "Motion" },
+    { "type": "checkbox", "id": "enable_tilt", "label": "Tilt the film towards the pointer", "default": true },
+    { "type": "range", "id": "tilt_strength", "label": "Tilt strength", "min": 0, "max": 20, "step": 1, "unit": "deg", "default": 6 },
+
+    { "type": "header", "content": "Colors", "info": "Left empty, each of these follows the theme colour palette." },
+    { "type": "color", "id": "background_color", "label": "Background" },
+    { "type": "color", "id": "text_color", "label": "Text" },
+    { "type": "color", "id": "accent_color", "label": "Accent" },
+    { "type": "color", "id": "body_color", "label": "Body text" },
+    { "type": "color", "id": "meta_color", "label": "Meta label" },
+
+    { "type": "header", "content": "Layout" },
+    { "type": "range", "id": "min_height", "label": "Minimum height", "min": 300, "max": 800, "step": 10, "unit": "px", "default": 540 },
+    { "type": "range", "id": "padding_top", "label": "Padding top", "min": 0, "max": 200, "step": 4, "unit": "px", "default": 96 },
+    { "type": "range", "id": "padding_bottom", "label": "Padding bottom", "min": 0, "max": 200, "step": 4, "unit": "px", "default": 96 },
+    { "type": "range", "id": "padding_top_mobile", "label": "Padding top on mobile", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 64 },
+    { "type": "range", "id": "padding_bottom_mobile", "label": "Padding bottom on mobile", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 64 },
+
+    { "type": "header", "content": "Anchor" },
+    { "type": "text", "id": "anchor_id", "label": "Anchor ID", "default": "faq-hero" }
+  ],
+  "presets": [
+    {
+      "name": "FAQ hero",
+      "blocks": [
+        { "type": "meta", "settings": { "index": "01", "label": "Fit & care" } },
+        { "type": "meta", "settings": { "index": "02", "label": "Delivery" } },
+        { "type": "meta", "settings": { "index": "03", "label": "Returns" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

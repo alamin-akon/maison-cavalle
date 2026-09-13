@@ -53,9 +53,66 @@
         "padding-block-start": 40,
         "padding-block-end": 80
       }
+    },
+    "jci_faq_hero": {
+      "type": "jci-faq-hero",
+      "blocks": {
+        "meta_1": {
+          "type": "meta",
+          "settings": {
+            "index": "01",
+            "label": "Fit & care"
+          }
+        },
+        "meta_2": {
+          "type": "meta",
+          "settings": {
+            "index": "02",
+            "label": "Delivery"
+          }
+        },
+        "meta_3": {
+          "type": "meta",
+          "settings": {
+            "index": "03",
+            "label": "Returns"
+          }
+        }
+      },
+      "block_order": [
+        "meta_1",
+        "meta_2",
+        "meta_3"
+      ],
+      "settings": {
+        "eyebrow": "The Maison help desk",
+        "title_line_one": "Good to know.",
+        "title_line_two": "Easy to find.",
+        "intro": "Clear answers for the moments before the ride, after checkout and everywhere in between.",
+        "image_asset": "jci-faq-hero-white-horse.webp",
+        "image_alt": "White horse and rider moving through a forest",
+        "overlay_kicker": "Maison Cavallé / support",
+        "overlay_title": "Here when you need us.",
+        "stamp_mark": "MC",
+        "stamp_note": "help / 2026",
+        "stamp_size": 74,
+        "image_ratio": 88,
+        "image_ratio_mobile": 86,
+        "image_saturate": 62,
+        "image_brightness": 82,
+        "enable_tilt": true,
+        "tilt_strength": 6,
+        "min_height": 540,
+        "padding_top": 96,
+        "padding_bottom": 96,
+        "padding_top_mobile": 64,
+        "padding_bottom_mobile": 64,
+        "anchor_id": "faq-hero"
+      }
     }
   },
   "order": [
+    "jci_faq_hero",
     "main"
   ]
 }
