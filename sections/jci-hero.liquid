@@ -39,7 +39,7 @@
     --jci-hero-video-contrast: {{ s.video_contrast | divided_by: 100.0 }};
     --jci-hero-video-brightness: {{ s.video_brightness | divided_by: 100.0 }};
     --jci-hero-grain-opacity: {{ s.grain_opacity | divided_by: 100.0 }};
-    --jci-hero-title-size: clamp({{ s.title_size_min }}rem, {{ s.title_size_fluid | divided_by: 10.0 }}vw, {{ s.title_size_max }}rem);
+    --jci-hero-title-size-desktop: clamp({{ s.title_size_min }}rem, {{ s.title_size_fluid | divided_by: 10.0 }}vw, {{ s.title_size_max }}rem);
     --jci-hero-crossfade: {{ s.crossfade_duration }}ms;
   "
 >
@@ -230,6 +230,9 @@
 
 {% stylesheet %}
   .jci-hero {
+    /* Seeded from the section settings inline. Kept out of the inline style
+       itself so the 900px / 680px overrides below can win the cascade. */
+    --jci-hero-title-size: var(--jci-hero-title-size-desktop);
     position: relative;
     display: block;
     min-height: var(--jci-hero-height);
@@ -680,6 +683,11 @@
     .jci-hero-bottomline {
       grid-template-columns: minmax(100px, 0.38fr) minmax(0, 2fr) auto;
       gap: 1rem;
+    }
+
+    /* styles.css:1494 — declared at 966px, folded into 900px per §5. */
+    .jci-hero-scroll {
+      visibility: hidden;
     }
   }
 

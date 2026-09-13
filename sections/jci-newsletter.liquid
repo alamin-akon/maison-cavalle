@@ -305,6 +305,12 @@
   }
 
   @media screen and (max-width: 680px) {
+    /* styles.css:@680 — `padding: 3.2rem 1.35rem`. The panel's own gutter is
+       tighter than --jci-page-pad, set through the container token per §1. */
+    .jci-newsletter {
+      --jci-container-pad: 1.35rem;
+    }
+
     .jci-newsletter-container {
       display: block;
       padding-block: var(--jci-newsletter-pad-top-mobile) var(--jci-newsletter-pad-bottom-mobile);

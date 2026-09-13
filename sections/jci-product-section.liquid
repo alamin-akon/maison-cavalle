@@ -355,7 +355,9 @@
 
     .jci-product-grid {
       grid-template-columns: repeat(var(--jci-product-grid-columns-mobile), 1fr);
-      gap: var(--jci-product-grid-row-gap-mobile) var(--jci-product-grid-gap);
+      /* styles.css:@680 — `gap: 2.3rem .7rem`. The column gap tightens on
+         mobile rather than carrying the desktop grid gap across. */
+      gap: var(--jci-product-grid-row-gap-mobile) 0.7rem;
     }
 
     /* Hover cannot reveal the button on touch, so it sits out as a square. */
