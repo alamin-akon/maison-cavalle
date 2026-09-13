@@ -114,6 +114,39 @@ These do **not** count as done:
 Condition 3 is not paperwork. A section that no template renders has not
 shipped, however complete the file looks — so it is not marked done in §8.
 
+### One container, one rhythm, one type scale
+
+Standing developer instruction, and by §0 #1 it outranks the prototype:
+**every section shares the same container, the same vertical padding and the
+same heading and body sizes — whatever the mockup does per section.**
+
+The prototype tunes these page by page: a 1280px measure on the FAQ against
+1600px elsewhere, a different padding on each band, a heading that is 48px in
+one place and 72px in another. None of that carries over. The mockup is still
+cloned 1:1 for everything else; these four properties come from one place
+instead.
+
+| Property | Single source | Never |
+|---|---|---|
+| Container width and gutter | `jci-base.css` container defaults — `--jci-content-max`, `--jci-page-pad` | A per-section max-width |
+| Section padding top / bottom | One `--jci-section-pad-*` step (§5) | A per-section clamp or a one-off value |
+| Section heading size | `--jci-section-title-size` | A per-section `clamp()` |
+| Body copy size | `--jci-subtitle-size` | A per-section font-size |
+
+Page heroes keep `--jci-hero-title-size` (§3) — a hero headline is not a
+section heading, and all heroes share that one token too.
+
+**Settings still exist.** §5's per-section Padding top / Padding bottom ranges
+stay, because a section has to be tunable without touching code. What this rule
+fixes is their **defaults**: every section starts from the same number, so the
+page is even until someone deliberately changes one. A setting that ships with
+a different default to its neighbours is the thing being banned, not the
+setting itself.
+
+When a section genuinely needs a different width, it sets
+`--jci-container-width` on its root (§1) rather than restyling its container —
+but it starts from the shared value, not from whatever the mockup had.
+
 ### Structure is not design
 
 The clone rule applies to the **visual output only**. The prototype's
@@ -656,6 +689,8 @@ Other border widths:
 | Desktop now, responsive in a later pass | Both breakpoints in the same pass (§0) |
 | A `jci-*` section no template renders | Place it in its template before calling it done (§0) |
 | Marking a section done before it is checked at 900px and 680px | All five conditions in §0, or it is not done |
+| A per-section container width, padding, heading or body size | The shared token — one container, one rhythm, one type scale (§0) |
+| Cloning the mockup's per-page measure or heading size | Clone everything else 1:1; these four come from one place (§0) |
 
 ---
 

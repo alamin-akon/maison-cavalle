@@ -206,7 +206,8 @@
     assign collapse_header_paddings_class = 'header--collapse-row-paddings'
   endif
 
-  assign class = 'header'
+  # jci-header-scroll-shrink carries the open / scrolled height tokens.
+  assign class = 'header jci-header-scroll-shrink'
 
   if header_height_class
     assign class = class | append: ' ' | append: header_height_class
@@ -680,6 +681,124 @@
 
   .header[data-sticky-state='active'] {
     view-transition-name: sticky-header;
+  }
+
+  /* ------------------------------------------------------------------ *
+   * Maison Cavalle: the header opens tall and shrinks once the page is
+   * scrolled, and its background firms up as it does.
+   *
+   * styles.css:50-53 (.site-header, .header-inner), :74 (.header-wordmark)
+   * and the @681 / @680 blocks. The prototype's `.is-scrolled` is this
+   * theme's [data-sticky-state='active'], which header.js sets from an
+   * IntersectionObserver while sticky="always".
+   *
+   * Horizon forces .header__row transparent and paints through the
+   * underlay, so the background lives on .header__underlay-closed.
+   * ------------------------------------------------------------------ */
+
+  .jci-header-scroll-shrink {
+    /* styles.css:53, 74 — open, then scrolled. */
+    --jci-header-height: 86px;
+    --jci-header-height-scrolled: 72px;
+    --jci-header-logo-height: 78px;
+    --jci-header-logo-height-scrolled: 64px;
+  }
+
+  .header .header__columns {
+    min-height: var(--jci-header-height, 86px);
+    align-items: center;
+    transition:
+      min-height 0.55s var(--jci-ease),
+      padding 0.55s var(--jci-ease);
+  }
+
+  .header .header-logo__image {
+    height: var(--jci-header-logo-height, 78px);
+    width: auto;
+    max-width: 100%;
+    object-fit: contain;
+    transition: height 0.55s var(--jci-ease);
+  }
+
+  /* styles.css:50 — frosted bar, and :51 once scrolled. */
+  .header .header__underlay-closed {
+    background: linear-gradient(
+      180deg,
+      rgb(var(--jci-paper-rgb) / 0.84),
+      rgb(var(--jci-paper-rgb) / 0.72)
+    );
+
+    /* styles.css:50 also frosts this with
+       `backdrop-filter: blur(18px) saturate(1.15)`. Not used here, by
+       instruction. */
+    transition: background 0.35s var(--jci-ease);
+  }
+
+  .header .header__row--top {
+    border-bottom: 1px solid rgb(var(--jci-ink-rgb) / 0.12);
+    box-shadow: 0 8px 24px rgb(var(--jci-ink-rgb) / 0.04);
+    transition:
+      border-color 0.35s var(--jci-ease),
+      box-shadow 0.35s var(--jci-ease);
+  }
+
+  .header[data-sticky-state='active'] .header__underlay-closed {
+    background: rgb(var(--jci-paper-rgb) / 0.8);
+  }
+
+  .header[data-sticky-state='active'] .header__row--top {
+    box-shadow: 0 10px 28px rgb(var(--jci-ink-rgb) / 0.08);
+  }
+
+  /* styles.css:1484 — the shrink itself is desktop only. */
+  @media screen and (min-width: 681px) {
+    .header[data-sticky-state='active'] .header__columns {
+      --header-padding: 0.45rem;
+
+      min-height: var(--jci-header-height-scrolled, 72px);
+    }
+
+    .header[data-sticky-state='active'] .header-logo__image {
+      height: var(--jci-header-logo-height-scrolled, 64px);
+    }
+  }
+
+  /* styles.css:@680 — shorter throughout, and a more opaque scrolled bar. */
+  @media screen and (max-width: 680px) {
+    .header .header__columns {
+      min-height: 70px;
+    }
+
+    .header .header-logo__image {
+      height: 58px;
+    }
+
+    .header[data-sticky-state='active'] .header__underlay-closed {
+      background: rgb(var(--jci-paper-rgb) / 0.96);
+    }
+
+    .header[data-sticky-state='active'] .header__row--top {
+      box-shadow: 0 10px 26px rgb(var(--jci-ink-rgb) / 0.12);
+    }
+
+    .header[data-sticky-state='active'] .header__columns {
+      --header-padding: 0.4rem;
+
+      min-height: 58px;
+    }
+
+    .header[data-sticky-state='active'] .header-logo__image {
+      height: 50px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .header .header__columns,
+    .header .header-logo__image,
+    .header .header__underlay-closed,
+    .header .header__row--top {
+      transition: none;
+    }
   }
 
   :active-view-transition-type(empty-cart-drawer) {
