@@ -37,6 +37,8 @@
   class="jci-faq"
   {% if s.anchor_id != blank %}id="{{ s.anchor_id }}"{% endif %}
   data-jci-faq
+  data-jci-faq-duration="{{ s.toggle_duration }}"
+  {% if s.single_open %}data-jci-faq-single{% endif %}
   {{ section.shopify_attributes }}
   style="
     --jci-faq-bg: {{ s.background_color | default: settings.color_palette.background }};
@@ -514,8 +516,10 @@
     display: inline;
   }
 
-  /* styles.css:1040-1041 */
+  /* styles.css:1040-1041. Height is animated by jci-faq.js, so the answer
+     clips as it moves — the same treatment as the home FAQ. */
   .jci-faq-item-answer {
+    overflow: hidden;
     display: grid;
     gap: 1rem;
     padding: 0 0 1.35rem;
@@ -649,6 +653,10 @@
     { "type": "header", "content": "Header" },
     { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Find your answer" },
     { "type": "text", "id": "title", "label": "Title", "default": "Questions, considered." },
+
+    { "type": "header", "content": "Open and close" },
+    { "type": "range", "id": "toggle_duration", "label": "Open/close speed", "min": 100, "max": 800, "step": 20, "unit": "ms", "default": 320 },
+    { "type": "checkbox", "id": "single_open", "label": "Only one question open at a time", "default": false },
 
     { "type": "header", "content": "Search" },
     { "type": "checkbox", "id": "show_search", "label": "Show search", "default": true },

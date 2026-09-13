@@ -1,19 +1,36 @@
 /**
  * Maison Cavallé — FAQ questions.
  *
- * Filters the questions as you type, hides a topic once none of its questions
- * match, and shows the no-results line. Mirrors the prototype's behaviour
- * (app.js → FAQ search): an open question closes while filtering, so the list
- * reads as a list of matches rather than a half-expanded one.
+ * Two jobs:
  *
- * The message copy is a section setting, passed in on the element rather than
- * written here, so it stays editable and translatable.
+ * 1. Open and close. `<details>` snaps; this animates the answer's height
+ *    instead, keeping the element semantics intact — the click is
+ *    intercepted, the height is animated, and `open` is set at the right end
+ *    of the transition so the markup is always honest about what is showing.
+ *    Same treatment as the home FAQ, including the two things that bite:
+ *      - the bottom padding travels with the height, because under
+ *        `box-sizing: border-box` an element at `height: 0` is still as tall
+ *        as its padding, which left a padding-tall strip to vanish on close;
+ *      - `cancel()` fires `cancel`, never `finish`, so the intended `open`
+ *        state is applied off the `finished` promise rather than a `finish`
+ *        listener that an interrupting click would drop.
+ *
+ * 2. Search. Filters the questions as you type, hides a topic once none of
+ *    its questions match, and shows the no-results line. Mirrors the
+ *    prototype (app.js → FAQ search): an open question closes while
+ *    filtering, so the list reads as a list of matches.
+ *
+ * With no JS, or under prefers-reduced-motion, the accordion behaves exactly
+ * as the browser's own <details> does.
  */
 const SECTION = 'section.jci-faq';
 const QUERY_TOKEN = '[query]';
+const DEFAULT_DURATION = 320;
+const EASING = 'cubic-bezier(0.22, 0.61, 0.36, 1)';
 
 class JciFaq {
-  #items = [];
+  #animations = new WeakMap();
+  #entries = [];
 
   constructor(section) {
     this.section = section;
@@ -21,27 +38,156 @@ class JciFaq {
     this.clear = section.querySelector('[data-jci-faq-clear]');
     this.groups = [...section.querySelectorAll('[data-jci-faq-group]')];
     this.empty = section.querySelector('[data-jci-faq-empty]');
+    this.items = [...section.querySelectorAll('[data-jci-faq-item]')];
+
+    this.reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    this.duration = Number(section.dataset.jciFaqDuration) || DEFAULT_DURATION;
+    this.singleOpen = section.hasAttribute('data-jci-faq-single');
 
     // The haystack is built once. Reading textContent per keystroke would
     // walk every answer on every character.
-    this.#items = [...section.querySelectorAll('[data-jci-faq-item]')].map((item) => ({
+    this.#entries = this.items.map((item) => ({
       item,
       text: item.textContent.toLowerCase().replace(/\s+/g, ' '),
     }));
 
-    if (!this.input) return;
-
-    this.input.addEventListener('input', this.#handleInput);
+    this.input?.addEventListener('input', this.#handleInput);
     this.clear?.addEventListener('click', this.#handleClear);
-    this.bound = true;
+
+    // Under reduced motion <details> is left to toggle itself. Single-open
+    // still has to hold, so it rides the native toggle event instead of the
+    // intercepted click.
+    if (this.reducedMotion) {
+      if (this.singleOpen) section.addEventListener('toggle', this.#handleToggle, true);
+    } else {
+      for (const item of this.items) {
+        item.querySelector('.jci-faq-item-summary')?.addEventListener('click', this.#handleClick);
+      }
+    }
   }
 
   destroy() {
-    if (!this.bound) return;
-
-    this.input.removeEventListener('input', this.#handleInput);
+    this.input?.removeEventListener('input', this.#handleInput);
     this.clear?.removeEventListener('click', this.#handleClear);
+    this.section.removeEventListener('toggle', this.#handleToggle, true);
+
+    for (const item of this.items) {
+      item.querySelector('.jci-faq-item-summary')?.removeEventListener('click', this.#handleClick);
+    }
   }
+
+  /* -- Open and close ------------------------------------------------- */
+
+  #handleToggle = (event) => {
+    const item = event.target;
+    if (!item.open || !this.items.includes(item)) return;
+
+    for (const other of this.items) {
+      if (other !== item) other.open = false;
+    }
+  };
+
+  #handleClick = (event) => {
+    // The browser would toggle `open` immediately; the height animation needs
+    // to drive that instead.
+    event.preventDefault();
+
+    const item = event.currentTarget.closest('[data-jci-faq-item]');
+    if (!item) return;
+
+    if (item.open) {
+      this.#close(item);
+      return;
+    }
+
+    if (this.singleOpen) {
+      for (const other of this.items) {
+        if (other !== item && other.open) this.#close(other);
+      }
+    }
+
+    this.#open(item);
+  };
+
+  #answer(item) {
+    return item.querySelector('.jci-faq-item-answer');
+  }
+
+  #padBottom(answer) {
+    return getComputedStyle(answer).paddingBottom || '0px';
+  }
+
+  #open(item) {
+    const answer = this.#answer(item);
+    if (!answer) {
+      item.open = true;
+      return;
+    }
+
+    this.#animations.get(answer)?.cancel();
+    item.open = true;
+
+    const animation = answer.animate(
+      {
+        height: ['0px', `${answer.scrollHeight}px`],
+        paddingBottom: ['0px', this.#padBottom(answer)],
+        opacity: [0, 1],
+      },
+      { duration: this.duration, easing: EASING }
+    );
+
+    this.#settle(answer, animation, item, true);
+  }
+
+  #close(item) {
+    const answer = this.#answer(item);
+    if (!answer) {
+      item.open = false;
+      return;
+    }
+
+    this.#animations.get(answer)?.cancel();
+
+    // Measured, not read off scrollHeight: a cancelled animation can leave an
+    // inline height behind, and collapsing from the wrong start point is what
+    // makes the row kick.
+    const from = answer.getBoundingClientRect().height || answer.scrollHeight;
+
+    const animation = answer.animate(
+      {
+        height: [`${from}px`, '0px'],
+        paddingBottom: [this.#padBottom(answer), '0px'],
+        opacity: [1, 0],
+      },
+      { duration: this.duration, easing: EASING }
+    );
+
+    // `open` comes off only once the answer has finished collapsing, so the
+    // row never jumps ahead of the animation.
+    this.#settle(answer, animation, item, false);
+  }
+
+  /**
+   * Applies the intended `open` state once the animation lands, and only if
+   * this animation is still the current one.
+   */
+  #settle(answer, animation, item, open) {
+    this.#animations.set(answer, animation);
+
+    animation.finished
+      .then(() => {
+        if (this.#animations.get(answer) !== animation) return;
+        item.open = open;
+      })
+      .catch(() => {
+        /* cancelled - whichever click replaced it owns the state now */
+      })
+      .finally(() => {
+        if (this.#animations.get(answer) === animation) this.#animations.delete(answer);
+      });
+  }
+
+  /* -- Search --------------------------------------------------------- */
 
   #handleInput = () => this.#filter(this.input.value);
 
@@ -55,14 +201,23 @@ class JciFaq {
     const query = value.trim().toLowerCase();
     let matches = 0;
 
-    for (const { item, text } of this.#items) {
+    for (const { item, text } of this.#entries) {
       const hit = query === '' || text.includes(query);
 
       item.hidden = !hit;
 
       // A question left open while filtered would push the matches down the
-      // page; the prototype closes them all as soon as a query is typed.
-      if (query !== '' && item.open) item.open = false;
+      // page, so they all close — instantly, not animated, since the row is
+      // about to be hidden anyway.
+      if (query !== '' && item.open) {
+        const answer = this.#answer(item);
+        if (answer) {
+          this.#animations.get(answer)?.cancel();
+          this.#animations.delete(answer);
+        }
+        item.open = false;
+      }
+
       if (hit) matches += 1;
     }
 

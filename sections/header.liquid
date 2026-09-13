@@ -728,10 +728,19 @@
       rgb(var(--jci-paper-rgb) / 0.72)
     );
 
-    /* styles.css:50 also frosts this with
-       `backdrop-filter: blur(18px) saturate(1.15)`. Not used here, by
-       instruction. */
+    /* The frost is on .header itself, not here — see below. */
     transition: background 0.35s var(--jci-ease);
+  }
+
+  /* styles.css:50 puts the frost on .site-header, the header root, and it has
+     to stay there. On .header__underlay-closed the declaration applies but
+     does nothing: the underlay is a child of .header, which carries
+     `contain: layout style`, so the page behind it is not part of the
+     underlay's backdrop and there is nothing left to blur. On the root the
+     backdrop is the page itself. */
+  .header {
+    backdrop-filter: blur(18px) saturate(1.15);
+    -webkit-backdrop-filter: blur(18px) saturate(1.15);
   }
 
   .header .header__row--top {
