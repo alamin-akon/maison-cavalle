@@ -71,7 +71,7 @@
         "fit_card_title": "<p>Choose your <em>usual size.</em></p>",
         "fit_card_link_label": "View the guide",
         "fit_card_link": "",
-        "height": 90,
+        "height": 50,
         "height_mobile": 100,
         "title_size_min": 4,
         "title_size_max": 9,
