@@ -81,6 +81,39 @@ This is the one place the clone is deliberately not 1:1, so it needs no
 per-instance report under §0. Everything else about the type — family, size,
 weight, case — is still cloned exactly.
 
+### A section ships complete, or not at all
+
+Standing developer instruction, and by §0 #1 it outranks everything below:
+**a section is built in one pass, from the mockup, responsive included.**
+
+Every section is authored against the mockup in a single sitting — markup,
+CSS, both breakpoints, settings, and the template entry that renders it. The
+desktop layout and the 900px / 680px behaviour are the same piece of work, not
+two.
+
+Responsive is **not** a follow-up task. There is no pass where the section is
+"finished on desktop" and mobile is left for later. Open the mockup at all
+three widths first, then write the section once.
+
+A section is **done** only when all five are true:
+
+| # | Condition |
+|---|---|
+| 1 | Renders correctly at desktop, 900px and 680px, matching the mockup at each |
+| 2 | Every string, colour, image and spacing value is a setting — nothing hardcoded (§7) |
+| 3 | Placed in its template (`templates/*.json` or a `*-group.json`) and rendering |
+| 4 | `shopify theme check` clean |
+| 5 | Range settings pass the four server rules (§1) |
+
+These do **not** count as done:
+
+- desktop built, responsive deferred;
+- a `sections/jci-*.liquid` file that exists but no template renders;
+- a section that only works with its default settings.
+
+Condition 3 is not paperwork. A section that no template renders has not
+shipped, however complete the file looks — so it is not marked done in §8.
+
 ### Structure is not design
 
 The clone rule applies to the **visual output only**. The prototype's
@@ -620,6 +653,9 @@ Other border widths:
 | Retuning `--line-height--*` / `--letter-spacing--*` | Leave Horizon's defaults alone |
 | Copying the first matching rule in `styles.css` | Copy the value that wins the cascade (§0) |
 | Editing `settings_data.json` by hand for values the editor owns | Change in Theme Editor, then `shopify theme pull` |
+| Desktop now, responsive in a later pass | Both breakpoints in the same pass (§0) |
+| A `jci-*` section no template renders | Place it in its template before calling it done (§0) |
+| Marking a section done before it is checked at 900px and 680px | All five conditions in §0, or it is not done |
 
 ---
 
@@ -642,11 +678,16 @@ Other border widths:
 | 6g | `sections/jci-newsletter.liquid` — Shopify customer form, ink panel | done |
 | 6h | `sections/jci-best-sellers.liquid` — piece blocks, scroll-dealt card stack | done |
 | 6i | `sections/jci-testimonials.liquid` — quote blocks, drag rail | done |
-| 6j | `sections/jci-social-media.liquid` — film card blocks, drifting drag band | done |
+| 6j | `sections/jci-social-media.liquid` — film card blocks, drifting drag band | built, not placed |
 | 7 | Verify in Theme Editor that every value round-trips | pending |
 | 8 | `sections/jci-footer.liquid` — menu-backed link columns, journal sign-off | done |
 | 9 | Product + collection templates | |
 | 10 | Content pages (story, journal, faq, shipping, size guide) | |
+
+**Status in this table follows §0.** `done` means all five conditions are
+met — including that a template actually renders the section. A section whose
+file is complete but which no template renders is `built, not placed`, and the
+remaining work is to place it, not to write it.
 
 ### Video
 
