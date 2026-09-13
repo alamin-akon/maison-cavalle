@@ -22,8 +22,6 @@
 <section
   class="jci-faq-hero"
   {% if s.anchor_id != blank %}id="{{ s.anchor_id }}"{% endif %}
-  {% if s.enable_tilt %}data-jci-tilt{% endif %}
-  data-jci-tilt-strength="{{ s.tilt_strength }}"
   {{ section.shopify_attributes }}
   style="
     --jci-faq-hero-bg: {{ s.background_color | default: settings.color_palette.foreground }};
@@ -78,11 +76,15 @@
     </div>
 
     {%- comment -%}
-      The tilt is pointer-driven, so the element keeps its own two custom
-      properties rather than a class. JS hooks target data-jci-*, never a
-      jci- class (§1).
+      The tilt is the shared jci-tilt behaviour: it sets --jci-tilt-x / -y on
+      this element and the CSS below decides what to do with them. JS hooks
+      target data-jci-*, never a jci- class (§1).
     {%- endcomment -%}
-    <div class="jci-faq-hero-visual" data-jci-faq-hero-visual>
+    <div
+      class="jci-faq-hero-visual"
+      {% if s.enable_tilt %}data-jci-tilt{% endif %}
+      data-jci-tilt-strength="{{ s.tilt_strength }}"
+    >
       {%- if image_asset != blank -%}
         <img
           class="jci-faq-hero-image"
@@ -134,7 +136,7 @@
   </div>
 </section>
 
-<script src="{{ 'jci-faq-hero.js' | asset_url }}" type="module"></script>
+<script src="{{ 'jci-tilt.js' | asset_url }}" type="module"></script>
 
 {% stylesheet %}
   /* styles.css:981 */

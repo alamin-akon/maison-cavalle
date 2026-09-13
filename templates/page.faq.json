@@ -236,6 +236,8 @@
       "settings": {
         "eyebrow": "Find your answer",
         "title": "Questions, considered.",
+        "toggle_duration": 320,
+        "single_open": false,
         "show_search": true,
         "search_label": "Search frequently asked questions",
         "search_placeholder": "Search fit, delivery or returns",
@@ -256,11 +258,7 @@
         "padding_bottom": 136,
         "padding_top_mobile": 72,
         "padding_bottom_mobile": 72,
-        "anchor_id": "faq-content",
-        "toggle_duration": 320,
-        "single_open": false,
-        "index_width": 34,
-        "summary_gap": 100
+        "anchor_id": "faq-content"
       }
     },
     "jci_faq_assurance": {

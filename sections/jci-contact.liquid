@@ -1,0 +1,810 @@
+{% comment %}
+  Maison Cavallé — contact details and form
+
+  Prototype source: maison-cavalle-main/index.html  → section.contact-section
+                    maison-cavalle-main/styles.css  → .contact-* (1103-1258),
+                                                      @680 block
+  Reference: MAISON-CAVALLE-SPEC.md §0, §1, §3, §5, §7
+
+  The form is Shopify's own `{% form 'contact' %}`, not the prototype's inert
+  markup — the prototype had nowhere to send a message. Field names are the
+  ones Shopify reads (`contact[name]`, `contact[email]`, `contact[body]`), so
+  submissions land in the shop's inbox, errors come back through
+  `form.errors` and the success state is `form.posted_successfully?`.
+
+  Per §0's "one container, one rhythm, one type scale", the intro and layout
+  take the shared container rather than the prototype's own 1180px measure.
+
+  No letter-spacing or line-height is authored and the `font:` shorthands are
+  split (§0). Colours are palette entries or opacity steps (§7).
+{% endcomment %}
+
+{%- liquid
+  assign s = section.settings
+  assign details = section.blocks | where: 'type', 'detail'
+  assign supports = section.blocks | where: 'type', 'support'
+  assign enquiries = section.blocks | where: 'type', 'enquiry'
+  assign form_id = 'jci-contact-form-' | append: section.id
+-%}
+
+<section
+  class="jci-contact"
+  {% if s.anchor_id != blank %}id="{{ s.anchor_id }}"{% endif %}
+  {{ section.shopify_attributes }}
+  style="
+    --jci-contact-bg: {{ s.background_color | default: settings.color_palette.background }};
+    --jci-contact-heading: {{ s.heading_color | default: settings.color_palette.foreground }};
+    --jci-contact-accent: {{ s.accent_color | default: settings.color_palette.color5 }};
+    --jci-contact-index: {{ s.index_color | default: settings.color_palette.color6 }};
+    --jci-contact-body: {% if s.body_color != blank %}{{ s.body_color }}{% else %}rgb(var(--jci-ink-rgb) / 0.74){% endif %};
+    --jci-contact-card-bg: {{ s.card_background | default: settings.color_palette.color3 }};
+    --jci-contact-field-bg: {% if s.field_background != blank %}{{ s.field_background }}{% else %}rgb(var(--jci-ink-rgb) / 0.04){% endif %};
+    --jci-contact-gap: {{ s.column_gap }}px;
+    --jci-contact-pad-top: {{ s.padding_top }}px;
+    --jci-contact-pad-bottom: {{ s.padding_bottom }}px;
+    --jci-contact-pad-top-mobile: {{ s.padding_top_mobile }}px;
+    --jci-contact-pad-bottom-mobile: {{ s.padding_bottom_mobile }}px;
+  "
+>
+  <div class="jci-contact-container">
+    <div class="jci-contact-intro">
+      <div class="jci-contact-intro-copy">
+        {%- if s.eyebrow != blank -%}
+          <p class="jci-eyebrow jci-contact-eyebrow">{{ s.eyebrow }}</p>
+        {%- endif -%}
+        {%- if s.title_line_one != blank or s.title_line_two != blank -%}
+          <h2 class="jci-contact-title">
+            {{- s.title_line_one -}}
+            {%- if s.title_line_one != blank and s.title_line_two != blank -%}<br>{%- endif -%}
+            {%- if s.title_line_two != blank -%}
+              <em class="jci-contact-title-accent">{{ s.title_line_two }}</em>
+            {%- endif -%}
+          </h2>
+        {%- endif -%}
+      </div>
+
+      {%- if s.status_label != blank or s.availability != blank -%}
+        <div class="jci-contact-availability">
+          {%- if s.status_label != blank -%}
+            <span class="jci-contact-status">
+              <i class="jci-contact-status-dot" aria-hidden="true"></i>
+              {{- s.status_label -}}
+            </span>
+          {%- endif -%}
+          {%- if s.availability != blank -%}
+            <p class="jci-contact-availability-text">{{ s.availability }}</p>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+    </div>
+
+    <div class="jci-contact-layout">
+      <div class="jci-contact-details">
+        {%- for block in details -%}
+          {%- assign row = block.settings -%}
+          <div class="jci-contact-detail-row" {{ block.shopify_attributes }}>
+            {%- if row.label != blank -%}
+              <span class="jci-contact-detail-label">{{ row.label }}</span>
+            {%- endif -%}
+            {%- if row.link != blank -%}
+              <a
+                class="jci-contact-detail-link"
+                href="{{ row.link }}"
+                {% if row.new_tab %}target="_blank" rel="noreferrer"{% endif %}
+              >
+                {{- row.value -}}
+              </a>
+            {%- else -%}
+              <p class="jci-contact-detail-text">{{ row.value }}</p>
+            {%- endif -%}
+          </div>
+        {%- endfor -%}
+
+        {%- if supports.size > 0 -%}
+          <div class="jci-contact-support-grid">
+            {%- for block in supports -%}
+              {%- assign card = block.settings -%}
+              <a
+                class="jci-contact-support-card"
+                href="{{ card.link | default: '#' }}"
+                {{ block.shopify_attributes }}
+              >
+                <span class="jci-contact-support-index">
+                  {{- card.index | default: forloop.index | prepend: '0' | slice: -2, 2 -}}
+                </span>
+                {%- if card.title != blank -%}
+                  <strong class="jci-contact-support-title">{{ card.title }}</strong>
+                {%- endif -%}
+                {%- if card.text != blank -%}
+                  <p class="jci-contact-support-text">{{ card.text }}</p>
+                {%- endif -%}
+                {%- render 'jci-action-arrow', class: 'jci-contact-support-arrow' -%}
+              </a>
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+
+        {%- if enquiries.size > 0 -%}
+          <div class="jci-contact-enquiry-types">
+            {%- for block in enquiries -%}
+              <div class="jci-contact-enquiry" {{ block.shopify_attributes }}>
+                {%- if block.settings.label != blank -%}
+                  <p class="jci-eyebrow jci-contact-enquiry-label">{{ block.settings.label }}</p>
+                {%- endif -%}
+                {%- if block.settings.text != blank -%}
+                  <p class="jci-contact-enquiry-text">{{ block.settings.text }}</p>
+                {%- endif -%}
+              </div>
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+      </div>
+
+      <div class="jci-contact-form-wrap" id="{{ s.form_anchor | default: 'contact-form' }}">
+        {%- form 'contact', id: form_id, class: 'jci-contact-form' -%}
+          <div class="jci-contact-form-head">
+            <div class="jci-contact-form-head-copy">
+              {%- if s.form_eyebrow != blank -%}
+                <p class="jci-eyebrow jci-contact-form-eyebrow">{{ s.form_eyebrow }}</p>
+              {%- endif -%}
+              {%- if s.form_title != blank -%}
+                <h2 class="jci-contact-form-title">{{ s.form_title }}</h2>
+              {%- endif -%}
+            </div>
+            {%- if s.form_stamp != blank -%}
+              <span class="jci-contact-form-stamp">{{ s.form_stamp }}</span>
+            {%- endif -%}
+          </div>
+
+          {%- if s.form_intro != blank -%}
+            <p class="jci-contact-form-intro">{{ s.form_intro }}</p>
+          {%- endif -%}
+
+          {%- if form.posted_successfully? -%}
+            <p class="jci-contact-form-feedback" role="status">{{ s.form_success }}</p>
+          {%- elsif form.errors -%}
+            <p class="jci-contact-form-feedback jci-contact-form-feedback--error" role="status">
+              {{- form.errors | default_errors -}}
+            </p>
+          {%- endif -%}
+
+          <div class="jci-contact-form-grid">
+            <div class="jci-contact-field">
+              <label class="jci-contact-field-label" for="{{ form_id }}-name">
+                {{- s.label_name -}}
+              </label>
+              <input
+                class="jci-contact-field-input"
+                id="{{ form_id }}-name"
+                type="text"
+                name="contact[name]"
+                autocomplete="name"
+                placeholder="{{ s.placeholder_name | escape }}"
+                value="{{ form.name }}"
+                required
+              >
+            </div>
+
+            <div class="jci-contact-field">
+              <label class="jci-contact-field-label" for="{{ form_id }}-email">
+                {{- s.label_email -}}
+              </label>
+              <input
+                class="jci-contact-field-input"
+                id="{{ form_id }}-email"
+                type="email"
+                name="contact[email]"
+                autocomplete="email"
+                placeholder="{{ s.placeholder_email | escape }}"
+                value="{{ form.email }}"
+                required
+              >
+            </div>
+
+            {%- if s.subject_options != blank -%}
+              <div class="jci-contact-field jci-contact-field--full">
+                <label class="jci-contact-field-label" for="{{ form_id }}-subject">
+                  {{- s.label_subject -}}
+                </label>
+                <select
+                  class="jci-contact-field-select"
+                  id="{{ form_id }}-subject"
+                  name="contact[subject]"
+                >
+                  {%- assign options = s.subject_options | newline_to_br | split: '<br />' -%}
+                  {%- for option in options -%}
+                    {%- assign label = option | strip -%}
+                    {%- if label != blank -%}
+                      <option value="{{ label | escape }}">{{ label }}</option>
+                    {%- endif -%}
+                  {%- endfor -%}
+                </select>
+              </div>
+            {%- endif -%}
+
+            <div class="jci-contact-field jci-contact-field--full">
+              <label class="jci-contact-field-label" for="{{ form_id }}-message">
+                {{- s.label_message -}}
+              </label>
+              <textarea
+                class="jci-contact-field-textarea"
+                id="{{ form_id }}-message"
+                name="contact[body]"
+                placeholder="{{ s.placeholder_message | escape }}"
+                required
+              >{{ form.body }}</textarea>
+            </div>
+          </div>
+
+          <button class="jci-button jci-contact-form-submit" type="submit">
+            {{- s.submit_label }}
+            {%- render 'jci-action-arrow', class: 'jci-contact-form-submit-arrow' -%}
+          </button>
+        {%- endform -%}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+  /* styles.css:1103 */
+  .jci-contact {
+    background: var(--jci-contact-bg);
+  }
+
+  .jci-contact-container {
+    padding-block: var(--jci-contact-pad-top) var(--jci-contact-pad-bottom);
+  }
+
+  /* styles.css:1105-1126. The 1180px measure is dropped for the shared
+     container, per §0's one-container rule. */
+  .jci-contact-intro {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(260px, 0.9fr);
+    gap: clamp(2rem, 7vw, 8rem);
+    align-items: end;
+    margin-block-end: clamp(3rem, 6vw, 5.5rem);
+    padding-block-end: 2rem;
+    border-bottom: 1px solid var(--jci-line);
+  }
+
+  .jci-contact-eyebrow {
+    color: var(--jci-contact-accent);
+  }
+
+  .jci-contact-title {
+    margin: 0.8rem 0 0;
+    color: var(--jci-contact-heading);
+    font-family: var(--jci-font-display);
+    font-size: var(--jci-section-title-size);
+    font-weight: 500;
+  }
+
+  .jci-contact-title-accent {
+    color: var(--jci-contact-accent);
+    font-style: italic;
+  }
+
+  /* styles.css:1127-1138 */
+  .jci-contact-availability {
+    max-width: 360px;
+    padding: 1rem 0 0 1.2rem;
+    border-left: 1px solid var(--jci-index, var(--jci-rust));
+  }
+
+  .jci-contact-availability-text {
+    margin: 0.8rem 0 0;
+    color: var(--jci-contact-body);
+    font-family: var(--jci-font-sans);
+    font-size: var(--jci-subtitle-size);
+  }
+
+  /* styles.css:1139-1162 — the dot breathes while the line is open. */
+  .jci-contact-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--jci-contact-accent);
+    font-family: var(--jci-font-label);
+    font-size: 12px;
+    text-transform: uppercase;
+  }
+
+  .jci-contact-status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--jci-contact-index);
+    box-shadow: 0 0 0 4px rgb(var(--jci-rust-rgb) / 0.12);
+    animation: jci-contact-pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes jci-contact-pulse {
+    0%,
+    100% {
+      box-shadow: 0 0 0 4px rgb(var(--jci-rust-rgb) / 0.12);
+    }
+
+    50% {
+      box-shadow: 0 0 0 8px rgb(var(--jci-rust-rgb) / 0.03);
+    }
+  }
+
+  /* styles.css:1163-1171 */
+  .jci-contact-layout {
+    display: grid;
+    grid-template-columns: 1.1fr 1.2fr;
+    gap: var(--jci-contact-gap);
+  }
+
+  .jci-contact-details {
+    padding-block-start: 0.4rem;
+  }
+
+  /* styles.css:1174-1181 */
+  .jci-contact-detail-row {
+    padding-block: 1rem;
+    border-top: 1px solid var(--jci-line);
+    transition:
+      padding 0.3s var(--jci-ease),
+      background 0.3s var(--jci-ease);
+  }
+
+  .jci-contact-detail-row:last-of-type {
+    border-bottom: 1px solid var(--jci-line);
+  }
+
+  .jci-contact-detail-row:hover {
+    padding-inline-start: 0.6rem;
+    background: rgb(var(--jci-cream-rgb) / 0.45);
+  }
+
+  .jci-contact-detail-label {
+    display: block;
+    margin-block-end: 0.35rem;
+    color: var(--jci-contact-accent);
+    font-family: var(--jci-font-label);
+    font-size: 14px;
+    text-transform: uppercase;
+  }
+
+  .jci-contact-detail-link {
+    color: var(--jci-contact-heading);
+    font-family: var(--jci-font-display);
+    font-size: 17px;
+    text-decoration: none;
+    transition: color 0.25s var(--jci-ease);
+  }
+
+  .jci-contact-detail-link:hover,
+  .jci-contact-detail-link:focus-visible {
+    color: var(--jci-contact-index);
+  }
+
+  .jci-contact-detail-text {
+    margin: 0;
+    color: var(--jci-contact-body);
+    font-family: var(--jci-font-sans);
+    font-size: var(--jci-subtitle-size);
+  }
+
+  /* styles.css:1183-1231 */
+  .jci-contact-support-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.6rem;
+    margin-block-start: 2.3rem;
+    padding-block-start: 1.2rem;
+    border-top: 1px solid var(--jci-line);
+  }
+
+  .jci-contact-support-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-height: 150px;
+    padding: 1rem;
+    border: 1px solid var(--jci-line);
+    color: var(--jci-contact-heading);
+    background: var(--jci-contact-card-bg);
+    text-decoration: none;
+    transition:
+      color 0.3s var(--jci-ease),
+      background 0.3s var(--jci-ease),
+      transform 0.4s var(--jci-ease),
+      box-shadow 0.4s var(--jci-ease);
+  }
+
+  .jci-contact-support-card:hover,
+  .jci-contact-support-card:focus-visible {
+    color: var(--jci-contact-bg);
+    background: var(--jci-contact-heading);
+    transform: translateY(-5px);
+    box-shadow: 8px 10px 0 rgb(var(--jci-ink-rgb) / 0.12);
+  }
+
+  .jci-contact-support-index {
+    color: var(--jci-contact-index);
+    font-family: var(--jci-font-label);
+    font-size: 12px;
+  }
+
+  .jci-contact-support-title {
+    max-width: 100px;
+    margin-block-start: auto;
+    font-family: var(--jci-font-display);
+    font-size: 18px;
+    font-weight: 500;
+  }
+
+  .jci-contact-support-text {
+    margin: 0.45rem 0 0;
+    color: var(--jci-contact-body);
+    font-family: var(--jci-font-sans);
+    font-size: var(--jci-subtitle-size);
+  }
+
+  .jci-contact-support-card:hover .jci-contact-support-text,
+  .jci-contact-support-card:focus-visible .jci-contact-support-text {
+    color: rgb(var(--jci-paper-rgb) / 0.78);
+  }
+
+  .jci-contact-support-card > .jci-contact-support-arrow {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 16px;
+    height: 16px;
+    transition: transform 0.3s var(--jci-ease);
+  }
+
+  .jci-contact-support-card:hover > .jci-contact-support-arrow,
+  .jci-contact-support-card:focus-visible > .jci-contact-support-arrow {
+    transform: translate(3px, -3px);
+  }
+
+  /* styles.css:1239 */
+  .jci-contact-support-card:focus-visible {
+    outline: 2px solid var(--jci-contact-index);
+    outline-offset: 4px;
+  }
+
+  /* styles.css:1232-1236 */
+  .jci-contact-enquiry-types {
+    display: grid;
+    gap: 1rem;
+    margin-block-start: 2rem;
+    padding-block-start: 1.2rem;
+    border-top: 1px solid var(--jci-line);
+  }
+
+  .jci-contact-enquiry {
+    padding-block-end: 1rem;
+    border-bottom: 1px solid var(--jci-line);
+  }
+
+  .jci-contact-enquiry:last-of-type {
+    padding-block-end: 0;
+    border-bottom: 0;
+  }
+
+  .jci-contact-enquiry-label {
+    margin-block-end: 0.3rem;
+    color: var(--jci-contact-accent);
+  }
+
+  .jci-contact-enquiry-text {
+    margin: 0;
+    color: var(--jci-contact-body);
+    font-family: var(--jci-font-sans);
+    font-size: var(--jci-subtitle-size);
+  }
+
+  /* styles.css:1241-1244 */
+  .jci-contact-form {
+    position: relative;
+    padding: clamp(1.5rem, 4vw, 3rem);
+    border: 1px solid var(--jci-line);
+    background: var(--jci-contact-card-bg);
+    box-shadow: 14px 16px 0 rgb(var(--jci-ink-rgb) / 0.08);
+    scroll-margin-block-start: 100px;
+  }
+
+  .jci-contact-form::before {
+    content: '';
+    position: absolute;
+    inset: 12px;
+    border: 1px solid rgb(var(--jci-ink-rgb) / 0.08);
+    pointer-events: none;
+  }
+
+  .jci-contact-form > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* styles.css:1245-1249 */
+  .jci-contact-form-head {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-block-end: 1.2rem;
+    border-bottom: 1px solid var(--jci-line);
+  }
+
+  .jci-contact-form-eyebrow {
+    margin-block-end: 0.6rem;
+    color: var(--jci-contact-accent);
+  }
+
+  .jci-contact-form-title {
+    margin: 0;
+    color: var(--jci-contact-heading);
+    font-family: var(--jci-font-display);
+    font-size: clamp(28px, 3vw, 42px);
+    font-weight: 500;
+  }
+
+  .jci-contact-form-stamp {
+    color: var(--jci-contact-accent);
+    font-family: var(--jci-font-label);
+    font-size: 12px;
+  }
+
+  .jci-contact-form-intro {
+    max-width: 420px;
+    margin: 1.3rem 0 2.2rem;
+    color: var(--jci-contact-body);
+    font-family: var(--jci-font-sans);
+    font-size: var(--jci-subtitle-size);
+  }
+
+  /* styles.css:1250-1256 */
+  .jci-contact-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.2rem;
+  }
+
+  .jci-contact-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    margin-block-end: 1.2rem;
+  }
+
+  .jci-contact-field--full {
+    grid-column: 1 / -1;
+  }
+
+  .jci-contact-field-label {
+    color: var(--jci-contact-heading);
+    font-family: var(--jci-font-label);
+    font-size: 14px;
+    text-transform: uppercase;
+  }
+
+  .jci-contact-field-input,
+  .jci-contact-field-textarea,
+  .jci-contact-field-select {
+    width: 100%;
+    padding: 0.8rem 20px;
+    border: 0;
+    border-bottom: 1px solid var(--jci-line);
+    border-radius: 0;
+    outline: 0;
+    color: var(--jci-contact-heading);
+    background: var(--jci-contact-field-bg);
+    font-family: var(--jci-font-sans);
+    font-size: var(--jci-subtitle-size);
+  }
+
+  .jci-contact-field-textarea {
+    min-height: 110px;
+    resize: vertical;
+  }
+
+  .jci-contact-field-input:focus,
+  .jci-contact-field-textarea:focus,
+  .jci-contact-field-select:focus {
+    border-color: var(--jci-contact-heading);
+  }
+
+  /* styles.css:1257-1258 */
+  .jci-contact-form-submit {
+    min-width: 190px;
+    margin-block-start: 0.25rem;
+  }
+
+  .jci-contact-form-submit-arrow {
+    width: 13px;
+    height: 13px;
+  }
+
+  .jci-contact-form-feedback {
+    min-height: 1.5em;
+    margin: 0 0 1.2rem;
+    padding-block-start: 0.7rem;
+    color: var(--jci-contact-accent);
+    font-family: var(--jci-font-sans);
+    font-size: 12px;
+  }
+
+  .jci-contact-form-feedback--error {
+    color: var(--jci-contact-index);
+  }
+
+  /* styles.css:@680 — the form comes first, then the details. */
+  @media screen and (max-width: 680px) {
+    .jci-contact-container {
+      padding-block: var(--jci-contact-pad-top-mobile) var(--jci-contact-pad-bottom-mobile);
+    }
+
+    .jci-contact-intro {
+      display: block;
+      margin-block-end: 2.8rem;
+      padding-block-end: 1.5rem;
+    }
+
+    .jci-contact-title {
+      margin-block-end: 1.8rem;
+    }
+
+    .jci-contact-availability {
+      max-width: 100%;
+      padding-inline-start: 1rem;
+    }
+
+    .jci-contact-layout {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .jci-contact-details {
+      order: 2;
+      margin-block-end: 0;
+    }
+
+    .jci-contact-support-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .jci-contact-support-card {
+      min-height: 120px;
+    }
+
+    .jci-contact-form-wrap {
+      order: 1;
+      margin-block-end: 2.8rem;
+    }
+
+    .jci-contact-form {
+      padding: 1.45rem 1.2rem;
+      box-shadow: 8px 10px 0 rgb(var(--jci-ink-rgb) / 0.08);
+    }
+
+    .jci-contact-form::before {
+      inset: 8px;
+    }
+
+    .jci-contact-form-head {
+      align-items: flex-start;
+    }
+
+    .jci-contact-form-grid {
+      display: block;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .jci-contact-status-dot {
+      animation: none;
+    }
+
+    .jci-contact-detail-row,
+    .jci-contact-detail-link,
+    .jci-contact-support-card,
+    .jci-contact-support-arrow {
+      transition: none;
+    }
+
+    .jci-contact-support-card:hover {
+      transform: none;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Contact details",
+  "tag": "section",
+  "class": "jci-contact-section",
+  "blocks": [
+    {
+      "type": "detail",
+      "name": "Detail row",
+      "settings": [
+        { "type": "text", "id": "label", "label": "Label", "default": "Email" },
+        { "type": "textarea", "id": "value", "label": "Value", "default": "admin@maisoncavalle.com" },
+        { "type": "text", "id": "link", "label": "Link", "info": "A URL, or mailto: / tel:. Leave empty for plain text." },
+        { "type": "checkbox", "id": "new_tab", "label": "Open in a new tab", "default": false }
+      ]
+    },
+    {
+      "type": "support",
+      "name": "Support card",
+      "settings": [
+        { "type": "text", "id": "index", "label": "Number", "info": "Leave empty to number automatically." },
+        { "type": "text", "id": "title", "label": "Title", "default": "Find an answer" },
+        { "type": "textarea", "id": "text", "label": "Body", "default": "Fit, delivery and returns." },
+        { "type": "url", "id": "link", "label": "Link" }
+      ]
+    },
+    {
+      "type": "enquiry",
+      "name": "Enquiry type",
+      "settings": [
+        { "type": "text", "id": "label", "label": "Label", "default": "Customer Care" },
+        { "type": "textarea", "id": "text", "label": "Body", "default": "For order, delivery, sizing and returns enquiries." }
+      ]
+    }
+  ],
+  "settings": [
+    { "type": "header", "content": "Intro" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Ways to reach us" },
+    { "type": "text", "id": "title_line_one", "label": "Title first line", "default": "Good conversations" },
+    { "type": "text", "id": "title_line_two", "label": "Title second line (italic)", "default": "start here." },
+    { "type": "text", "id": "status_label", "label": "Status label", "default": "The Maison is open" },
+    { "type": "textarea", "id": "availability", "label": "Availability note", "default": "We aim to respond to enquiries within 1–2 business days. For order questions, include your order number so we can help quickly." },
+
+    { "type": "header", "content": "Form" },
+    { "type": "text", "id": "form_anchor", "label": "Form anchor ID", "default": "contact-form" },
+    { "type": "text", "id": "form_eyebrow", "label": "Eyebrow", "default": "The open line" },
+    { "type": "text", "id": "form_title", "label": "Title", "default": "Send a note." },
+    { "type": "text", "id": "form_stamp", "label": "Corner stamp", "default": "MC / 01" },
+    { "type": "textarea", "id": "form_intro", "label": "Intro", "default": "Tell us a little about what you need. A member of the Maison will be in touch shortly." },
+    { "type": "text", "id": "label_name", "label": "Name label", "default": "Name" },
+    { "type": "text", "id": "placeholder_name", "label": "Name placeholder", "default": "Your name" },
+    { "type": "text", "id": "label_email", "label": "Email label", "default": "Email" },
+    { "type": "text", "id": "placeholder_email", "label": "Email placeholder", "default": "you@example.com" },
+    { "type": "text", "id": "label_subject", "label": "Subject label", "default": "Subject" },
+    { "type": "textarea", "id": "subject_options", "label": "Subject options", "default": "Order enquiry\nProduct question\nReturns & exchanges\nSize guidance\nSomething else", "info": "One per line. Leave empty to drop the subject field." },
+    { "type": "text", "id": "label_message", "label": "Message label", "default": "Message" },
+    { "type": "text", "id": "placeholder_message", "label": "Message placeholder", "default": "How can we help?" },
+    { "type": "text", "id": "submit_label", "label": "Submit label", "default": "Send message" },
+    { "type": "textarea", "id": "form_success", "label": "Success message", "default": "Thank you. A member of the Maison will be in touch shortly." },
+
+    { "type": "header", "content": "Colors", "info": "Left empty, each of these follows the theme colour palette." },
+    { "type": "color", "id": "background_color", "label": "Background" },
+    { "type": "color", "id": "heading_color", "label": "Heading" },
+    { "type": "color", "id": "accent_color", "label": "Accent" },
+    { "type": "color", "id": "index_color", "label": "Numbers and highlights" },
+    { "type": "color", "id": "body_color", "label": "Body text" },
+    { "type": "color", "id": "card_background", "label": "Card and form background" },
+    { "type": "color", "id": "field_background", "label": "Field background" },
+
+    { "type": "header", "content": "Layout" },
+    { "type": "range", "id": "column_gap", "label": "Column gap", "min": 16, "max": 120, "step": 2, "unit": "px", "default": 50 },
+    { "type": "range", "id": "padding_top", "label": "Padding top", "min": 0, "max": 240, "step": 4, "unit": "px", "default": 136 },
+    { "type": "range", "id": "padding_bottom", "label": "Padding bottom", "min": 0, "max": 240, "step": 4, "unit": "px", "default": 136 },
+    { "type": "range", "id": "padding_top_mobile", "label": "Padding top on mobile", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 72 },
+    { "type": "range", "id": "padding_bottom_mobile", "label": "Padding bottom on mobile", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 72 },
+
+    { "type": "header", "content": "Anchor" },
+    { "type": "text", "id": "anchor_id", "label": "Anchor ID", "default": "contact-content" }
+  ],
+  "presets": [
+    {
+      "name": "Contact details",
+      "blocks": [
+        { "type": "detail", "settings": { "label": "Email", "value": "admin@maisoncavalle.com", "link": "mailto:admin@maisoncavalle.com" } },
+        { "type": "detail", "settings": { "label": "Hours", "value": "Monday–Friday\n9am–5pm AEST" } },
+        { "type": "support", "settings": { "index": "01", "title": "Find an answer", "text": "Fit, delivery and returns." } },
+        { "type": "enquiry", "settings": { "label": "Customer Care", "text": "For order, delivery, sizing and returns enquiries." } }
+      ]
+    }
+  ]
+}
+{% endschema %}
