@@ -193,9 +193,22 @@
     }
   }
 
-  .account-button {
-    min-width: 0;
-    min-height: 0;
+.account-button {
+    --hover-opacity: 0;
+    --clamped-avatar-size: clamp( 24px, var(--shopify-account-signed-in-avatar-size), 32px );
+    appearance: none;
+    border: 0px solid transparent;
+    background-color: transparent;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: currentColor;
+    text-decoration: none;
+    cursor: pointer;
+    min-width: 0 !important;
+    min-height: 0 !important;
 }
 
 

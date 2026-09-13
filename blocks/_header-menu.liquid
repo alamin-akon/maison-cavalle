@@ -317,7 +317,7 @@
     font-family: var(--menu-top-level-font-family);
     font-style: var(--menu-top-level-font-style);
     font-weight: var(--menu-top-level-font-weight);
-    font-size: var(--menu-top-level-font-size);
+    font-size: 12px;
     line-height: var(--menu-top-level-font-line-height);
     text-transform: var(--menu-top-level-font-case);
     color: var(--menu-top-level-font-color);
@@ -399,10 +399,10 @@
   .menu-list__disclosure[aria-expanded='true'] .menu-list__disclosure-icon {
     transform: rotate(180deg);
   }
-
-  .menu-list__link-title {
+.menu-list__link-title {
     padding-inline: var(--gap-sm);
-  }
+    text-transform: uppercase;
+}
   [slot='overflow'] .menu-list__link-title {
     padding-inline: 0;
   }
