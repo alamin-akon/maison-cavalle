@@ -1,0 +1,612 @@
+{% comment %}
+  Maison Cavallé — collection grid
+
+  Prototype source: maison-cavalle-main/app.js      → renderCollection, sortCollection,
+                                                      loadMoreCollection
+                    maison-cavalle-main/styles.css  → .collection-toolbar … .collection-load-more-button
+                                                      (465-489), .section-cta (307),
+                                                      @1174 (1488-1491), @900 (1513-1514),
+                                                      @680 (1634-1641, 1670-1674)
+  Reference: MAISON-CAVALLE-SPEC.md §0, §1, §5, §7
+
+  The prototype filters and sorts one in-memory list. On Shopify each category
+  is a collection and each sort is Shopify's own `sort_by`, so the filters and
+  sort options are links: the URL is shareable, the back button works and the
+  collection hero above can follow the collection being viewed.
+
+  The cards are snippets/jci-product-card.liquid, the same card as the home
+  product section, with the collection's taller ratio, shadow and hover lift
+  passed in through the card's custom properties.
+
+  "Load more pieces" appends Shopify's next page (jci-collection-grid.js). With
+  no JS it is a plain link to that page.
+
+  The prototype swaps the filter buttons for the dropdown at 1174px. §5 allows
+  900px and 680px only, so the swap happens at 900px.
+
+  No letter-spacing or line-height is authored and the `font:` shorthands are
+  split (§0). Colours are palette entries or opacity steps off one (§7).
+{% endcomment %}
+
+{%- liquid
+  assign s = section.settings
+  assign filters = section.blocks | where: 'type', 'filter'
+
+  assign current_sort = collection.sort_by | default: collection.default_sort_by
+
+  assign active_label = collection.title
+  for block in filters
+    assign filter_collection = block.settings.collection
+    if filter_collection == blank and collection.handle == 'all'
+      assign active_label = block.settings.label | default: collection.title
+    elsif filter_collection != blank and filter_collection.handle == collection.handle
+      assign active_label = block.settings.label | default: filter_collection.title
+    endif
+  endfor
+
+  assign sort_featured = collection.default_sort_by
+  assign sort_label = s.sort_featured_label
+  if current_sort == 'price-ascending'
+    assign sort_label = s.sort_low_label
+  elsif current_sort == 'price-descending'
+    assign sort_label = s.sort_high_label
+  endif
+
+  assign filter_menu_id = 'jci-collection-grid-filter-' | append: section.id
+  assign sort_menu_id = 'jci-collection-grid-sort-' | append: section.id
+-%}
+
+<section
+  class="jci-collection-grid"
+  {% if s.anchor_id != blank %}id="{{ s.anchor_id | handleize }}"{% endif %}
+  data-jci-collection-grid
+  data-section-id="{{ section.id }}"
+  {{ section.shopify_attributes }}
+  style="
+    --jci-collection-grid-bg: {{ s.background_color | default: settings.color_palette.background }};
+    --jci-collection-grid-text: {{ s.text_color | default: settings.color_palette.foreground }};
+    --jci-collection-grid-label: {{ s.label_color | default: settings.color_palette.color5 }};
+    --jci-collection-grid-selected: {{ s.selected_color | default: settings.color_palette.color5 }};
+    --jci-collection-grid-pad-top: {{ s.padding_top }}px;
+    --jci-collection-grid-pad-bottom: {{ s.padding_bottom }}px;
+    --jci-collection-grid-pad-top-mobile: {{ s.padding_top_mobile }}px;
+    --jci-collection-grid-pad-bottom-mobile: {{ s.padding_bottom_mobile }}px;
+    --jci-collection-grid-columns: {{ s.columns }};
+    --jci-collection-grid-row-gap: {{ s.row_gap }}px;
+    --jci-collection-grid-row-gap-mobile: {{ s.row_gap_mobile }}px;
+    --jci-product-section-bg: {{ s.background_color | default: settings.color_palette.background }};
+    --jci-product-section-bg-rgb: {{ s.background_color.rgb | default: settings.color_palette.background.rgb }};
+    --jci-product-section-heading: {{ s.text_color | default: settings.color_palette.foreground }};
+    --jci-product-section-heading-rgb: {{ s.text_color.rgb | default: settings.color_palette.foreground.rgb }};
+    --jci-product-card-subtitle-color: {{ s.subtitle_color }};
+    --jci-product-card-media-bg: {{ s.media_background | default: settings.color_palette.color2 }};
+    --jci-product-card-ratio: {{ s.image_ratio | divided_by: 100.0 }};
+    --jci-product-card-zoom: {{ s.image_zoom | divided_by: 1000.0 | plus: 1 }};
+    --jci-collection-grid-lift: -{{ s.card_lift }}px;
+  "
+>
+  <div class="jci-collection-grid-container">
+    {%- paginate collection.products by s.products_per_page -%}
+      <div class="jci-collection-grid-toolbar">
+        {%- if filters.size > 0 -%}
+          <nav class="jci-collection-grid-filters" aria-label="{{ s.filter_label | escape }}">
+            {%- for block in filters -%}
+              {%- liquid
+                assign filter_collection = block.settings.collection
+                assign filter_url = filter_collection.url | default: routes.all_products_collection_url
+                assign filter_text = block.settings.label | default: filter_collection.title
+
+                assign is_active = false
+                if filter_collection == blank and collection.handle == 'all'
+                  assign is_active = true
+                elsif filter_collection != blank and filter_collection.handle == collection.handle
+                  assign is_active = true
+                endif
+              -%}
+              <a
+                class="jci-collection-grid-filter{% if is_active %} is-active{% endif %}"
+                href="{{ filter_url }}"
+                {% if is_active %}aria-current="page"{% endif %}
+                {{ block.shopify_attributes }}
+              >
+                {{- filter_text -}}
+              </a>
+            {%- endfor -%}
+          </nav>
+
+          <div class="jci-collection-grid-compact">
+            <span class="jci-collection-grid-control-label">{{ s.filter_heading }}</span>
+            <div class="jci-collection-grid-dropdown" data-jci-dropdown>
+              <button
+                class="jci-collection-grid-trigger"
+                type="button"
+                aria-label="{{ s.filter_label | escape }}"
+                aria-expanded="false"
+                aria-controls="{{ filter_menu_id }}"
+                data-jci-dropdown-trigger
+              >
+                <span class="jci-collection-grid-trigger-text">{{ active_label }}</span>
+                <span class="jci-collection-grid-chevron" aria-hidden="true">&#8964;</span>
+              </button>
+              <div class="jci-collection-grid-menu" id="{{ filter_menu_id }}" hidden data-jci-dropdown-menu>
+                {%- for block in filters -%}
+                  {%- liquid
+                    assign filter_collection = block.settings.collection
+                    assign filter_url = filter_collection.url | default: routes.all_products_collection_url
+                    assign filter_text = block.settings.label | default: filter_collection.title
+
+                    assign is_active = false
+                    if filter_collection == blank and collection.handle == 'all'
+                      assign is_active = true
+                    elsif filter_collection != blank and filter_collection.handle == collection.handle
+                      assign is_active = true
+                    endif
+                  -%}
+                  <a
+                    class="jci-collection-grid-menu-item{% if is_active %} is-selected{% endif %}"
+                    href="{{ filter_url }}"
+                    {% if is_active %}aria-current="page"{% endif %}
+                  >
+                    {{- filter_text -}}
+                  </a>
+                {%- endfor -%}
+              </div>
+            </div>
+          </div>
+        {%- endif -%}
+
+        {%- if s.show_sort -%}
+          <div class="jci-collection-grid-sort">
+            <span class="jci-collection-grid-control-label">{{ s.sort_heading }}</span>
+            <div class="jci-collection-grid-dropdown" data-jci-dropdown>
+              <button
+                class="jci-collection-grid-trigger"
+                type="button"
+                aria-label="{{ s.sort_label | escape }}"
+                aria-expanded="false"
+                aria-controls="{{ sort_menu_id }}"
+                data-jci-dropdown-trigger
+              >
+                <span class="jci-collection-grid-trigger-text">{{ sort_label }}</span>
+                <span class="jci-collection-grid-chevron" aria-hidden="true">&#8964;</span>
+              </button>
+              <div class="jci-collection-grid-menu" id="{{ sort_menu_id }}" hidden data-jci-dropdown-menu>
+                {%- liquid
+                  assign sort_values = sort_featured | append: '|price-ascending|price-descending'
+                  assign sort_values = sort_values | split: '|'
+                  assign sort_labels = s.sort_featured_label | append: '|' | append: s.sort_low_label | append: '|' | append: s.sort_high_label
+                  assign sort_labels = sort_labels | split: '|'
+                -%}
+                {%- for value in sort_values -%}
+                  {%- assign label_index = forloop.index0 -%}
+                  <a
+                    class="jci-collection-grid-menu-item{% if value == current_sort %} is-selected{% endif %}"
+                    href="{{ collection.url }}?sort_by={{ value }}"
+                    {% if value == current_sort %}aria-current="true"{% endif %}
+                  >
+                    {{- sort_labels[label_index] -}}
+                  </a>
+                {%- endfor -%}
+              </div>
+            </div>
+          </div>
+        {%- endif -%}
+      </div>
+
+      <div class="jci-collection-grid-list" data-jci-collection-grid-list>
+        {%- for product in collection.products -%}
+          {%- liquid
+            assign lazy = true
+            if paginate.current_page == 1 and forloop.index <= s.columns
+              assign lazy = false
+            endif
+          -%}
+          {% render 'jci-product-card',
+            product: product,
+            section_id: section.id,
+            subtitle_key: s.subtitle_metafield,
+            badge_text: s.badge_text,
+            badge_source: s.badge_source,
+            swatch_option: s.swatch_option,
+            swatch_metafield: s.swatch_metafield,
+            show_quick_add: s.show_quick_add,
+            quick_add_label: s.quick_add_label,
+            image_index: s.image_index,
+            lazy: lazy
+          %}
+        {%- else -%}
+          <div class="jci-collection-grid-empty">
+            {%- if s.empty_title != blank -%}
+              <h2 class="jci-collection-grid-empty-title">{{ s.empty_title }}</h2>
+            {%- endif -%}
+            {%- if s.empty_text != blank -%}
+              <p class="jci-collection-grid-empty-text">{{ s.empty_text }}</p>
+            {%- endif -%}
+          </div>
+        {%- endfor -%}
+      </div>
+
+      {%- if paginate.next.is_link -%}
+        <div class="jci-collection-grid-more" data-jci-collection-grid-more>
+          <a
+            class="jci-text-link jci-collection-grid-more-link"
+            href="{{ paginate.next.url }}"
+            data-jci-collection-grid-more-link
+          >
+            {{- s.load_more_label -}}
+            {%- render 'jci-action-arrow' -%}
+          </a>
+        </div>
+      {%- endif -%}
+    {%- endpaginate -%}
+  </div>
+</section>
+
+<script src="{{ 'jci-collection-grid.js' | asset_url }}" type="module"></script>
+
+{% stylesheet %}
+  /* The card's lift and shadow hooks (snippets/jci-product-card.liquid)
+     are set here rather than inline, so the 680px block can switch the lift
+     off (styles.css:483, 486, 1674). */
+  .jci-collection-grid {
+    --jci-product-card-lift: var(--jci-collection-grid-lift);
+    --jci-product-card-media-shadow: 0 12px 26px rgb(var(--jci-ink-rgb) / 0.08);
+
+    display: block;
+    color: var(--jci-collection-grid-text);
+    background: var(--jci-collection-grid-bg);
+  }
+
+  .jci-collection-grid-container {
+    padding-block: var(--jci-collection-grid-pad-top) var(--jci-collection-grid-pad-bottom);
+  }
+
+  /* -- Toolbar (styles.css:465-472) --------------------------------------- */
+
+  .jci-collection-grid-toolbar {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 1.2rem;
+    margin-block-end: 2.3rem;
+    padding-block: 1rem;
+    border-bottom: 1px solid var(--jci-line);
+  }
+
+  .jci-collection-grid-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+  }
+
+  /* styles.css:468-470 */
+  .jci-collection-grid-filter {
+    display: inline-flex;
+    align-items: center;
+    min-height: 32px;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--jci-line);
+    color: var(--jci-collection-grid-text);
+    background: transparent;
+    font-family: var(--jci-font-label);
+    font-size: 14px;
+    text-decoration: none;
+    text-transform: uppercase;
+    transition:
+      color 0.25s,
+      background 0.25s,
+      border-color 0.25s,
+      transform 0.25s var(--jci-ease);
+  }
+
+  .jci-collection-grid-filter.is-active,
+  .jci-collection-grid-filter:hover {
+    border-color: var(--jci-collection-grid-text);
+    color: var(--jci-collection-grid-bg);
+    background: var(--jci-collection-grid-text);
+    transform: translateY(-2px);
+  }
+
+  .jci-collection-grid-filter:focus-visible,
+  .jci-collection-grid-trigger:focus-visible,
+  .jci-collection-grid-more-link:focus-visible {
+    outline: 2px solid var(--jci-rust);
+    outline-offset: 3px;
+  }
+
+  /* styles.css:467, 471-472 — the dropdown twin of the filter row, shown
+     once the row no longer fits. */
+  .jci-collection-grid-compact {
+    display: none;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .jci-collection-grid-sort {
+    display: flex;
+    grid-column: 2;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .jci-collection-grid-control-label {
+    color: var(--jci-collection-grid-label);
+    font-family: var(--jci-font-label);
+    font-size: 12px;
+    text-transform: uppercase;
+  }
+
+  /* -- Dropdowns (styles.css:473-481) ------------------------------------- */
+
+  .jci-collection-grid-dropdown {
+    position: relative;
+    min-width: 210px;
+    color: var(--jci-collection-grid-text);
+  }
+
+  .jci-collection-grid-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    width: 100%;
+    min-height: 32px;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--jci-line);
+    border-radius: 0;
+    color: var(--jci-collection-grid-text);
+    background: transparent;
+    font-family: var(--jci-font-label);
+    font-size: 14px;
+    text-align: left;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  .jci-collection-grid-chevron {
+    font-size: 16px;
+    transition: transform 0.25s var(--jci-ease);
+  }
+
+  .jci-collection-grid-trigger[aria-expanded='true'] .jci-collection-grid-chevron {
+    transform: rotate(180deg);
+  }
+
+  /* The 1px gap over a line-coloured ground draws the dividers between
+     items, so no item needs a first-child exception (§1). */
+  .jci-collection-grid-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    z-index: 12;
+    display: grid;
+    gap: 1px;
+    width: 100%;
+    overflow: hidden;
+    border: 1px solid var(--jci-line);
+    background: var(--jci-line);
+    box-shadow: 0 12px 24px rgb(var(--jci-ink-rgb) / 0.14);
+  }
+
+  .jci-collection-grid-menu[hidden] {
+    display: none;
+  }
+
+  .jci-collection-grid-menu-item {
+    display: block;
+    padding: 0.65rem 0.75rem;
+    color: var(--jci-collection-grid-text);
+    background: var(--jci-collection-grid-bg);
+    font-family: var(--jci-font-label);
+    font-size: 14px;
+    text-align: left;
+    text-decoration: none;
+    text-transform: uppercase;
+  }
+
+  .jci-collection-grid-menu-item:hover,
+  .jci-collection-grid-menu-item:focus-visible,
+  .jci-collection-grid-menu-item.is-selected {
+    color: var(--jci-collection-grid-bg);
+    background: var(--jci-collection-grid-selected);
+    outline: none;
+  }
+
+  /* -- Grid (styles.css:288, 482-487) ------------------------------------- */
+
+  .jci-collection-grid-list {
+    display: grid;
+    grid-template-columns: repeat(var(--jci-collection-grid-columns), 1fr);
+    gap: var(--jci-collection-grid-row-gap) clamp(0.8rem, 2vw, 1.75rem);
+  }
+
+  /* styles.css:488 */
+  .jci-collection-grid-empty {
+    grid-column: 1 / -1;
+    padding: 5rem 1rem;
+    text-align: center;
+  }
+
+  .jci-collection-grid-empty-title {
+    margin: 0 0 1rem;
+    font-family: var(--jci-font-display);
+    font-size: var(--jci-section-title-size);
+    font-weight: 500;
+  }
+
+  .jci-collection-grid-empty-text {
+    margin: 0;
+    font-family: var(--jci-font-sans);
+    font-size: var(--jci-subtitle-size);
+  }
+
+  /* styles.css:307, 489 */
+  .jci-collection-grid-more {
+    display: flex;
+    justify-content: center;
+    margin-block-start: 3.7rem;
+  }
+
+  .jci-collection-grid-more-link[aria-busy='true'] {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  /* -- Breakpoints (§5 — 900 and 680 only) -------------------------------- */
+
+  /* styles.css:1488-1491 (moved from 1174px, see top) and 1513-1514. */
+  @media screen and (max-width: 900px) {
+    .jci-collection-grid-toolbar {
+      align-items: start;
+    }
+
+    .jci-collection-grid-filters {
+      display: none;
+    }
+
+    .jci-collection-grid-compact {
+      display: flex;
+      justify-self: start;
+    }
+
+    .jci-collection-grid-sort {
+      justify-self: end;
+    }
+  }
+
+  /* styles.css:1634-1641, 1670-1674 */
+  @media screen and (max-width: 680px) {
+    .jci-collection-grid {
+      --jci-product-card-lift: 0px;
+    }
+
+    .jci-collection-grid-container {
+      padding-block: var(--jci-collection-grid-pad-top-mobile) var(--jci-collection-grid-pad-bottom-mobile);
+    }
+
+    .jci-collection-grid-toolbar {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.75rem;
+    }
+
+    .jci-collection-grid-compact,
+    .jci-collection-grid-sort {
+      display: grid;
+      justify-self: stretch;
+      gap: 0.5rem;
+    }
+
+    .jci-collection-grid-dropdown {
+      width: 100%;
+      min-width: 0;
+    }
+
+    .jci-collection-grid-list {
+      grid-template-columns: 1fr;
+      row-gap: var(--jci-collection-grid-row-gap-mobile);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .jci-collection-grid-filter,
+    .jci-collection-grid-chevron {
+      transition: none;
+    }
+
+    .jci-collection-grid-filter.is-active,
+    .jci-collection-grid-filter:hover {
+      transform: none;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Collection grid",
+  "tag": "div",
+  "class": "jci-collection-grid-wrapper",
+  "max_blocks": 12,
+  "blocks": [
+    {
+      "type": "filter",
+      "name": "Filter link",
+      "settings": [
+        { "type": "collection", "id": "collection", "label": "Collection", "info": "Left empty, the link goes to all products." },
+        { "type": "text", "id": "label", "label": "Label", "info": "Left empty, the collection title is used." }
+      ]
+    }
+  ],
+  "settings": [
+    { "type": "header", "content": "Filter" },
+    { "type": "text", "id": "filter_heading", "label": "Dropdown label", "default": "Filter" },
+    { "type": "text", "id": "filter_label", "label": "Accessible label", "default": "Filter products" },
+
+    { "type": "header", "content": "Sort" },
+    { "type": "checkbox", "id": "show_sort", "label": "Show sort", "default": true },
+    { "type": "text", "id": "sort_heading", "label": "Dropdown label", "default": "Sort" },
+    { "type": "text", "id": "sort_label", "label": "Accessible label", "default": "Sort products" },
+    { "type": "text", "id": "sort_featured_label", "label": "Featured label", "default": "Featured", "info": "Uses the collection's own sort order." },
+    { "type": "text", "id": "sort_low_label", "label": "Price low to high label", "default": "Price: Low to high" },
+    { "type": "text", "id": "sort_high_label", "label": "Price high to low label", "default": "Price: High to low" },
+
+    { "type": "header", "content": "Products" },
+    { "type": "range", "id": "products_per_page", "label": "Products per page", "min": 3, "max": 48, "step": 3, "default": 12, "info": "Load more adds the next page." },
+    { "type": "range", "id": "columns", "label": "Columns on desktop", "min": 2, "max": 4, "step": 1, "default": 3 },
+    { "type": "range", "id": "image_index", "label": "Image to show", "min": 0, "max": 5, "step": 1, "default": 0, "info": "0 is the first product image." },
+    { "type": "text", "id": "load_more_label", "label": "Load more label", "default": "Load more pieces" },
+
+    { "type": "header", "content": "Card details" },
+    { "type": "text", "id": "subtitle_metafield", "label": "Subtitle metafield", "default": "custom.subtitle", "info": "namespace.key — falls back to the product type when empty." },
+    { "type": "text", "id": "swatch_option", "label": "Swatch option name", "default": "Color", "info": "Reads colour swatches from this product option." },
+    { "type": "text", "id": "swatch_metafield", "label": "Swatch colour metafield", "default": "custom.colour_swatches", "info": "Fallback for option values with no Shopify swatch. Holds \"Name:#hex | Name:#hex\" pairs." },
+    { "type": "checkbox", "id": "show_quick_add", "label": "Show quick add", "default": true, "info": "Single-variant products add straight to cart; the rest open the options." },
+    { "type": "text", "id": "quick_add_label", "label": "Quick add label", "default": "Quick add" },
+
+    { "type": "header", "content": "Badge" },
+    {
+      "type": "select", "id": "badge_source", "label": "Show badge",
+      "options": [
+        { "value": "none", "label": "Never" },
+        { "value": "sale", "label": "Only when on sale" },
+        { "value": "always", "label": "On every card" }
+      ],
+      "default": "always"
+    },
+    { "type": "text", "id": "badge_text", "label": "Badge text", "default": "New" },
+
+    { "type": "header", "content": "Empty collection" },
+    { "type": "text", "id": "empty_title", "label": "Title", "default": "Coming to the Maison soon." },
+    { "type": "text", "id": "empty_text", "label": "Text", "default": "We are making room for something beautiful." },
+
+    { "type": "header", "content": "Colors", "info": "Left empty, each of these follows the theme colour palette." },
+    { "type": "color", "id": "background_color", "label": "Background" },
+    { "type": "color", "id": "text_color", "label": "Text" },
+    { "type": "color", "id": "label_color", "label": "Control labels" },
+    { "type": "color", "id": "selected_color", "label": "Selected menu item" },
+    { "type": "color", "id": "media_background", "label": "Image placeholder" },
+    { "type": "color", "id": "subtitle_color", "label": "Card subtitle", "default": "#6d7066" },
+
+    { "type": "header", "content": "Layout" },
+    { "type": "range", "id": "padding_top", "label": "Padding top", "min": 0, "max": 240, "step": 4, "unit": "px", "default": 136 },
+    { "type": "range", "id": "padding_bottom", "label": "Padding bottom", "min": 0, "max": 240, "step": 4, "unit": "px", "default": 136 },
+    { "type": "range", "id": "padding_top_mobile", "label": "Padding top on mobile", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 72 },
+    { "type": "range", "id": "padding_bottom_mobile", "label": "Padding bottom on mobile", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 72 },
+    { "type": "range", "id": "row_gap", "label": "Row gap", "min": 0, "max": 96, "step": 2, "unit": "px", "default": 56 },
+    { "type": "range", "id": "row_gap_mobile", "label": "Row gap on mobile", "min": 0, "max": 96, "step": 2, "unit": "px", "default": 40 },
+    { "type": "range", "id": "image_ratio", "label": "Image ratio", "min": 60, "max": 140, "step": 1, "unit": "%", "default": 83, "info": "Width over height — 83 is the prototype's 0.83." },
+    { "type": "range", "id": "image_zoom", "label": "Hover zoom", "min": 0, "max": 100, "step": 5, "unit": "%", "default": 35, "info": "Thousandths — 35 is a 1.035 scale." },
+    { "type": "range", "id": "card_lift", "label": "Hover lift", "min": 0, "max": 20, "step": 1, "unit": "px", "default": 5 },
+
+    { "type": "header", "content": "Anchor" },
+    { "type": "text", "id": "anchor_id", "label": "Anchor ID", "default": "collection-grid" }
+  ],
+  "presets": [
+    {
+      "name": "Collection grid",
+      "blocks": [
+        { "type": "filter", "settings": { "label": "All pieces" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

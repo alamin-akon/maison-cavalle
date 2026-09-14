@@ -44,6 +44,70 @@
       ],
       "settings": {}
     },
+    "jci_collection_grid": {
+      "type": "jci-collection-grid",
+      "blocks": {
+        "f_all": {
+          "type": "filter",
+          "settings": {
+            "collection": "",
+            "label": "All pieces"
+          }
+        },
+        "f_tops": {
+          "type": "filter",
+          "settings": {
+            "collection": "tops",
+            "label": "Tops"
+          }
+        },
+        "f_jackets": {
+          "type": "filter",
+          "settings": {
+            "collection": "jackets",
+            "label": "Jackets"
+          }
+        },
+        "f_tights": {
+          "type": "filter",
+          "settings": {
+            "collection": "tights",
+            "label": "Tights"
+          }
+        },
+        "f_base_layers": {
+          "type": "filter",
+          "settings": {
+            "collection": "base-layers",
+            "label": "Base layers"
+          }
+        },
+        "f_kids": {
+          "type": "filter",
+          "settings": {
+            "collection": "kids",
+            "label": "Kids"
+          }
+        },
+        "f_accessories": {
+          "type": "filter",
+          "settings": {
+            "collection": "accessories",
+            "label": "Caps & accessories"
+          }
+        }
+      },
+      "block_order": [
+        "f_all",
+        "f_tops",
+        "f_jackets",
+        "f_tights",
+        "f_base_layers",
+        "f_kids",
+        "f_accessories"
+      ],
+      "settings": {}
+    },
     "section": {
       "type": "section",
       "blocks": {
@@ -249,11 +313,13 @@
         "background_color": "{{ settings.color_palette.background }}",
         "padding-block-start": 0,
         "padding-block-end": 32
-      }
+      },
+      "disabled": true
     }
   },
   "order": [
     "jci_collection_hero",
+    "jci_collection_grid",
     "section",
     "main"
   ]

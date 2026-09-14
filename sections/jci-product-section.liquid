@@ -196,6 +196,13 @@
        own the way the article it replaced did. */
     display: block;
     min-width: 0;
+    transition: transform 0.5s var(--jci-ease);
+  }
+
+  /* Lift and shadow are off here; the collection grid turns them on
+     (styles.css:483-486) by setting the two custom properties. */
+  .jci-product-card:hover {
+    transform: translateY(var(--jci-product-card-lift, 0px));
   }
 
   .jci-product-card-media {
@@ -204,6 +211,7 @@
     overflow: hidden;
     aspect-ratio: var(--jci-product-card-ratio);
     background: var(--jci-product-card-media-bg);
+    box-shadow: var(--jci-product-card-media-shadow, none);
   }
 
   .jci-product-card-link {
@@ -451,9 +459,14 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
+    .jci-product-card,
     .jci-product-card-image,
     .jci-product-card-quick-add {
       transition: none;
+    }
+
+    .jci-product-card:hover {
+      transform: none;
     }
 
     .jci-product-card:hover .jci-product-card-image {
