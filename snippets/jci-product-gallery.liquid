@@ -1,0 +1,200 @@
+{% comment %}
+  Maison Cavallé — product gallery and lightbox
+  Prototype source: maison-cavalle-main/app.js → galleryImageMarkup,
+                    productGalleryMarkup, productLightboxMarkup (206-218)
+                    maison-cavalle-main/styles.css → .product-gallery-*,
+                    .gallery-*, .product-lightbox-* (505-539, 1700-1721)
+  Reference: MAISON-CAVALLE-SPEC.md §1
+
+  Accepts:
+    product   - the product (required)
+    lead      - the image shown first: the selected variant's, else the first
+    images    - the product's image media, in order
+    s         - the jci-product section settings
+
+  The lead image follows the selected colour (app.js:342-346), so jci-product.js
+  swaps its src. The secondary images are the rest of the product's images, as
+  in the prototype. Every figure opens the lightbox.
+{% endcomment %}
+
+{%- liquid
+  assign gallery_total = images.size | prepend: '0' | slice: -2, 2
+  assign gallery_category = product.metafields.custom.category.value
+-%}
+
+<div class="jci-product-gallery-shell">
+  <div class="jci-product-gallery-head">
+    <span class="jci-product-gallery-head-label">
+      {{- s.gallery_head | escape -}}
+      {%- if gallery_category != blank %} / {{ gallery_category | escape }}{% endif -%}
+    </span>
+    <span class="jci-product-gallery-head-count">{{ gallery_total }} {{ s.gallery_views_label | escape }}</span>
+  </div>
+
+  <div
+    class="jci-product-gallery"
+    aria-label="{{ product.title | escape }}"
+  >
+    {%- for image in images -%}
+      {%- liquid
+        assign media = image
+        if forloop.first and lead != blank
+          assign media = lead
+        endif
+
+        case forloop.index0
+          when 0
+            assign caption_label = s.caption_first
+          when 1
+            assign caption_label = s.caption_second
+          else
+            assign caption_label = s.caption_rest
+        endcase
+
+        assign figure_class = 'jci-product-gallery-image'
+        if forloop.first
+          assign figure_class = 'jci-product-gallery-image jci-product-gallery-image-lead'
+        endif
+      -%}
+
+      {%- if forloop.index0 == 1 -%}
+        <div
+          class="jci-product-gallery-secondary"
+          data-jci-gallery-secondary
+        >
+          <div
+            class="jci-product-gallery-track"
+            data-jci-gallery-rail
+          >
+      {%- endif -%}
+
+      <figure
+        class="{{ figure_class }}"
+        {% if s.enable_tilt %}
+          data-jci-tilt data-jci-tilt-strength="{{ s.tilt_strength }}"
+        {% endif %}
+        data-jci-lightbox-open="{{ forloop.index0 }}"
+        role="button"
+        tabindex="0"
+        aria-label="{{ 'actions.zoom_media' | t: index: forloop.index }}"
+      >
+        <img
+          class="jci-product-gallery-img"
+          src="{{ media.preview_image | image_url: width: 1200 }}"
+          srcset="
+            {{ media.preview_image | image_url: width: 600 }} 600w,
+            {{ media.preview_image | image_url: width: 900 }} 900w,
+            {{ media.preview_image | image_url: width: 1200 }} 1200w,
+            {{ media.preview_image | image_url: width: 1800 }} 1800w
+          "
+          sizes="{% if forloop.first %}(max-width: 680px) 100vw, 55vw{% else %}(max-width: 680px) 56vw, 28vw{% endif %}"
+          alt="{{ media.alt | default: product.title | escape }}"
+          width="{{ media.preview_image.width }}"
+          height="{{ media.preview_image.height }}"
+          data-jci-lightbox-src="{{ media.preview_image | image_url: width: 2200 }}"
+          {% if forloop.first %}
+            data-jci-lead-image fetchpriority="high"
+          {% else %}
+            loading="lazy"
+          {% endif %}
+        >
+        <figcaption class="jci-product-gallery-caption">
+          <span class="jci-product-gallery-caption-index">
+            {{- forloop.index | prepend: '0' | slice: -2, 2 }} / {{ gallery_total -}}
+          </span>
+          <b class="jci-product-gallery-caption-label">{{ caption_label | escape }}</b>
+        </figcaption>
+      </figure>
+
+      {%- if forloop.last and forloop.length > 1 -%}
+          </div>
+          <div class="jci-product-gallery-controls">
+            <button
+              type="button"
+              class="jci-product-gallery-control"
+              data-jci-gallery-control="previous"
+              aria-label="{{ 'accessibility.slideshow_previous' | t }}"
+            >
+              ←
+            </button>
+            <button
+              type="button"
+              class="jci-product-gallery-control"
+              data-jci-gallery-control="next"
+              aria-label="{{ 'accessibility.slideshow_next' | t }}"
+            >
+              →
+            </button>
+          </div>
+        </div>
+      {%- endif -%}
+    {%- endfor -%}
+  </div>
+
+  {%- if s.gallery_hint != blank -%}
+    <p class="jci-product-gallery-hint">
+      {% render 'jci-action-arrow' %}
+      {{ s.gallery_hint | escape }}
+    </p>
+  {%- endif -%}
+</div>
+
+<div
+  class="jci-product-lightbox"
+  data-jci-lightbox
+  role="dialog"
+  aria-modal="true"
+  aria-label="{{ product.title | escape }}"
+  aria-hidden="true"
+  inert
+>
+  <button
+    type="button"
+    class="jci-product-lightbox-close"
+    data-jci-lightbox-close
+    aria-label="{{ 'actions.close' | t }}"
+  >
+    ×
+  </button>
+  <button
+    type="button"
+    class="jci-product-lightbox-control jci-product-lightbox-previous"
+    data-jci-lightbox-control="previous"
+    aria-label="{{ 'accessibility.slideshow_previous' | t }}"
+  >
+    ←
+  </button>
+  <div
+    class="jci-product-lightbox-stage"
+    data-jci-lightbox-stage
+  >
+    <img
+      class="jci-product-lightbox-image"
+      data-jci-lightbox-image
+      src="{{ images.first.preview_image | image_url: width: 2200 }}"
+      alt="{{ images.first.alt | default: product.title | escape }}"
+      width="{{ images.first.preview_image.width }}"
+      height="{{ images.first.preview_image.height }}"
+    >
+    <div class="jci-product-lightbox-meta">
+      <span
+        class="jci-product-lightbox-count"
+        data-jci-lightbox-count
+      >
+        01 / {{ gallery_total }}
+      </span>
+      <strong class="jci-product-lightbox-title">{{ product.title }}</strong>
+    </div>
+    {%- if s.lightbox_hint != blank -%}
+      <p class="jci-product-lightbox-hint">{{ s.lightbox_hint | escape }}</p>
+    {%- endif -%}
+  </div>
+  <button
+    type="button"
+    class="jci-product-lightbox-control jci-product-lightbox-next"
+    data-jci-lightbox-control="next"
+    aria-label="{{ 'accessibility.slideshow_next' | t }}"
+  >
+    →
+  </button>
+</div>

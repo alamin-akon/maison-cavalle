@@ -1,0 +1,155 @@
+{% comment %}
+  Maison Cavallé — product option picker
+  Prototype source: maison-cavalle-main/app.js → renderProduct colourSelector,
+                    sizeSelector, renderProductSizeOptions (201-204, 649-653)
+                    maison-cavalle-main/styles.css → .selector-*, .swatch-*,
+                    .size-*, .size-guide-* (548-579)
+  Reference: MAISON-CAVALLE-SPEC.md §1
+
+  Accepts:
+    product - the product (required)
+    block   - the "option" block (required)
+
+  One product option, drawn either as colour swatches or as the prototype's
+  square buttons. A value is a swatch only when it has a colour to show — the
+  option value's own Shopify swatch first, then the custom.colour_swatches
+  metafield ("Name:#hex | Name:#hex") — and a plain button otherwise, so a
+  product without swatch data can still be chosen.
+
+  Availability and the active state are drawn here for the first paint;
+  jci-product.js keeps them in step as the selection changes.
+{% endcomment %}
+
+{%- liquid
+  assign bs = block.settings
+  assign wanted_name = bs.option_name | strip | downcase
+  assign option = blank
+
+  for product_option in product.options_with_values
+    assign option_name = product_option.name | strip | downcase
+    if option_name == wanted_name
+      assign option = product_option
+      break
+    endif
+  endfor
+
+  assign swatch_pairs = blank
+  if bs.style == 'swatches'
+    assign swatch_raw = product.metafields.custom.colour_swatches.value
+    if swatch_raw != blank
+      assign swatch_pairs = swatch_raw | split: '|'
+    endif
+  endif
+
+  assign group_class = 'jci-product-option'
+  if bs.show_rule_above
+    assign group_class = 'jci-product-option jci-product-option-ruled'
+  endif
+-%}
+
+{%- if option != blank -%}
+  <div
+    class="{{ group_class }}"
+    {{ block.shopify_attributes }}
+  >
+    <div class="jci-product-option-label">
+      <span class="jci-product-option-name">
+        {{- bs.label | default: option.name | escape -}}
+        {%- if bs.show_selected_value -%}
+          : <strong
+            class="jci-product-option-selected"
+            data-jci-option-selected="{{ option.position }}"
+          >
+            {{- option.selected_value | escape -}}
+          </strong>
+        {%- endif -%}
+      </span>
+
+      {%- if bs.show_size_guide and bs.size_guide_url != blank -%}
+        <span class="jci-product-size-guide">
+          <a
+            class="jci-product-size-guide-link"
+            href="{{ bs.size_guide_url }}"
+            {% if bs.size_guide_new_tab %}
+              target="_blank" rel="noreferrer"
+            {% endif %}
+            aria-describedby="jci-product-size-guide-{{ block.id }}"
+          >
+            {{- bs.size_guide_label | escape }}
+            {% render 'jci-action-arrow' %}
+          </a>
+          <span
+            class="jci-product-size-guide-popover"
+            id="jci-product-size-guide-{{ block.id }}"
+            role="note"
+          >
+            <span class="jci-eyebrow jci-product-size-guide-eyebrow">{{ bs.size_guide_eyebrow | escape }}</span>
+            <strong class="jci-product-size-guide-title">{{ bs.size_guide_title | escape }}</strong>
+            <small class="jci-product-size-guide-text">{{ bs.size_guide_text | escape }}</small>
+            <a
+              class="jci-product-size-guide-popover-link"
+              href="{{ bs.size_guide_url }}"
+            >
+              {{- bs.size_guide_link_label | escape }}
+              {% render 'jci-action-arrow' %}
+            </a>
+          </span>
+        </span>
+      {%- endif -%}
+    </div>
+
+    <div
+      class="jci-product-option-values jci-product-option-values-{{ bs.style }}"
+      role="group"
+      aria-label="{{ option.name | escape }}"
+    >
+      {%- for value in option.values -%}
+        {%- liquid
+          assign swatch_color = blank
+          if bs.style == 'swatches'
+            assign swatch_color = value.swatch.color
+
+            if swatch_color == blank and swatch_pairs != blank
+              assign value_name = value.name | strip | downcase
+              for pair in swatch_pairs
+                assign pair_parts = pair | split: ':'
+                assign pair_name = pair_parts[0] | strip | downcase
+                if pair_name == value_name
+                  assign swatch_color = pair_parts[1] | strip
+                  break
+                endif
+              endfor
+            endif
+          endif
+
+          assign value_class = 'jci-product-option-button'
+          if swatch_color != blank
+            assign value_class = 'jci-product-swatch'
+          endif
+          if value.selected
+            assign value_class = value_class | append: ' is-active'
+          endif
+          if value.available == false
+            assign value_class = value_class | append: ' is-unavailable'
+          endif
+        -%}
+        <button
+          type="button"
+          class="{{ value_class }}"
+          data-jci-option="{{ option.position }}"
+          data-jci-option-value="{{ value.name | escape }}"
+          aria-pressed="{{ value.selected }}"
+          {% if swatch_color != blank %}
+            style="--jci-product-swatch-color: {{ swatch_color }};"
+            title="{{ value.name | escape }}"
+            aria-label="{{ value.name | escape }}"
+          {% endif %}
+        >
+          {%- if swatch_color == blank -%}
+            {{- value.name | escape -}}
+          {%- endif -%}
+        </button>
+      {%- endfor -%}
+    </div>
+  </div>
+{%- endif -%}

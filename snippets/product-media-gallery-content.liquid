@@ -1179,12 +1179,24 @@
   /* The grid presentation stays a grid at every width on the product page.
      On mobile the prototype keeps the lead image and a swipeable rail of the
      rest (styles.css:1700-1710) rather than Horizon's slideshow. */
-  .product-information media-gallery.media-gallery--grid .media-gallery__grid {
+  .product-information .media-gallery--grid .media-gallery__grid {
     display: grid;
   }
 
-  .product-information media-gallery.media-gallery--grid slideshow-component {
+  .product-information .media-gallery--grid slideshow-component {
     display: none;
+  }
+
+  /* Horizon turns two columns on at 750px; the product page keeps its
+     two-column layout down to 681px (styles.css:1553). */
+  @media screen and (min-width: 681px) {
+    .product-information .media-gallery--two-column .media-gallery__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .product-information .media-gallery--large-first-image .media-gallery__grid > .product-media-container:first-child {
+      grid-column: span 2;
+    }
   }
 
   /* styles.css:506-507 */

@@ -13,6 +13,11 @@
 {% liquid
   assign s = section.settings
   assign products = s.collection.products
+
+  # On a product page the piece being viewed is left out of its own list
+  # (app.js:654 — `products.filter((item) => item.id !== product.id)`).
+  # Elsewhere there is no current product and nothing is skipped.
+  assign current_product_id = product.id
 %}
 
 <section
@@ -67,12 +72,21 @@
 
     {%- if products.size > 0 -%}
       <div class="jci-product-grid">
-        {%- for product in products limit: s.products_to_show -%}
+        {%- assign shown = 0 -%}
+        {%- for product in products -%}
           {%- liquid
+            if product.id == current_product_id
+              continue
+            endif
+            if shown >= s.products_to_show
+              break
+            endif
+
             assign lazy = true
-            if forloop.index0 < s.columns
+            if shown < s.columns
               assign lazy = false
             endif
+            assign shown = shown | plus: 1
           -%}
           {% render 'jci-product-card',
             product: product,

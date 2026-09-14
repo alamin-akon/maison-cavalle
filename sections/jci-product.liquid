@@ -1,0 +1,1690 @@
+{% comment %}
+  Maison Cavallé — product page
+  Prototype source: maison-cavalle-main/app.js → renderProduct,
+                    setupProductLightbox, setupMobileStickyPurchase (206-334, 614-697)
+                    maison-cavalle-main/styles.css → .product-page … .detail-description
+                    (503-599), @900 (1520), @680 (1679-1735), @560 (1886-1890)
+  Reference: MAISON-CAVALLE-SPEC.md §1
+
+  The gallery is the section's own left column. Everything in the right column
+  is a block, in the order the Theme Editor gives them, so the details can be
+  rearranged without code.
+
+  The add to bag is Horizon's: product-form-component posts the add, and its
+  cart event is what the header bag count and the cart drawer listen for.
+  jci-product.js only keeps the chosen variant, the price, the buttons and the
+  lead image in step, and runs the lightbox and the mobile sticky bar.
+{% endcomment %}
+
+{%- liquid
+  assign s = section.settings
+  assign current_variant = product.selected_or_first_available_variant
+  assign images = product.media | where: 'media_type', 'image'
+  assign lead = current_variant.featured_media | default: images.first
+
+  assign form_id = 'jci-product-form-' | append: section.id
+
+  capture current_price
+    if s.show_currency_code
+      echo current_variant.price | money_with_currency
+    else
+      echo current_variant.price | money
+    endif
+  endcapture
+
+  assign buy_label = s.add_label
+  if current_variant.available == false
+    assign buy_label = 'products.product.sold_out' | t
+  endif
+
+  assign previous_type = blank
+-%}
+
+<section
+  class="jci-product"
+  id="jci-product-{{ section.id }}"
+  data-jci-product
+  data-jci-label-add="{{ s.add_label | escape }}"
+  data-jci-label-sold-out="{{ 'products.product.sold_out' | t }}"
+  data-jci-label-unavailable="{{ 'products.product.unavailable' | t }}"
+  data-jci-product-url="{{ product.url }}"
+  style="
+    --jci-product-bg: {{ s.background_color | default: settings.color_palette.background }};
+    --jci-product-pad-top: {{ s.padding_top }}px;
+    --jci-product-pad-bottom: {{ s.padding_bottom }}px;
+    --jci-product-pad-top-mobile: {{ s.padding_top_mobile }}px;
+    --jci-product-pad-bottom-mobile: {{ s.padding_bottom_mobile }}px;
+  "
+>
+  <div class="jci-product-container">
+    <div class="jci-product-layout">
+      {%- if images.size > 0 -%}
+        {% render 'jci-product-gallery', product: product, lead: lead, images: images, s: s %}
+      {%- endif -%}
+
+      <div class="jci-product-detail">
+        {%- for block in section.blocks -%}
+          {%- liquid
+            assign bs = block.settings
+            assign stacked = false
+            if block.type == 'accordion' and previous_type == 'accordion'
+              assign stacked = true
+            endif
+          -%}
+
+          {%- case block.type -%}
+            {%- when '@app' -%}
+              {% render block %}
+
+            {%- when 'badge' -%}
+              {%- liquid
+                assign badge_text = bs.text
+                if badge_text == blank
+                  assign badge_text = product.metafields.custom.category.value
+                endif
+              -%}
+              <div
+                class="jci-product-badge"
+                {{ block.shopify_attributes }}
+              >
+                {%- if bs.link_label != blank -%}
+                  <a
+                    class="jci-product-badge-link"
+                    href="{{ bs.link | default: routes.all_products_collection_url }}"
+                  >
+                    {{- bs.link_label | escape -}}
+                  </a>
+                {%- endif -%}
+                {%- if bs.link_label != blank and badge_text != blank -%}
+                  <span
+                    class="jci-product-badge-divider"
+                    aria-hidden="true"
+                  >
+                    /
+                  </span>
+                {%- endif -%}
+                {%- if badge_text != blank -%}
+                  <span class="jci-product-badge-text">{{ badge_text | escape }}</span>
+                {%- endif -%}
+              </div>
+
+            {%- when 'title' -%}
+              <div
+                class="jci-product-title-group"
+                {{ block.shopify_attributes }}
+              >
+                {%- if bs.eyebrow != blank -%}
+                  <p class="jci-eyebrow jci-product-title-eyebrow">{{ bs.eyebrow | escape }}</p>
+                {%- endif -%}
+                <h1 class="jci-product-title">{{ product.title }}</h1>
+              </div>
+
+            {%- when 'text' -%}
+              {%- liquid
+                assign plain_text = bs.text
+                if plain_text == blank and bs.style == 'subtitle'
+                  assign plain_text = product.metafields.custom.subtitle.value | default: product.type
+                endif
+              -%}
+              {%- if plain_text != blank -%}
+                <p
+                  class="jci-product-text jci-product-text-{{ bs.style }}"
+                  {{ block.shopify_attributes }}
+                >
+                  {{ plain_text | escape }}
+                </p>
+              {%- endif -%}
+
+            {%- when 'price' -%}
+              <p
+                class="jci-product-price"
+                {{ block.shopify_attributes }}
+              >
+                <span
+                  class="jci-product-price-current"
+                  data-jci-price
+                >
+                  {{- current_price | strip -}}
+                </span>
+                <s
+                  class="jci-product-price-was"
+                  data-jci-price-was
+                  {% unless current_variant.compare_at_price > current_variant.price %}
+                    hidden
+                  {% endunless %}
+                >
+                  {%- if s.show_currency_code -%}
+                    {{- current_variant.compare_at_price | money_with_currency -}}
+                  {%- else -%}
+                    {{- current_variant.compare_at_price | money -}}
+                  {%- endif -%}
+                </s>
+              </p>
+
+            {%- when 'option' -%}
+              {% render 'jci-product-option', product: product, block: block %}
+
+            {%- when 'description' -%}
+              {%- liquid
+                assign description = product.description
+                if bs.source == 'custom'
+                  assign description = bs.custom_text
+                elsif bs.first_paragraph_only and description contains '</p>'
+                  assign description = description | split: '</p>' | first | append: '</p>'
+                endif
+                assign description = description | replace: '<p>', '<p class="jci-product-description-paragraph">'
+              -%}
+              {%- if description != blank -%}
+                <div
+                  class="jci-product-description"
+                  {{ block.shopify_attributes }}
+                >
+                  {{ description }}
+                </div>
+              {%- endif -%}
+
+            {%- when 'rule' -%}
+              <div
+                class="jci-product-rule"
+                {{ block.shopify_attributes }}
+              ></div>
+
+            {%- when 'buy' -%}
+              {%- capture buy_inner -%}
+                <span
+                  class="jci-product-buy-label"
+                  data-jci-buy-label
+                >
+                  {{- buy_label -}}
+                </span>
+                {% render 'jci-action-arrow' %}
+              {%- endcapture -%}
+              <div
+                class="jci-product-buy"
+                {{ block.shopify_attributes }}
+              >
+                <product-form-component
+                  class="jci-product-form"
+                  data-section-id="{{ section.id }}"
+                  data-product-id="{{ product.id }}"
+                  on:submit="/handleSubmit"
+                >
+                  <div
+                    class="jci-sr-only"
+                    aria-live="assertive"
+                    role="status"
+                    aria-atomic="true"
+                    ref="liveRegion"
+                  ></div>
+
+                  {%- form 'product', product, id: form_id, novalidate: 'novalidate', data-type: 'add-to-cart-form' -%}
+                    <input
+                      type="hidden"
+                      name="id"
+                      ref="variantId"
+                      value="{{ current_variant.id }}"
+                      data-jci-variant-input
+                    >
+                    <div class="jci-product-purchase-row">
+                      <div class="jci-product-quantity">
+                        <button
+                          type="button"
+                          class="jci-product-quantity-button"
+                          data-jci-quantity="decrease"
+                          aria-label="{{ 'accessibility.decrease_quantity' | t }}"
+                        >
+                          −
+                        </button>
+                        <span
+                          class="jci-product-quantity-value"
+                          data-jci-quantity-value
+                        >
+                          1
+                        </span>
+                        <input
+                          type="hidden"
+                          name="quantity"
+                          value="1"
+                          data-jci-quantity-input
+                        >
+                        <button
+                          type="button"
+                          class="jci-product-quantity-button"
+                          data-jci-quantity="increase"
+                          aria-label="{{ 'accessibility.increase_quantity' | t }}"
+                        >
+                          ＋
+                        </button>
+                      </div>
+
+                      {%- render 'add-to-cart-button',
+                        add_to_cart_text: buy_inner,
+                        class: 'jci-button jci-product-buy-button',
+                        can_add_to_cart: current_variant.available,
+                        show_icon: false,
+                        product: product
+                      -%}
+                    </div>
+                  {%- endform -%}
+                </product-form-component>
+                {%- render 'add-to-cart-button-styles' -%}
+              </div>
+
+            {%- when 'trust' -%}
+              <div
+                class="jci-product-trust"
+                aria-label="{{ bs.label | escape }}"
+                {{ block.shopify_attributes }}
+              >
+                {%- assign trust_shown = 0 -%}
+                {%- for i in (1..3) -%}
+                  {%- liquid
+                    assign text_key = 'item_' | append: i | append: '_text'
+                    assign icon_key = 'item_' | append: i | append: '_icon'
+                    assign trust_text = bs[text_key]
+                    if trust_text == blank
+                      continue
+                    endif
+
+                    case i
+                      when 1
+                        assign fallback_icon = 'jci-trust-designed.png' | asset_url
+                      when 2
+                        assign fallback_icon = 'jci-trust-fabrics.png' | asset_url
+                      else
+                        assign fallback_icon = 'jci-trust-made.png' | asset_url
+                    endcase
+
+                    assign trust_icon = fallback_icon
+                    if bs[icon_key] != blank
+                      assign trust_icon = bs[icon_key] | image_url: width: 120
+                    endif
+
+                    assign item_class = 'jci-product-trust-item'
+                    if trust_shown > 0
+                      assign item_class = 'jci-product-trust-item jci-product-trust-item-divided'
+                    endif
+                    assign trust_shown = trust_shown | plus: 1
+                  -%}
+                  <div class="{{ item_class }}">
+                    <span
+                      class="jci-product-trust-icon"
+                      aria-hidden="true"
+                    >
+                      <span
+                        class="jci-product-trust-glyph"
+                        style="--jci-product-trust-glyph: url('{{ trust_icon }}');"
+                      ></span>
+                    </span>
+                    <span class="jci-product-trust-text">{{ trust_text | escape | newline_to_br }}</span>
+                  </div>
+                {%- endfor -%}
+              </div>
+
+            {%- when 'accordion' -%}
+              {%- assign accordion_content = bs.content | replace: '<p>', '<p class="jci-product-accordion-paragraph">' -%}
+              <details
+                class="jci-product-accordion{% if stacked %} jci-product-accordion-stacked{% endif %}"
+                name="jci-product-accordion-{{ section.id }}"
+                {% if bs.open %}
+                  open
+                {% endif %}
+                {{ block.shopify_attributes }}
+              >
+                <summary class="jci-product-accordion-summary">{{ bs.heading | escape }}</summary>
+                <div class="jci-product-accordion-content">{{ accordion_content }}</div>
+              </details>
+          {%- endcase -%}
+
+          {%- assign previous_type = block.type -%}
+        {%- endfor -%}
+      </div>
+    </div>
+  </div>
+
+  {%- if s.enable_sticky_bar -%}
+    <aside
+      class="jci-product-sticky"
+      data-jci-product-sticky
+      aria-label="{{ product.title | escape }}"
+      aria-hidden="true"
+      inert
+    >
+      <div class="jci-product-sticky-copy">
+        <strong class="jci-product-sticky-title">{{ product.title }}</strong>
+        <span
+          class="jci-product-sticky-price"
+          data-jci-price
+        >
+          {{- current_price | strip -}}
+        </span>
+      </div>
+      <button
+        type="button"
+        class="jci-button jci-product-sticky-button"
+        data-jci-sticky-add
+        {% unless current_variant.available %}
+          disabled
+        {% endunless %}
+      >
+        <span
+          class="jci-product-buy-label"
+          data-jci-buy-label
+        >
+          {{- buy_label -}}
+        </span>
+        {% render 'jci-action-arrow' %}
+      </button>
+    </aside>
+  {%- endif -%}
+
+  <script
+    type="application/json"
+    data-jci-product-variants
+  >
+    [
+      {%- for variant in product.variants -%}
+        {%- liquid
+          if s.show_currency_code
+            assign variant_price = variant.price | money_with_currency
+            assign variant_compare = variant.compare_at_price | money_with_currency
+          else
+            assign variant_price = variant.price | money
+            assign variant_compare = variant.compare_at_price | money
+          endif
+          if variant.compare_at_price <= variant.price
+            assign variant_compare = nil
+          endif
+          assign variant_image = variant.featured_media.preview_image
+        -%}
+        {
+          "id": {{ variant.id }},
+          "options": {{ variant.options | json }},
+          "available": {{ variant.available | json }},
+          "price": {{ variant_price | json }},
+          "compare": {{ variant_compare | json }},
+          "image": {% if variant_image %}{
+            "src": {{ variant_image | image_url: width: 1200 | json }},
+            "full": {{ variant_image | image_url: width: 2200 | json }},
+            "alt": {{ variant.featured_media.alt | default: product.title | json }}
+          }{% else %}null{% endif %}
+        }{% unless forloop.last %},{% endunless %}
+      {%- endfor -%}
+    ]
+  </script>
+</section>
+
+<script
+  src="{{ 'jci-product.js' | asset_url }}"
+  type="module"
+></script>
+<script
+  src="{{ 'jci-product-gallery.js' | asset_url }}"
+  type="module"
+></script>
+{%- if s.enable_tilt -%}
+  <script
+    src="{{ 'jci-tilt.js' | asset_url }}"
+    type="module"
+  ></script>
+{%- endif -%}
+
+{% stylesheet %}
+  /* styles.css:503 */
+  .jci-product {
+    display: block;
+    padding-block: var(--jci-product-pad-top) var(--jci-product-pad-bottom);
+    background: var(--jci-product-bg);
+  }
+
+  /* styles.css:504, @900 :1520 */
+  .jci-product-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.22fr) minmax(350px, 0.78fr);
+    gap: clamp(2.5rem, 6vw, 7rem);
+    min-width: 0;
+  }
+
+  /* -- Gallery ----------------------------------------------------------- */
+
+  .jci-product-gallery-shell {
+    width: 100%;
+    min-width: 0;
+  }
+
+  /* styles.css:506-507 — #757a6d is ink at 60% on paper. */
+  .jci-product-gallery-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0 0 0.8rem;
+    color: rgb(var(--jci-ink-rgb) / 0.6);
+    font-family: var(--jci-font-label);
+    font-size: 12px;
+    text-transform: uppercase;
+  }
+
+  .jci-product-gallery-head-count {
+    color: var(--jci-olive);
+  }
+
+  /* styles.css:508 */
+  .jci-product-gallery {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.65rem;
+    align-content: start;
+  }
+
+  /* styles.css:509, 516-519 */
+  .jci-product-gallery-image {
+    position: relative;
+    aspect-ratio: 0.88;
+    margin: 0;
+    overflow: hidden;
+    background: var(--jci-sand);
+    cursor: zoom-in;
+    transform: perspective(1100px) rotateX(var(--jci-tilt-x, 0deg)) rotateY(var(--jci-tilt-y, 0deg));
+    transform-style: preserve-3d;
+    transition:
+      transform 0.6s var(--jci-ease),
+      box-shadow 0.6s var(--jci-ease);
+  }
+
+  .jci-product-gallery-image:focus-visible {
+    outline: 2px solid var(--jci-rust);
+    outline-offset: 4px;
+  }
+
+  .jci-product-gallery-image::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgb(var(--jci-ink-rgb) / 0) 54%, rgb(var(--jci-ink-rgb) / 0.58) 100%);
+    opacity: 0.72;
+    pointer-events: none;
+  }
+
+  .jci-product-gallery-image:hover {
+    z-index: 2;
+    box-shadow: 0 18px 35px rgb(var(--jci-ink-rgb) / 0.16);
+  }
+
+  /* styles.css:512 */
+  .jci-product-gallery-image-lead {
+    grid-column: span 2;
+    aspect-ratio: 0.92;
+  }
+
+  .jci-product-gallery-img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition:
+      transform 1s var(--jci-ease),
+      filter 0.6s var(--jci-ease);
+  }
+
+  .jci-product-gallery-image:hover .jci-product-gallery-img {
+    filter: saturate(1.08);
+    transform: scale(1.045);
+  }
+
+  /* styles.css:520-521 — #dce2c7 is the hero accent lifted towards paper. */
+  .jci-product-gallery-caption {
+    position: absolute;
+    right: 1rem;
+    bottom: 0.9rem;
+    left: 1rem;
+    z-index: 1;
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 1rem;
+    color: var(--jci-paper);
+    font-family: var(--jci-font-label);
+    font-size: 12px;
+    text-transform: uppercase;
+  }
+
+  .jci-product-gallery-caption-label {
+    color: color-mix(in srgb, var(--jci-hero-accent) 60%, var(--jci-paper));
+    font-weight: 400;
+  }
+
+  /* styles.css:513-515 */
+  .jci-product-gallery-secondary {
+    display: contents;
+  }
+
+  .jci-product-gallery-track {
+    display: grid;
+    grid-column: span 2;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.65rem;
+    min-width: 0;
+  }
+
+  .jci-product-gallery-track .jci-product-gallery-image {
+    aspect-ratio: 0.82;
+  }
+
+  /* styles.css:522 */
+  .jci-product-gallery-controls {
+    display: none;
+  }
+
+  /* styles.css:523-524 — #888d81 is ink at 52% on paper. */
+  .jci-product-gallery-hint {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin: 0.8rem 0 0;
+    color: rgb(var(--jci-ink-rgb) / 0.52);
+    font-family: var(--jci-font-label);
+    font-size: 12px;
+    text-transform: uppercase;
+  }
+
+  .jci-product-gallery-hint .jci-action-arrow {
+    width: 14px;
+    height: 14px;
+    color: var(--jci-rust);
+  }
+
+  /* -- Lightbox (styles.css:525-539) -------------------------------------- */
+
+  .jci-product-lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 80;
+    display: grid;
+    place-items: center;
+    padding: clamp(3.75rem, 7vw, 6rem) clamp(4.5rem, 8vw, 8rem);
+    color: var(--jci-paper);
+    background: rgb(var(--jci-ink-rgb) / 0.94);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition:
+      opacity 0.32s ease,
+      visibility 0.32s ease;
+  }
+
+  /* Visibility flips at once on open, so the close button can take focus in
+     the next frame; it still fades out on close. */
+  .jci-product-lightbox.is-open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transition:
+      opacity 0.32s ease,
+      visibility 0s;
+  }
+
+  body.jci-product-lightbox-open {
+    overflow: hidden;
+  }
+
+  .jci-product-lightbox-stage {
+    --jci-product-lightbox-height: min(82svh, 900px);
+
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: min(100%, 1100px);
+    height: var(--jci-product-lightbox-height);
+    touch-action: pan-y;
+    user-select: none;
+  }
+
+  /* A percentage max-height does not resolve inside the stage's auto grid
+     row, so the stage height is passed down as a length. */
+  .jci-product-lightbox-image {
+    width: auto;
+    max-width: 100%;
+    height: auto;
+    max-height: var(--jci-product-lightbox-height);
+    object-fit: contain;
+    box-shadow: 0 24px 70px rgb(0 0 0 / 0.34);
+    -webkit-user-drag: none;
+  }
+
+  .jci-product-lightbox-close,
+  .jci-product-lightbox-control {
+    position: absolute;
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    color: var(--jci-paper);
+    border: 1px solid rgb(var(--jci-paper-rgb) / 0.42);
+    border-radius: 0;
+    background: rgb(var(--jci-ink-rgb) / 0.48);
+    backdrop-filter: blur(10px);
+    font-family: var(--jci-font-sans);
+    cursor: pointer;
+    transition:
+      color 0.25s ease,
+      border-color 0.25s ease,
+      background-color 0.25s ease,
+      transform 0.25s var(--jci-ease);
+  }
+
+  .jci-product-lightbox-close:hover,
+  .jci-product-lightbox-close:focus-visible,
+  .jci-product-lightbox-control:hover,
+  .jci-product-lightbox-control:focus-visible {
+    color: var(--jci-ink);
+    border-color: var(--jci-paper);
+    outline: 0;
+    background: var(--jci-paper);
+  }
+
+  .jci-product-lightbox-close {
+    top: clamp(1rem, 2.5vw, 2rem);
+    right: clamp(1rem, 2.5vw, 2rem);
+    width: 46px;
+    height: 46px;
+    font-size: 28px;
+    font-weight: 300;
+  }
+
+  .jci-product-lightbox-control {
+    top: 50%;
+    width: 52px;
+    height: 52px;
+    font-size: 21px;
+    transform: translateY(-50%);
+  }
+
+  .jci-product-lightbox-control:hover,
+  .jci-product-lightbox-control:focus-visible {
+    transform: translateY(-50%) scale(1.05);
+  }
+
+  .jci-product-lightbox-previous {
+    left: clamp(1rem, 2.5vw, 2rem);
+  }
+
+  .jci-product-lightbox-next {
+    right: clamp(1rem, 2.5vw, 2rem);
+  }
+
+  .jci-product-lightbox-meta {
+    position: absolute;
+    bottom: -2.5rem;
+    left: 0;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-family: var(--jci-font-label);
+    font-size: 12px;
+    text-transform: uppercase;
+  }
+
+  .jci-product-lightbox-count {
+    color: color-mix(in srgb, var(--jci-hero-accent) 60%, var(--jci-paper));
+  }
+
+  .jci-product-lightbox-title {
+    font-weight: 400;
+  }
+
+  .jci-product-lightbox-hint {
+    position: absolute;
+    right: 0;
+    bottom: -2.5rem;
+    margin: 0;
+    color: rgb(var(--jci-paper-rgb) / 0.65);
+    font-family: var(--jci-font-label);
+    font-size: 12px;
+    text-transform: uppercase;
+  }
+
+  /* -- Details column (styles.css:540-599) -------------------------------- */
+
+  /* The prototype sticks at 1.5rem; its header is not sticky over the page
+     the way this theme's is, so the header height is added. */
+  .jci-product-detail {
+    position: sticky;
+    top: calc(var(--header-height, 0px) + 1.5rem);
+    align-self: start;
+    min-width: 0;
+    padding-top: 2.3rem;
+  }
+
+  /* styles.css:541-542 — #73776c is ink at 62% on paper. */
+  .jci-product-badge {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+    margin-bottom: 2.5rem;
+    color: rgb(var(--jci-ink-rgb) / 0.62);
+    font-family: var(--jci-font-label);
+    font-size: 14px;
+    text-transform: uppercase;
+  }
+
+  .jci-product-badge-link {
+    color: inherit;
+    text-decoration: none;
+    transition: color 0.25s var(--jci-ease);
+  }
+
+  .jci-product-badge-link:hover {
+    color: var(--jci-ink);
+  }
+
+  .jci-product-title-eyebrow {
+    color: var(--jci-ink);
+  }
+
+  /* styles.css:543. The .55rem sits on the group: Horizon zeroes the bottom
+     margin of any heading that is a last child. */
+  .jci-product-title-group {
+    margin-bottom: 0.55rem;
+  }
+
+  /* Product title keeps its own size (spec §3). */
+  .jci-product-title {
+    margin: 0;
+    color: var(--jci-ink);
+    font-family: var(--jci-font-display);
+    font-size: clamp(36px, 4vw, 56px);
+    font-weight: 500;
+  }
+
+  /* styles.css:546 — #6d7066 is ink at 65% on paper. */
+  .jci-product-text {
+    margin: 0 0 1.1rem;
+    font-family: var(--jci-font-sans);
+    font-size: var(--jci-subtitle-size);
+  }
+
+  .jci-product-text-subtitle {
+    color: rgb(var(--jci-ink-rgb) / 0.65);
+  }
+
+  .jci-product-text-body {
+    color: var(--jci-ink);
+  }
+
+  /* styles.css:547 */
+  .jci-product-price {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.75rem;
+    margin: 0 0 2rem;
+    color: var(--jci-ink);
+    font-family: var(--jci-font-label);
+    font-size: 35px;
+    font-weight: 400;
+  }
+
+  .jci-product-price-was {
+    color: rgb(var(--jci-ink-rgb) / 0.5);
+    font-size: 0.5em;
+  }
+
+  /* styles.css:558 */
+  .jci-product-option-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.7rem;
+    color: var(--jci-ink);
+    font-family: var(--jci-font-label);
+    font-size: 14px;
+    text-transform: uppercase;
+  }
+
+  .jci-product-option-selected {
+    font-weight: 600;
+  }
+
+  /* styles.css:548-549 — the colour row in the intro. */
+  .jci-product-option-ruled {
+    margin-top: 0.2rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--jci-line);
+  }
+
+  /* styles.css:574 */
+  .jci-product-option-values {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1.6rem;
+  }
+
+  .jci-product-option-ruled .jci-product-option-values {
+    margin-bottom: 0;
+  }
+
+  /* styles.css:575-576 */
+  .jci-product-swatch {
+    position: relative;
+    width: 25px;
+    height: 25px;
+    padding: 0;
+    border: 1px solid rgb(var(--jci-ink-rgb) / 0.25);
+    border-radius: 50%;
+    background: var(--jci-product-swatch-color);
+    cursor: pointer;
+  }
+
+  .jci-product-swatch.is-active::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border: 1px solid var(--jci-ink);
+    border-radius: 50%;
+  }
+
+  /* styles.css:577-579 */
+  .jci-product-option-button {
+    min-width: 45px;
+    padding: 0.65rem 0.7rem;
+    border: 1px solid var(--jci-line);
+    border-radius: 0;
+    color: var(--jci-ink);
+    background: transparent;
+    font-family: var(--jci-font-label);
+    font-size: 14px;
+    cursor: pointer;
+  }
+
+  .jci-product-option-button:not(:disabled):hover,
+  .jci-product-option-button:not(:disabled).is-active {
+    color: var(--jci-paper);
+    background: var(--jci-ink);
+    border-color: var(--jci-ink);
+  }
+
+  .jci-product-option-button.is-unavailable,
+  .jci-product-option-button:disabled,
+  .jci-product-swatch:disabled {
+    opacity: 0.36;
+    text-decoration: line-through;
+  }
+
+  .jci-product-option-button:disabled,
+  .jci-product-swatch:disabled {
+    cursor: not-allowed;
+  }
+
+  /* styles.css:560-573 */
+  .jci-product-size-guide {
+    position: relative;
+    display: inline-flex;
+  }
+
+  .jci-product-size-guide-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding-bottom: 0.2rem;
+    border-bottom: 1px solid currentcolor;
+    color: inherit;
+    text-decoration: none;
+    transition: color 0.25s var(--jci-ease);
+  }
+
+  .jci-product-size-guide-link .jci-action-arrow {
+    width: 12px;
+    height: 12px;
+    transition: transform 0.25s var(--jci-ease);
+  }
+
+  .jci-product-size-guide:hover .jci-product-size-guide-link,
+  .jci-product-size-guide:focus-within .jci-product-size-guide-link {
+    color: var(--jci-olive);
+  }
+
+  .jci-product-size-guide:hover .jci-product-size-guide-link .jci-action-arrow,
+  .jci-product-size-guide:focus-within .jci-product-size-guide-link .jci-action-arrow {
+    transform: translate(2px, -2px);
+  }
+
+  .jci-product-size-guide-popover {
+    position: absolute;
+    top: calc(100% + 0.85rem);
+    right: 0;
+    z-index: 8;
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+    width: min(290px, calc(100vw - 2rem));
+    padding: 1.15rem 1.2rem 1.2rem;
+    color: var(--jci-paper);
+    border: 1px solid rgb(var(--jci-paper-rgb) / 0.22);
+    background: var(--jci-ink);
+    box-shadow: 10px 12px 0 rgb(var(--jci-ink-rgb) / 0.08);
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(7px) scale(0.98);
+    transform-origin: top right;
+    transition:
+      opacity 0.25s var(--jci-ease),
+      transform 0.3s var(--jci-ease);
+  }
+
+  .jci-product-size-guide-popover::before {
+    content: '';
+    position: absolute;
+    top: -5px;
+    right: 1.2rem;
+    width: 9px;
+    height: 9px;
+    border-top: 1px solid rgb(var(--jci-paper-rgb) / 0.22);
+    border-left: 1px solid rgb(var(--jci-paper-rgb) / 0.22);
+    background: var(--jci-ink);
+    transform: rotate(45deg);
+  }
+
+  .jci-product-size-guide:hover .jci-product-size-guide-popover,
+  .jci-product-size-guide:focus-within .jci-product-size-guide-popover {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0) scale(1);
+  }
+
+  .jci-product-size-guide-eyebrow {
+    color: color-mix(in srgb, var(--jci-hero-accent) 95%, var(--jci-paper));
+    font-size: 12px;
+  }
+
+  .jci-product-size-guide-title {
+    font-family: var(--jci-font-display);
+    font-size: 22px;
+    font-weight: 500;
+    text-transform: none;
+  }
+
+  /* #c4c8bd is paper at 75% on ink. */
+  .jci-product-size-guide-text {
+    max-width: 235px;
+    color: rgb(var(--jci-paper-rgb) / 0.75);
+    font-family: var(--jci-font-sans);
+    font-size: 12px;
+    text-transform: none;
+  }
+
+  .jci-product-size-guide-popover-link {
+    display: inline-flex;
+    align-items: center;
+    align-self: flex-start;
+    gap: 0.5rem;
+    margin-top: 0.25rem;
+    padding-bottom: 0.35rem;
+    border-bottom: 1px solid rgb(var(--jci-paper-rgb) / 0.55);
+    color: var(--jci-paper);
+    font-family: var(--jci-font-label);
+    font-size: 12px;
+    text-decoration: none;
+    text-transform: uppercase;
+  }
+
+  .jci-product-size-guide-popover-link .jci-action-arrow {
+    width: 13px;
+    height: 13px;
+  }
+
+  /* styles.css:544-545 */
+  .jci-product-description {
+    margin-top: 0.75rem;
+    color: var(--jci-ink);
+    font-family: var(--jci-font-sans);
+    font-size: var(--jci-subtitle-size);
+  }
+
+  .jci-product-description-paragraph {
+    margin: 0;
+  }
+
+  /* styles.css:557 */
+  .jci-product-rule {
+    height: 1px;
+    margin: 1.5rem 0;
+    background: var(--jci-line);
+  }
+
+  /* styles.css:580-584 */
+  .jci-product-purchase-row {
+    display: grid;
+    grid-template-columns: 104px 1fr;
+    gap: 0.6rem;
+  }
+
+  .jci-product-quantity {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: 1px solid var(--jci-line);
+  }
+
+  .jci-product-quantity-button {
+    width: 30px;
+    height: 100%;
+    padding: 0;
+    border: 0;
+    color: inherit;
+    background: transparent;
+    font-family: var(--jci-font-sans);
+    font-size: 14px;
+    cursor: pointer;
+  }
+
+  .jci-product-quantity-value {
+    font-family: var(--jci-font-label);
+    font-size: 14px;
+  }
+
+  /* Horizon's add-to-cart button brings `.button` and its checkmark burst;
+     the box is set back to the prototype's .button (styles.css:114-115). */
+  .jci-product-buy .jci-product-buy-button {
+    position: relative;
+    width: 100%;
+    min-height: var(--jci-button-min-height);
+    padding: var(--jci-button-padding);
+    border-radius: 0;
+  }
+
+  .jci-product-buy-button:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  .jci-product-buy-button:disabled:hover {
+    color: var(--color-background);
+    background: var(--color-foreground);
+  }
+
+  .jci-product-buy-button .add-to-cart__added-icon {
+    width: 22px;
+    height: 22px;
+  }
+
+  /* styles.css:586-593 */
+  .jci-product-trust {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+    margin-top: clamp(1.6rem, 3vw, 2.35rem);
+    padding: 1.4rem 0 1.5rem;
+    border-top: 1px solid var(--jci-line);
+    border-bottom: 1px solid var(--jci-line);
+  }
+
+  .jci-product-trust-item {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0.8rem;
+    min-width: 0;
+    padding: 0.55rem clamp(0.55rem, 2.4vw, 1.6rem) 0.65rem;
+    color: var(--jci-ink);
+    font-family: var(--jci-font-sans);
+    font-size: clamp(12px, 0.75vw, 13px);
+    font-weight: 500;
+    text-align: center;
+    transition:
+      background-color 0.3s var(--jci-ease),
+      box-shadow 0.3s var(--jci-ease),
+      transform 0.3s var(--jci-ease);
+  }
+
+  .jci-product-trust-item-divided::before {
+    content: '';
+    position: absolute;
+    top: 14%;
+    bottom: 14%;
+    left: 0;
+    width: 1px;
+    background: var(--jci-line);
+  }
+
+  /* The prototype recolours the icon image with a filter chain; a mask
+     paints the same glyph in the palette's olive instead. */
+  .jci-product-trust-icon {
+    display: grid;
+    place-items: center;
+    flex: 0 0 42px;
+    width: 42px;
+    height: 42px;
+    padding: 0.55rem;
+    border: 1px solid rgb(var(--jci-olive-rgb) / 0.24);
+    border-radius: 50%;
+    background: rgb(var(--jci-olive-rgb) / 0.09);
+    transition:
+      background-color 0.35s var(--jci-ease),
+      border-color 0.35s var(--jci-ease),
+      transform 0.35s var(--jci-ease);
+  }
+
+  .jci-product-trust-glyph {
+    width: 100%;
+    height: 100%;
+    background: var(--jci-olive);
+    mask: var(--jci-product-trust-glyph) center / contain no-repeat;
+    transition: background-color 0.35s var(--jci-ease);
+  }
+
+  @media (hover: hover) {
+    .jci-product-trust-item:hover {
+      background: rgb(var(--jci-olive-rgb) / 0.055);
+      box-shadow: 0 8px 18px rgb(var(--jci-ink-rgb) / 0.06);
+      transform: translateY(-2px);
+    }
+
+    .jci-product-trust-item:hover .jci-product-trust-icon {
+      border-color: rgb(var(--jci-olive-rgb) / 0.45);
+      background: rgb(var(--jci-olive-rgb) / 0.15);
+      transform: scale(1.05) rotate(-4deg);
+    }
+
+    .jci-product-trust-item:hover .jci-product-trust-glyph {
+      background: var(--jci-ink-soft);
+    }
+  }
+
+  /* styles.css:594-599 — #60645a is ink at 70% on paper. */
+  .jci-product-accordion {
+    margin-top: 2rem;
+    color: rgb(var(--jci-ink-rgb) / 0.7);
+    font-size: 13px;
+  }
+
+  .jci-product-accordion-stacked {
+    margin-top: 1.4rem;
+    padding-top: 1.4rem;
+    border-top: 1px solid var(--jci-line);
+  }
+
+  .jci-product-accordion-summary {
+    display: flex;
+    justify-content: space-between;
+    color: var(--jci-ink);
+    font-family: var(--jci-font-label);
+    font-size: 14px;
+    text-transform: uppercase;
+    list-style: none;
+    cursor: pointer;
+  }
+
+  .jci-product-accordion-summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .jci-product-accordion-summary::after {
+    content: '+';
+    font-size: 16px;
+  }
+
+  .jci-product-accordion[open] .jci-product-accordion-summary::after {
+    content: '−';
+  }
+
+  .jci-product-accordion-content {
+    padding-top: 1rem;
+    font-family: var(--jci-font-sans);
+    font-size: var(--jci-subtitle-size);
+  }
+
+  .jci-product-accordion-paragraph {
+    margin: 0;
+  }
+
+  /* styles.css:585 */
+  .jci-product-sticky {
+    display: none;
+  }
+
+  /* -- Tablet (styles.css:1520) ----------------------------------------- */
+
+  @media screen and (max-width: 900px) {
+    .jci-product-layout {
+      grid-template-columns: minmax(0, 1fr) minmax(280px, 0.72fr);
+      gap: 2.5rem;
+    }
+  }
+
+  /* -- Mobile (styles.css:1679-1735) ------------------------------------ */
+
+  @media screen and (max-width: 680px) {
+    .jci-product {
+      padding-block: var(--jci-product-pad-top-mobile) var(--jci-product-pad-bottom-mobile);
+    }
+
+    .jci-product-layout {
+      grid-template-columns: 1fr;
+      gap: 1.7rem;
+    }
+
+    /* The gallery runs edge to edge. The prototype's shell clips this bleed
+       with overflow-x: clip, cutting the captions; that clip is not copied. */
+    .jci-product-gallery {
+      display: block;
+      max-width: 100vw;
+      margin: 0 calc(var(--jci-page-pad) * -1);
+    }
+
+    .jci-product-gallery-head {
+      padding-top: 1rem;
+    }
+
+    .jci-product-gallery-image-lead {
+      aspect-ratio: 0.82;
+    }
+
+    .jci-product-gallery-secondary {
+      position: relative;
+      display: block;
+    }
+
+    .jci-product-gallery-controls {
+      position: absolute;
+      inset: 0 0.65rem;
+      z-index: 3;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      pointer-events: none;
+    }
+
+    .jci-product-gallery-control {
+      display: grid;
+      place-items: center;
+      width: 44px;
+      height: 44px;
+      padding: 0;
+      color: var(--jci-ink);
+      border: 1px solid rgb(var(--jci-ink-rgb) / 0.34);
+      border-radius: 0;
+      background: rgb(var(--jci-paper-rgb) / 0.7);
+      box-shadow: 0 10px 24px rgb(var(--jci-ink-rgb) / 0.16);
+      font-family: var(--jci-font-sans);
+      font-size: 18px;
+      pointer-events: auto;
+      cursor: pointer;
+    }
+
+    .jci-product-gallery-control:focus-visible {
+      outline: 2px solid var(--jci-rust);
+      outline-offset: 3px;
+    }
+
+    .jci-product-gallery-track {
+      display: flex;
+      gap: 0.45rem;
+      margin-top: 0.45rem;
+      padding: 0 var(--jci-page-pad) 0.3rem;
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+    }
+
+    .jci-product-gallery-track::-webkit-scrollbar {
+      display: none;
+    }
+
+    .jci-product-gallery-track .jci-product-gallery-image {
+      flex: 0 0 clamp(165px, 54vw, 220px);
+      scroll-snap-align: start;
+    }
+
+    .jci-product-gallery-caption {
+      right: 0.75rem;
+      bottom: 0.7rem;
+      left: 0.75rem;
+    }
+
+    .jci-product-gallery-hint {
+      margin-bottom: 0.2rem;
+    }
+
+    .jci-product-lightbox {
+      padding: 4rem 0.75rem 4.75rem;
+    }
+
+    .jci-product-lightbox-stage {
+      --jci-product-lightbox-height: calc(100svh - 8.75rem);
+
+      width: 100%;
+    }
+
+    .jci-product-lightbox-close {
+      top: 0.75rem;
+      right: 0.75rem;
+      width: 42px;
+      height: 42px;
+    }
+
+    .jci-product-lightbox-control {
+      width: 44px;
+      height: 44px;
+      background: rgb(var(--jci-ink-rgb) / 0.62);
+    }
+
+    .jci-product-lightbox-previous {
+      left: 0.65rem;
+    }
+
+    .jci-product-lightbox-next {
+      right: 0.65rem;
+    }
+
+    .jci-product-lightbox-meta {
+      bottom: -2.35rem;
+      left: 0.2rem;
+      max-width: calc(100% - 0.4rem);
+    }
+
+    .jci-product-lightbox-title {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .jci-product-lightbox-hint {
+      display: none;
+    }
+
+    .jci-product-detail {
+      position: static;
+      padding-top: 2.2rem;
+    }
+
+    .jci-product-badge {
+      margin-bottom: 1.7rem;
+    }
+
+    .jci-product-title {
+      font-size: clamp(2.35rem, 11vw, 3.5rem);
+      overflow-wrap: anywhere;
+    }
+
+    .jci-product-price {
+      margin-bottom: 1.1rem;
+    }
+
+    .jci-product-option-ruled {
+      margin-top: 0.1rem;
+    }
+
+    /* On mobile the prototype's body block starts a grid row below the
+       intro: 1.7rem row gap, .5rem padding and its .75rem margin. */
+    .jci-product-description {
+      margin-top: 2.95rem;
+    }
+
+    .jci-product-trust {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.45rem;
+    }
+
+    .jci-product-sticky {
+      position: fixed;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      z-index: 19;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 0.8rem;
+      padding: 0.7rem max(var(--jci-page-pad), env(safe-area-inset-right))
+        calc(0.7rem + env(safe-area-inset-bottom)) max(var(--jci-page-pad), env(safe-area-inset-left));
+      border-top: 1px solid rgb(var(--jci-ink-rgb) / 0.16);
+      background: rgb(var(--jci-paper-rgb) / 0.96);
+      box-shadow: 0 -12px 30px rgb(var(--jci-ink-rgb) / 0.14);
+      backdrop-filter: blur(16px);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(110%);
+      transition:
+        opacity 0.3s var(--jci-ease),
+        transform 0.4s var(--jci-ease);
+    }
+
+    .jci-product-sticky.is-visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+
+    .jci-product-sticky-copy {
+      display: grid;
+      gap: 0.25rem;
+      min-width: 0;
+    }
+
+    .jci-product-sticky-title {
+      overflow: hidden;
+      font-family: var(--jci-font-display);
+      font-size: 16px;
+      font-weight: 500;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* #666b61 is ink at 67% on paper. */
+    .jci-product-sticky-price {
+      color: rgb(var(--jci-ink-rgb) / 0.67);
+      font-family: var(--jci-font-label);
+      font-size: 11px;
+    }
+
+    .jci-product-sticky-button {
+      min-width: 128px;
+      padding: 0.85rem 1rem;
+      white-space: nowrap;
+    }
+  }
+
+  /* styles.css:1886-1890 — the trust strip stacks below 560px. This is the
+     prototype's own breakpoint for this one element, kept as authored. */
+  @media screen and (max-width: 560px) {
+    .jci-product-trust {
+      grid-template-columns: 1fr;
+      gap: 0.3rem;
+      padding: 0.65rem 0;
+    }
+
+    .jci-product-trust-item {
+      flex-direction: row;
+      justify-content: flex-start;
+      gap: 0.8rem;
+      min-height: 54px;
+      padding: 0.45rem 0.65rem;
+      text-align: left;
+    }
+
+    .jci-product-trust-item-divided::before {
+      top: 0;
+      right: 0;
+      bottom: auto;
+      left: 0;
+      width: auto;
+      height: 1px;
+    }
+
+    .jci-product-trust-icon {
+      flex-basis: 38px;
+      width: 38px;
+      height: 38px;
+      padding: 0.5rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .jci-product-gallery-image,
+    .jci-product-gallery-img,
+    .jci-product-lightbox,
+    .jci-product-size-guide-popover,
+    .jci-product-trust-item,
+    .jci-product-trust-icon,
+    .jci-product-sticky {
+      transition: none;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Product page",
+  "enabled_on": { "templates": ["product"] },
+  "settings": [
+    { "type": "header", "content": "Gallery" },
+    {
+      "type": "text", "id": "gallery_head", "label": "Gallery head", "default": "Maison Cavallé",
+      "info": "The product's category follows it when the custom.category metafield is filled in."
+    },
+    { "type": "text", "id": "gallery_views_label", "label": "Image count label", "default": "views" },
+    { "type": "text", "id": "caption_first", "label": "First image caption", "default": "The piece" },
+    { "type": "text", "id": "caption_second", "label": "Second image caption", "default": "In motion" },
+    { "type": "text", "id": "caption_rest", "label": "Other image captions", "default": "Details" },
+    { "type": "text", "id": "gallery_hint", "label": "Hint under the gallery", "default": "Swipe or hover to explore the details" },
+    { "type": "checkbox", "id": "enable_tilt", "label": "Tilt images towards the pointer", "default": true },
+    { "type": "range", "id": "tilt_strength", "label": "Tilt strength", "min": 0, "max": 20, "step": 1, "unit": "deg", "default": 4, "visible_if": "{{ section.settings.enable_tilt }}" },
+    { "type": "text", "id": "lightbox_hint", "label": "Image viewer hint", "default": "Swipe or use arrow keys to explore" },
+
+    { "type": "header", "content": "Purchase" },
+    { "type": "text", "id": "add_label", "label": "Add to bag label", "default": "Add to bag" },
+    { "type": "checkbox", "id": "show_currency_code", "label": "Show currency code with prices", "default": true },
+    {
+      "type": "checkbox", "id": "enable_sticky_bar", "label": "Sticky add to bag on mobile", "default": true,
+      "info": "Appears once the main button has scrolled out of view."
+    },
+
+    { "type": "header", "content": "Layout" },
+    { "type": "color", "id": "background_color", "label": "Background", "info": "Left empty, it follows the theme colour palette." },
+    { "type": "range", "id": "padding_top", "label": "Padding top", "min": 0, "max": 240, "step": 4, "unit": "px", "default": 56 },
+    { "type": "range", "id": "padding_bottom", "label": "Padding bottom", "min": 0, "max": 240, "step": 4, "unit": "px", "default": 136 },
+    { "type": "range", "id": "padding_top_mobile", "label": "Padding top on mobile", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 0 },
+    { "type": "range", "id": "padding_bottom_mobile", "label": "Padding bottom on mobile", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 72 }
+  ],
+  "blocks": [
+    { "type": "@app" },
+    {
+      "type": "badge",
+      "name": "Badge",
+      "limit": 2,
+      "settings": [
+        { "type": "text", "id": "link_label", "label": "Link label", "default": "Shop" },
+        { "type": "url", "id": "link", "label": "Link" },
+        {
+          "type": "text", "id": "text", "label": "Text",
+          "info": "Can be connected to a metafield. Left empty, the custom.category metafield is used."
+        }
+      ]
+    },
+    {
+      "type": "title",
+      "name": "Title",
+      "limit": 1,
+      "settings": [
+        { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Maison Cavallé / New", "info": "Can be connected to a metafield." }
+      ]
+    },
+    {
+      "type": "text",
+      "name": "Text",
+      "settings": [
+        { "type": "text", "id": "text", "label": "Text", "info": "Plain text. Can be connected to a metafield. Left empty with the Subtitle style, the custom.subtitle metafield is shown, then the product type." },
+        {
+          "type": "select", "id": "style", "label": "Style",
+          "options": [
+            { "value": "subtitle", "label": "Subtitle" },
+            { "value": "body", "label": "Body" }
+          ],
+          "default": "subtitle"
+        }
+      ]
+    },
+    { "type": "price", "name": "Price", "limit": 1, "settings": [] },
+    {
+      "type": "option",
+      "name": "Variant option",
+      "limit": 3,
+      "settings": [
+        { "type": "text", "id": "option_name", "label": "Product option name", "default": "Color", "info": "Matched without regard to case, e.g. Color, Size." },
+        { "type": "text", "id": "label", "label": "Label", "info": "Left empty, the option's own name is shown." },
+        {
+          "type": "select", "id": "style", "label": "Style",
+          "options": [
+            { "value": "swatches", "label": "Colour swatches" },
+            { "value": "buttons", "label": "Buttons" }
+          ],
+          "default": "buttons",
+          "info": "Swatches show only for values with a colour — a Shopify swatch or the custom.colour_swatches metafield. The rest show as buttons."
+        },
+        { "type": "checkbox", "id": "show_selected_value", "label": "Show the selected value in the label", "default": false },
+        { "type": "checkbox", "id": "show_rule_above", "label": "Line above", "default": false },
+        { "type": "header", "content": "Size guide" },
+        { "type": "checkbox", "id": "show_size_guide", "label": "Show size guide", "default": false },
+        { "type": "url", "id": "size_guide_url", "label": "Size guide page", "visible_if": "{{ block.settings.show_size_guide }}" },
+        { "type": "checkbox", "id": "size_guide_new_tab", "label": "Open in a new tab", "default": true, "visible_if": "{{ block.settings.show_size_guide }}" },
+        { "type": "text", "id": "size_guide_label", "label": "Link label", "default": "Size guide", "visible_if": "{{ block.settings.show_size_guide }}" },
+        { "type": "text", "id": "size_guide_eyebrow", "label": "Popover eyebrow", "default": "Fit guidance", "visible_if": "{{ block.settings.show_size_guide }}" },
+        { "type": "text", "id": "size_guide_title", "label": "Popover title", "default": "Choose your usual size.", "visible_if": "{{ block.settings.show_size_guide }}" },
+        { "type": "text", "id": "size_guide_text", "label": "Popover text", "default": "Compare your bust, waist and hip measurements.", "visible_if": "{{ block.settings.show_size_guide }}" },
+        { "type": "text", "id": "size_guide_link_label", "label": "Popover link label", "default": "Open size guide", "visible_if": "{{ block.settings.show_size_guide }}" }
+      ]
+    },
+    {
+      "type": "description",
+      "name": "Description",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "select", "id": "source", "label": "Content",
+          "options": [
+            { "value": "product", "label": "Product description" },
+            { "value": "custom", "label": "Custom text" }
+          ],
+          "default": "product"
+        },
+        { "type": "checkbox", "id": "first_paragraph_only", "label": "First paragraph only", "default": true, "visible_if": "{{ block.settings.source == 'product' }}" },
+        { "type": "richtext", "id": "custom_text", "label": "Text", "visible_if": "{{ block.settings.source == 'custom' }}" }
+      ]
+    },
+    { "type": "rule", "name": "Divider", "settings": [] },
+    { "type": "buy", "name": "Quantity and add to bag", "limit": 1, "settings": [] },
+    {
+      "type": "trust",
+      "name": "Trust points",
+      "limit": 1,
+      "settings": [
+        { "type": "text", "id": "label", "label": "Accessible label", "default": "Maison Cavallé trust points" },
+        { "type": "header", "content": "Point 1" },
+        { "type": "image_picker", "id": "item_1_icon", "label": "Icon", "info": "A transparent PNG or SVG; it is drawn in the palette's olive." },
+        { "type": "textarea", "id": "item_1_text", "label": "Text", "default": "Designed in\nAustralia" },
+        { "type": "header", "content": "Point 2" },
+        { "type": "image_picker", "id": "item_2_icon", "label": "Icon" },
+        { "type": "textarea", "id": "item_2_text", "label": "Text", "default": "Considered\nfabrics" },
+        { "type": "header", "content": "Point 3" },
+        { "type": "image_picker", "id": "item_3_icon", "label": "Icon" },
+        { "type": "textarea", "id": "item_3_text", "label": "Text", "default": "Made to move" }
+      ]
+    },
+    {
+      "type": "accordion",
+      "name": "Accordion",
+      "settings": [
+        { "type": "text", "id": "heading", "label": "Heading", "default": "Details & care" },
+        { "type": "richtext", "id": "content", "label": "Content", "default": "<p>Designed in Australia. Please follow the care instructions on the garment label.</p>" },
+        { "type": "checkbox", "id": "open", "label": "Open by default", "default": false }
+      ]
+    }
+  ],
+  "presets": []
+}
+{% endschema %}

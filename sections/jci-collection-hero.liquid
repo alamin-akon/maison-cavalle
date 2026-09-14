@@ -1,0 +1,540 @@
+{% comment %}
+  Maison Cavallé — collection page hero
+
+  Prototype source: maison-cavalle-main/app.js      → renderCollection, section.collection-hero
+                    maison-cavalle-main/styles.css  → .collection-hero (436-464),
+                                                      @900 (1511-1512), @680 (1664-1669)
+  Reference: MAISON-CAVALLE-SPEC.md §0, §1, §3, §5, §7
+
+  The prototype swaps the headline per category filter. On Shopify every
+  collection is its own page, so the section either shows its own text or the
+  collection's title and description (Content source).
+
+  The mosaic's lead piece spans both rows. The prototype targets it with
+  :first-child and positions pieces two and three with :nth-child; here the
+  lead carries `is-lead` and each piece sets its own focus (§1).
+
+  Container width and section padding come from the shared defaults (§0), not
+  the prototype's per-hero clamps. No letter-spacing or line-height is authored
+  and the `font:` shorthands are split (§0). Colours are palette entries or
+  opacity steps off one (§7).
+{% endcomment %}
+
+{%- liquid
+  assign s = section.settings
+  assign pieces = section.blocks | where: 'type', 'piece'
+  assign piece_count = pieces.size
+
+  assign use_collection = false
+  if s.content_source == 'collection' and collection != blank
+    assign use_collection = true
+  endif
+
+  assign intro = s.intro
+  if use_collection
+    assign intro = collection.description | strip_html | strip
+  endif
+
+  assign mosaic_columns = '1.28fr 0.72fr'
+  if piece_count == 1
+    assign mosaic_columns = '1fr'
+  endif
+-%}
+
+<section
+  class="jci-collection-hero"
+  {% if s.anchor_id != blank %}id="{{ s.anchor_id }}"{% endif %}
+  {{ section.shopify_attributes }}
+  style="
+    --jci-collection-hero-bg: {{ s.background_color | default: settings.color_palette.foreground }};
+    --jci-collection-hero-text: {{ s.text_color | default: settings.color_palette.background }};
+    --jci-collection-hero-accent: {{ s.accent_color | default: settings.color_palette.color7 }};
+    --jci-collection-hero-meta: {% if s.meta_color != blank %}{{ s.meta_color }}{% else %}rgb(var(--jci-paper-rgb) / 0.7){% endif %};
+    --jci-collection-hero-body: {% if s.body_color != blank %}{{ s.body_color }}{% else %}rgb(var(--jci-paper-rgb) / 0.74){% endif %};
+    --jci-collection-hero-frame: {{ s.frame_background | default: settings.color_palette.color1 }};
+    --jci-collection-hero-min-height: {{ s.min_height }}px;
+    --jci-collection-hero-visual-height: {{ s.visual_height }}px;
+    --jci-collection-hero-visual-height-mobile: {{ s.visual_height_mobile }}px;
+    --jci-collection-hero-pad-top: {{ s.padding_top }}px;
+    --jci-collection-hero-pad-bottom: {{ s.padding_bottom }}px;
+    --jci-collection-hero-pad-top-mobile: {{ s.padding_top_mobile }}px;
+    --jci-collection-hero-pad-bottom-mobile: {{ s.padding_bottom_mobile }}px;
+    --jci-collection-hero-image-saturate: {{ s.image_saturate | divided_by: 100.0 }};
+    --jci-collection-hero-image-saturate-hover: {{ s.image_saturate_hover | divided_by: 100.0 }};
+    --jci-collection-hero-watermark-opacity: {{ s.watermark_opacity | divided_by: 1000.0 }};
+    --jci-collection-hero-mosaic-columns: {{ mosaic_columns }};
+  "
+>
+  <div class="jci-collection-hero-container">
+    <div class="jci-collection-hero-content">
+      <div class="jci-collection-hero-top">
+        {%- if s.eyebrow != blank -%}
+          <p class="jci-eyebrow jci-collection-hero-eyebrow">{{ s.eyebrow }}</p>
+        {%- endif -%}
+      </div>
+
+      {%- if use_collection -%}
+        <h1 class="jci-collection-hero-title">{{ collection.title }}</h1>
+      {%- elsif s.title_line_one != blank or s.title_line_two != blank -%}
+        <h1 class="jci-collection-hero-title">
+          {{- s.title_line_one -}}
+          {%- if s.title_line_one != blank and s.title_line_two != blank -%}<br>{%- endif -%}
+          {%- if s.title_line_two != blank -%}
+            <em class="jci-collection-hero-title-accent">{{ s.title_line_two }}</em>
+          {%- endif -%}
+        </h1>
+      {%- endif -%}
+
+      <div class="jci-collection-hero-intro">
+        {%- if intro != blank -%}
+          <p class="jci-collection-hero-text">{{ intro }}</p>
+        {%- endif -%}
+      </div>
+    </div>
+
+    <div class="jci-collection-hero-visual">
+      {%- if piece_count > 0 -%}
+        <div class="jci-collection-hero-mosaic" role="group" aria-label="{{ s.mosaic_label | escape }}">
+          {%- for block in pieces -%}
+            {%- liquid
+              assign b = block.settings
+              assign product = b.product
+              assign image_asset = b.image_asset | strip
+
+              assign piece_image = blank
+              if b.image != blank
+                assign piece_image = b.image
+              elsif image_asset == blank and product != blank
+                assign piece_image = product.featured_image
+              endif
+
+              assign piece_alt = b.image_alt | default: product.title
+              if piece_image.alt != blank
+                assign piece_alt = piece_image.alt
+              endif
+
+              assign piece_url = b.link | default: product.url | default: routes.all_products_collection_url
+
+              assign piece_index = b.index
+              if piece_index == blank
+                assign current = forloop.index | prepend: '0' | slice: -2, 2
+                assign total = piece_count | prepend: '0' | slice: -2, 2
+                assign piece_index = current | append: ' / ' | append: total
+              endif
+
+              assign is_lead = false
+              if forloop.first or piece_count < 3
+                assign is_lead = true
+              endif
+            -%}
+            <a
+              class="jci-collection-hero-piece{% if is_lead %} is-lead{% endif %}"
+              href="{{ piece_url }}"
+              style="--jci-collection-hero-piece-focus: {{ b.focus_y }}%;"
+              {{ block.shopify_attributes }}
+            >
+              {%- if b.image == blank and image_asset != blank -%}
+                <img
+                  class="jci-collection-hero-piece-image"
+                  src="{{ image_asset | asset_url }}"
+                  alt="{{ piece_alt | escape }}"
+                  width="900"
+                  height="1200"
+                  loading="eager"
+                  {% if forloop.first %}fetchpriority="high"{% endif %}
+                >
+              {%- elsif piece_image != blank -%}
+                <img
+                  class="jci-collection-hero-piece-image"
+                  src="{{ piece_image | image_url: width: 900 }}"
+                  srcset="
+                    {{ piece_image | image_url: width: 450 }} 450w,
+                    {{ piece_image | image_url: width: 700 }} 700w,
+                    {{ piece_image | image_url: width: 900 }} 900w
+                  "
+                  sizes="{% if is_lead %}(max-width: 680px) 60vw, 26vw{% else %}(max-width: 680px) 36vw, 15vw{% endif %}"
+                  alt="{{ piece_alt | escape }}"
+                  width="{{ piece_image.width }}"
+                  height="{{ piece_image.height }}"
+                  loading="eager"
+                  {% if forloop.first %}fetchpriority="high"{% endif %}
+                >
+              {%- endif -%}
+              <span class="jci-collection-hero-piece-index" aria-hidden="true">{{ piece_index }}</span>
+            </a>
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+
+      {%- if s.visual_eyebrow != blank or s.visual_title != blank -%}
+        <div class="jci-collection-hero-visual-label">
+          {%- if s.visual_eyebrow != blank -%}
+            <span class="jci-collection-hero-visual-eyebrow">{{ s.visual_eyebrow }}</span>
+          {%- endif -%}
+          {%- if s.visual_title != blank -%}
+            <strong class="jci-collection-hero-visual-title">{{ s.visual_title }}</strong>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+
+      {%- if s.orbit_label != blank -%}
+        <span class="jci-collection-hero-orbit" aria-hidden="true">{{ s.orbit_label }}</span>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+  /* styles.css:436 — background, overflow and the stacking root. Width and
+     gutter stay on the shared container (§0). */
+  .jci-collection-hero {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+    color: var(--jci-collection-hero-text);
+    background: var(--jci-collection-hero-bg);
+  }
+
+  /* styles.css:437 — the oversized MC watermark. */
+  .jci-collection-hero::before {
+    content: 'MC';
+    position: absolute;
+    right: 39%;
+    bottom: -9%;
+    z-index: -1;
+    color: rgb(var(--jci-paper-rgb) / var(--jci-collection-hero-watermark-opacity));
+    font-family: var(--jci-font-display);
+    font-size: clamp(170px, 30vw, 440px);
+    font-weight: 600;
+    pointer-events: none;
+  }
+
+  /* styles.css:436 — the two-column grid and min(670px, 72vh). */
+  .jci-collection-hero-container {
+    display: grid;
+    grid-template-columns: minmax(0, 1.05fr) minmax(320px, 0.75fr);
+    gap: clamp(2rem, 7vw, 8rem);
+    min-height: min(var(--jci-collection-hero-min-height), 72vh);
+    padding-block: var(--jci-collection-hero-pad-top) var(--jci-collection-hero-pad-bottom);
+  }
+
+  /* styles.css:438 */
+  .jci-collection-hero-content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 480px;
+  }
+
+  /* styles.css:439-440 */
+  .jci-collection-hero-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .jci-collection-hero-eyebrow {
+    color: var(--jci-collection-hero-meta);
+  }
+
+  /* styles.css:441-442. All page heroes share the hero title size (§3). */
+  .jci-collection-hero-title {
+    max-width: 760px;
+    margin: auto 0 2.4rem;
+    font-family: var(--jci-font-display);
+    font-size: var(--jci-hero-title-size);
+    font-weight: 500;
+  }
+
+  .jci-collection-hero-title-accent {
+    color: var(--jci-collection-hero-accent);
+    font-style: italic;
+  }
+
+  /* styles.css:443-444 */
+  .jci-collection-hero-intro {
+    color: var(--jci-collection-hero-body);
+  }
+
+  .jci-collection-hero-text {
+    max-width: 365px;
+    margin: 0;
+    font-family: var(--jci-font-sans);
+    font-size: var(--jci-subtitle-size);
+  }
+
+  /* styles.css:445 */
+  .jci-collection-hero-visual {
+    position: relative;
+    align-self: end;
+    min-height: var(--jci-collection-hero-visual-height);
+    overflow: hidden;
+    border: 1px solid rgb(var(--jci-paper-rgb) / 0.2);
+    background: var(--jci-collection-hero-frame);
+    box-shadow: 20px 20px 0 rgb(var(--jci-paper-rgb) / 0.06);
+  }
+
+  /* styles.css:446 + :462 — scrim over the whole mosaic. */
+  .jci-collection-hero-visual::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: linear-gradient(180deg, transparent 42%, rgb(17 21 17 / 0.72));
+    pointer-events: none;
+  }
+
+  /* styles.css:453. The gutter colour is the background lifted 4% towards the
+     text colour — the prototype's #252a25 on ink. */
+  .jci-collection-hero-mosaic {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    grid-template-columns: var(--jci-collection-hero-mosaic-columns);
+    grid-template-rows: repeat(2, minmax(0, 1fr));
+    gap: 0.45rem;
+    padding: 0.45rem;
+    background: color-mix(in srgb, var(--jci-collection-hero-bg), var(--jci-collection-hero-text) 4%);
+  }
+
+  /* styles.css:454-455 */
+  .jci-collection-hero-piece {
+    position: relative;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+    background: var(--jci-sand);
+  }
+
+  .jci-collection-hero-piece.is-lead {
+    grid-row: 1 / -1;
+  }
+
+  /* styles.css:456 */
+  .jci-collection-hero-piece::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgb(17 21 17 / 0.02) 45%, rgb(17 21 17 / 0.5));
+    pointer-events: none;
+  }
+
+  /* styles.css:457-459 — :457 wins the cascade over :447 for filter and
+     transition. */
+  .jci-collection-hero-piece-image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center var(--jci-collection-hero-piece-focus, 50%);
+    filter: saturate(var(--jci-collection-hero-image-saturate)) contrast(1.04);
+    transition:
+      transform 0.8s var(--jci-ease),
+      filter 0.6s var(--jci-ease);
+  }
+
+  /* styles.css:460 */
+  .jci-collection-hero-piece:hover .jci-collection-hero-piece-image,
+  .jci-collection-hero-piece:focus-visible .jci-collection-hero-piece-image {
+    filter: saturate(var(--jci-collection-hero-image-saturate-hover)) contrast(1.04);
+    transform: scale(1.06);
+  }
+
+  .jci-collection-hero-piece:focus-visible {
+    outline: 2px solid var(--jci-rust);
+    outline-offset: -2px;
+  }
+
+  /* styles.css:461 */
+  .jci-collection-hero-piece-index {
+    position: absolute;
+    top: 0.8rem;
+    left: 0.8rem;
+    z-index: 1;
+    color: rgb(var(--jci-paper-rgb) / 0.84);
+    font-family: var(--jci-font-label);
+    font-size: 12px;
+  }
+
+  /* styles.css:449-451 + :463 */
+  .jci-collection-hero-visual-label {
+    position: absolute;
+    right: 1.25rem;
+    bottom: 1.2rem;
+    left: 1.25rem;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    pointer-events: none;
+  }
+
+  .jci-collection-hero-visual-eyebrow {
+    color: rgb(var(--jci-paper-rgb) / 0.82);
+    font-family: var(--jci-font-label);
+    font-size: 12px;
+    text-transform: uppercase;
+  }
+
+  .jci-collection-hero-visual-title {
+    max-width: 210px;
+    font-family: var(--jci-font-display);
+    font-size: 24px;
+    font-weight: 500;
+  }
+
+  /* styles.css:452 + :464 */
+  .jci-collection-hero-orbit {
+    position: absolute;
+    top: 1.1rem;
+    right: 1.1rem;
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border: 1px solid rgb(var(--jci-paper-rgb) / 0.65);
+    border-radius: 50%;
+    color: var(--jci-collection-hero-text);
+    font-family: var(--jci-font-label);
+    font-size: 14px;
+    pointer-events: none;
+  }
+
+  /* styles.css:1511-1512 */
+  @media screen and (max-width: 900px) {
+    .jci-collection-hero-container {
+      grid-template-columns: minmax(0, 1fr) minmax(270px, 0.8fr);
+      gap: 3rem;
+    }
+
+    .jci-collection-hero-content {
+      min-height: 430px;
+    }
+  }
+
+  /* styles.css:1664-1669 */
+  @media screen and (max-width: 680px) {
+    .jci-collection-hero-container {
+      display: flex;
+      flex-direction: column;
+      gap: 2.5rem;
+      min-height: auto;
+      padding-block: var(--jci-collection-hero-pad-top-mobile) var(--jci-collection-hero-pad-bottom-mobile);
+    }
+
+    .jci-collection-hero-content {
+      min-height: auto;
+    }
+
+    .jci-collection-hero-title {
+      margin-block: clamp(4rem, 18vw, 6rem) 2rem;
+    }
+
+    .jci-collection-hero-text {
+      margin-block-end: 1.6rem;
+    }
+
+    .jci-collection-hero-visual {
+      align-self: flex-end;
+      width: calc(100% - 0.75rem);
+      min-height: var(--jci-collection-hero-visual-height-mobile);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .jci-collection-hero-piece-image {
+      transition: none;
+    }
+
+    .jci-collection-hero-piece:hover .jci-collection-hero-piece-image,
+    .jci-collection-hero-piece:focus-visible .jci-collection-hero-piece-image {
+      transform: none;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Collection hero",
+  "tag": "section",
+  "class": "jci-collection-hero-section",
+  "max_blocks": 3,
+  "blocks": [
+    {
+      "type": "piece",
+      "name": "Piece",
+      "settings": [
+        { "type": "product", "id": "product", "label": "Product", "info": "Sets the link, and the image when none is chosen below." },
+        { "type": "image_picker", "id": "image", "label": "Image", "info": "Replaces the file and product images." },
+        { "type": "text", "id": "image_asset", "label": "Image file in theme assets", "info": "Filename only. Used when no image is chosen above, ahead of the product's image." },
+        { "type": "text", "id": "image_alt", "label": "Image description", "info": "Left empty, the product title is used." },
+        { "type": "url", "id": "link", "label": "Link", "info": "Left empty, the product page is used." },
+        { "type": "text", "id": "index", "label": "Corner index", "info": "Leave empty to number automatically, e.g. 01 / 03." },
+        { "type": "range", "id": "focus_y", "label": "Vertical focus", "min": 0, "max": 100, "step": 1, "unit": "%", "default": 50, "info": "0 shows the top of the image, 100 the bottom." }
+      ]
+    }
+  ],
+  "settings": [
+    { "type": "header", "content": "Copy" },
+    {
+      "type": "select",
+      "id": "content_source",
+      "label": "Content source",
+      "options": [
+        { "value": "section", "label": "Text below" },
+        { "value": "collection", "label": "Collection title and description" }
+      ],
+      "default": "section"
+    },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Maison Cavallé · 2026" },
+    { "type": "text", "id": "title_line_one", "label": "Title first line", "default": "The opening" },
+    { "type": "text", "id": "title_line_two", "label": "Title second line (italic)", "default": "collection." },
+    { "type": "textarea", "id": "intro", "label": "Intro", "default": "Timeless equestrian influence, considered fabrics and pieces made to live beyond the ride." },
+
+    { "type": "header", "content": "Visual" },
+    { "type": "text", "id": "mosaic_label", "label": "Accessible label", "default": "Featured Maison Cavallé pieces" },
+    { "type": "text", "id": "visual_eyebrow", "label": "Label eyebrow", "default": "Maison Cavallé · The first edit" },
+    { "type": "text", "id": "visual_title", "label": "Label title", "default": "Made for the moments between." },
+    { "type": "text", "id": "orbit_label", "label": "Corner badge", "default": "01" },
+
+    { "type": "header", "content": "Media treatment" },
+    { "type": "range", "id": "image_saturate", "label": "Saturation", "min": 0, "max": 150, "step": 5, "unit": "%", "default": 65 },
+    { "type": "range", "id": "image_saturate_hover", "label": "Saturation on hover", "min": 0, "max": 150, "step": 2, "unit": "%", "default": 92 },
+    { "type": "range", "id": "watermark_opacity", "label": "Watermark strength", "min": 0, "max": 120, "step": 5, "unit": "%", "default": 45, "info": "Thousandths — 45 is the prototype's 0.045." },
+
+    { "type": "header", "content": "Colors", "info": "Left empty, each of these follows the theme colour palette." },
+    { "type": "color", "id": "background_color", "label": "Background" },
+    { "type": "color", "id": "text_color", "label": "Text" },
+    { "type": "color", "id": "accent_color", "label": "Accent" },
+    { "type": "color", "id": "body_color", "label": "Body text" },
+    { "type": "color", "id": "meta_color", "label": "Eyebrow" },
+    { "type": "color", "id": "frame_background", "label": "Image frame" },
+
+    { "type": "header", "content": "Layout" },
+    { "type": "range", "id": "min_height", "label": "Minimum height", "min": 300, "max": 900, "step": 10, "unit": "px", "default": 670, "info": "Never taller than 72% of the screen." },
+    { "type": "range", "id": "visual_height", "label": "Visual height", "min": 240, "max": 720, "step": 10, "unit": "px", "default": 430 },
+    { "type": "range", "id": "visual_height_mobile", "label": "Visual height on mobile", "min": 200, "max": 600, "step": 10, "unit": "px", "default": 360 },
+    { "type": "range", "id": "padding_top", "label": "Padding top", "min": 0, "max": 240, "step": 4, "unit": "px", "default": 136 },
+    { "type": "range", "id": "padding_bottom", "label": "Padding bottom", "min": 0, "max": 240, "step": 4, "unit": "px", "default": 136 },
+    { "type": "range", "id": "padding_top_mobile", "label": "Padding top on mobile", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 72 },
+    { "type": "range", "id": "padding_bottom_mobile", "label": "Padding bottom on mobile", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 72 },
+
+    { "type": "header", "content": "Anchor" },
+    { "type": "text", "id": "anchor_id", "label": "Anchor ID", "default": "collection-hero" }
+  ],
+  "presets": [
+    {
+      "name": "Collection hero",
+      "blocks": [
+        { "type": "piece" },
+        { "type": "piece", "settings": { "focus_y": 28 } },
+        { "type": "piece" }
+      ]
+    }
+  ]
+}
+{% endschema %}

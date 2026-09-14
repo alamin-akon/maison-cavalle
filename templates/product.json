@@ -6,8 +6,147 @@
  * or related systems. Please exercise caution as any changes
  * made to this file may be overwritten.
  * ------------------------------------------------------------
- */{
+ */
+{
   "sections": {
+    "jci_product": {
+      "type": "jci-product",
+      "blocks": {
+        "badge": {
+          "type": "badge",
+          "settings": {
+            "link_label": "Shop",
+            "link": "shopify://collections/all",
+            "text": ""
+          }
+        },
+        "title": {
+          "type": "title",
+          "settings": {
+            "eyebrow": "Maison Cavallé / New"
+          }
+        },
+        "subtitle": {
+          "type": "text",
+          "settings": {
+            "text": "",
+            "style": "subtitle"
+          }
+        },
+        "price": {
+          "type": "price",
+          "settings": {}
+        },
+        "colour": {
+          "type": "option",
+          "settings": {
+            "option_name": "Color",
+            "label": "Colour",
+            "style": "swatches",
+            "show_selected_value": true,
+            "show_rule_above": true,
+            "show_size_guide": false,
+            "size_guide_new_tab": true,
+            "size_guide_label": "Size guide",
+            "size_guide_eyebrow": "Fit guidance",
+            "size_guide_title": "Choose your usual size.",
+            "size_guide_text": "Compare your bust, waist and hip measurements.",
+            "size_guide_link_label": "Open size guide"
+          }
+        },
+        "description": {
+          "type": "description",
+          "settings": {
+            "source": "product",
+            "first_paragraph_only": true
+          }
+        },
+        "rule": {
+          "type": "rule",
+          "settings": {}
+        },
+        "size": {
+          "type": "option",
+          "settings": {
+            "option_name": "Size",
+            "label": "Size",
+            "style": "buttons",
+            "show_selected_value": false,
+            "show_rule_above": false,
+            "show_size_guide": true,
+            "size_guide_url": "shopify://pages/size-guide",
+            "size_guide_new_tab": true,
+            "size_guide_label": "Size guide",
+            "size_guide_eyebrow": "Fit guidance",
+            "size_guide_title": "Choose your usual size.",
+            "size_guide_text": "Compare your bust, waist and hip measurements.",
+            "size_guide_link_label": "Open size guide"
+          }
+        },
+        "buy": {
+          "type": "buy",
+          "settings": {}
+        },
+        "trust": {
+          "type": "trust",
+          "settings": {
+            "label": "Maison Cavallé trust points",
+            "item_1_text": "Designed in\nAustralia",
+            "item_2_text": "Considered\nfabrics",
+            "item_3_text": "Made to move"
+          }
+        },
+        "details": {
+          "type": "accordion",
+          "settings": {
+            "heading": "Details & care",
+            "content": "<p>Designed in Australia. Please follow the care instructions on the garment label. If you are between sizes, we recommend choosing the larger size for an easier fit.</p>",
+            "open": true
+          }
+        },
+        "shipping": {
+          "type": "accordion",
+          "settings": {
+            "heading": "Shipping and Returns",
+            "content": "<p>Orders are prepared with care and dispatched with tracking. Eligible unworn pieces can be returned within 14 days of delivery.</p>",
+            "open": false
+          }
+        }
+      },
+      "block_order": [
+        "badge",
+        "title",
+        "subtitle",
+        "price",
+        "colour",
+        "description",
+        "rule",
+        "size",
+        "buy",
+        "trust",
+        "details",
+        "shipping"
+      ],
+      "settings": {
+        "gallery_head": "Maison Cavallé",
+        "gallery_views_label": "views",
+        "caption_first": "The piece",
+        "caption_second": "In motion",
+        "caption_rest": "Details",
+        "gallery_hint": "Swipe or hover to explore the details",
+        "enable_tilt": true,
+        "tilt_strength": 4,
+        "lightbox_hint": "Swipe or use arrow keys to explore",
+        "add_label": "Add to bag",
+        "show_currency_code": true,
+        "enable_sticky_bar": true,
+        "background_color": "",
+        "padding_top": 56,
+        "padding_bottom": 136,
+        "padding_top_mobile": 0,
+        "padding_bottom_mobile": 72
+      }
+    },
     "main": {
       "type": "product-information",
       "blocks": {
@@ -330,153 +469,53 @@
         "background_color": "{{ settings.color_palette.background }}",
         "padding-block-start": 56,
         "padding-block-end": 136
-      }
-    },
-    "product_recommendations_qggXJq": {
-      "type": "product-recommendations",
-      "blocks": {
-        "text_cbcgyb": {
-          "type": "text",
-          "name": "t:names.header",
-          "settings": {
-            "text": "<h3>You may also like </h3>",
-            "width": "fit-content",
-            "max_width": "normal",
-            "alignment": "left",
-            "type_preset": "h4",
-            "font": "var(--font-body--family)",
-            "font_size": "1rem",
-            "line_height": "normal",
-            "letter_spacing": "normal",
-            "case": "none",
-            "wrap": "pretty",
-            "text_color": "",
-            "background": false,
-            "background_color": "#00000026",
-            "corner_radius": 0,
-            "padding-block-start": 0,
-            "padding-block-end": 0,
-            "padding-inline-start": 0,
-            "padding-inline-end": 0
-          },
-          "blocks": {}
-        },
-        "static-product-card": {
-          "type": "_product-card",
-          "name": "t:names.product_card",
-          "static": true,
-          "settings": {
-            "product_card_gap": 8,
-            "background_color": "",
-            "border": "none",
-            "border_width": 1,
-            "border_opacity": 100,
-            "border_color": "",
-            "border_radius": 0,
-            "padding-block-start": 0,
-            "padding-block-end": 8,
-            "padding-inline-start": 0,
-            "padding-inline-end": 0
-          },
-          "blocks": {
-            "product_card_gallery_DNizbJ": {
-              "type": "_product-card-gallery",
-              "name": "t:names.product_card_media",
-              "settings": {
-                "image_ratio": "adapt",
-                "border": "none",
-                "border_width": 1,
-                "border_opacity": 100,
-                "border_color": "",
-                "border_radius": 0,
-                "padding-block-start": 0,
-                "padding-block-end": 0,
-                "padding-inline-start": 0,
-                "padding-inline-end": 0
-              },
-              "blocks": {}
-            },
-            "product_title_M7MJkb": {
-              "type": "product-title",
-              "name": "t:names.product_title",
-              "settings": {
-                "width": "100%",
-                "max_width": "normal",
-                "alignment": "left",
-                "type_preset": "rte",
-                "font": "var(--font-body--family)",
-                "font_size": "1rem",
-                "line_height": "normal",
-                "letter_spacing": "normal",
-                "case": "none",
-                "wrap": "pretty",
-                "text_color": "",
-                "background": false,
-                "background_color": "#00000026",
-                "corner_radius": 0,
-                "padding-block-start": 4,
-                "padding-block-end": 0,
-                "padding-inline-start": 0,
-                "padding-inline-end": 0
-              },
-              "blocks": {}
-            },
-            "price_gLWgA6": {
-              "type": "price",
-              "settings": {
-                "show_sale_price_first": true,
-                "show_installments": false,
-                "show_tax_info": false,
-                "type_preset": "h6",
-                "width": "100%",
-                "alignment": "left",
-                "font": "var(--font-body--family)",
-                "font_size": "1rem",
-                "line_height": "normal",
-                "letter_spacing": "normal",
-                "case": "none",
-                "text_color": "",
-                "padding-block-start": 0,
-                "padding-block-end": 0,
-                "padding-inline-start": 0,
-                "padding-inline-end": 0
-              },
-              "blocks": {}
-            }
-          },
-          "block_order": [
-            "product_card_gallery_DNizbJ",
-            "product_title_M7MJkb",
-            "price_gLWgA6"
-          ]
-        }
       },
-      "block_order": [
-        "text_cbcgyb"
-      ],
-      "name": "t:names.product_recommendations",
+      "disabled": true
+    },
+    "jci_related_products": {
+      "type": "jci-product-section",
+      "name": "More from the Maison",
       "settings": {
-        "product": "{{ closest.product }}",
-        "recommendation_type": "related",
-        "layout_type": "grid",
-        "carousel_on_mobile": false,
-        "max_products": 4,
+        "eyebrow": "Complete the feeling",
+        "title_line_one": "More from the Maison.",
+        "title_line_two": "",
+        "intro": "",
+        "collection": "frontpage",
+        "products_to_show": 4,
         "columns": 4,
-        "mobile_columns": "2",
-        "columns_gap": 12,
-        "rows_gap": 24,
-        "icons_style": "arrow",
-        "icons_shape": "none",
-        "section_width": "page-width",
-        "gap": 28,
-        "background_color": "{{ settings.color_palette.background }}",
-        "padding-block-start": 48,
-        "padding-block-end": 48
+        "columns_mobile": 2,
+        "image_index": 0,
+        "subtitle_metafield": "custom.subtitle",
+        "swatch_option": "Color",
+        "swatch_metafield": "custom.colour_swatches",
+        "show_quick_add": true,
+        "quick_add_label": "Quick add",
+        "badge_source": "always",
+        "badge_text": "New",
+        "cta_label": "",
+        "background_color": "",
+        "heading_color": "",
+        "accent_color": "",
+        "media_background": "",
+        "intro_color": "#5f6259",
+        "subtitle_color": "#6d7066",
+        "padding_top": 136,
+        "padding_bottom": 136,
+        "padding_top_mobile": 72,
+        "padding_bottom_mobile": 72,
+        "header_gap": 40,
+        "grid_gap": 28,
+        "grid_row_gap_mobile": 36,
+        "image_ratio": 78,
+        "image_zoom": 35,
+        "placeholder_subtitle": "Choose a collection to show real products",
+        "anchor_id": "more-from-the-maison"
       }
     }
   },
   "order": [
+    "jci_product",
     "main",
-    "product_recommendations_qggXJq"
+    "jci_related_products"
   ]
 }

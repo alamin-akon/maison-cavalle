@@ -6,8 +6,44 @@
  * or related systems. Please exercise caution as any changes
  * made to this file may be overwritten.
  * ------------------------------------------------------------
- */{
+ */
+{
   "sections": {
+    "jci_collection_hero": {
+      "type": "jci-collection-hero",
+      "blocks": {
+        "piece_1": {
+          "type": "piece",
+          "settings": {
+            "image_asset": "jci-lux-jacket-front-horse.webp",
+            "image_alt": "Lux Jacket in powder blue",
+            "focus_y": 50
+          }
+        },
+        "piece_2": {
+          "type": "piece",
+          "settings": {
+            "image_asset": "jci-active-turtleneck-front.webp",
+            "image_alt": "Active Turtleneck Top in cocoa",
+            "focus_y": 28
+          }
+        },
+        "piece_3": {
+          "type": "piece",
+          "settings": {
+            "image_asset": "jci-groomi-horse-shedder-lifestyle.webp",
+            "image_alt": "The Groomi Horse Shedder",
+            "focus_y": 50
+          }
+        }
+      },
+      "block_order": [
+        "piece_1",
+        "piece_2",
+        "piece_3"
+      ],
+      "settings": {}
+    },
     "section": {
       "type": "section",
       "blocks": {
@@ -90,7 +126,8 @@
         "gradient_direction": "to top",
         "padding-block-start": 48,
         "padding-block-end": 48
-      }
+      },
+      "disabled": true
     },
     "main": {
       "type": "main-collection",
@@ -216,6 +253,7 @@
     }
   },
   "order": [
+    "jci_collection_hero",
     "section",
     "main"
   ]
