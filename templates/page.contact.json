@@ -9,6 +9,210 @@
  */
 {
   "sections": {
+    "jci_contact_hero": {
+      "type": "jci-contact-hero",
+      "blocks": {
+        "m1": {
+          "type": "meta",
+          "settings": {
+            "index": "01",
+            "label": "Ask about a piece"
+          }
+        },
+        "m2": {
+          "type": "meta",
+          "settings": {
+            "index": "02",
+            "label": "Track an order"
+          }
+        },
+        "m3": {
+          "type": "meta",
+          "settings": {
+            "index": "03",
+            "label": "Find your fit"
+          }
+        }
+      },
+      "block_order": [
+        "m1",
+        "m2",
+        "m3"
+      ],
+      "settings": {
+        "topline_left": "Maison Cavallé · Contact",
+        "topline_right": "Open line / 2026",
+        "eyebrow": "A note to the Maison",
+        "title_line_one": "Here when",
+        "title_line_two": "you need us.",
+        "intro": "Questions about a piece, your order or life around the stable? Send us a note and we’ll take care of the rest.",
+        "cta_label": "Start a conversation",
+        "cta_link": "#contact-form",
+        "image_asset": "",
+        "image": "shopify://shop_images/miriam-and-misha.png",
+        "image_alt": "Miriam Claire with Misha the horse",
+        "feature_link": "#contact-form",
+        "feature_index": "01 / 01",
+        "feature_eyebrow": "The Maison open line",
+        "feature_title": "Thoughtful answers, from our house to yours.",
+        "feature_link_label": "Write to us",
+        "image_ratio": 92,
+        "image_ratio_mobile": 82,
+        "image_saturate": 72,
+        "image_brightness": 80,
+        "watermark_opacity": 35,
+        "enable_tilt": true,
+        "tilt_strength": 6,
+        "background_color": "",
+        "text_color": "",
+        "accent_color": "",
+        "body_color": "",
+        "meta_color": "",
+        "frame_background": "",
+        "min_height": 600,
+        "padding_top": 76,
+        "padding_bottom": 112,
+        "padding_top_mobile": 48,
+        "padding_bottom_mobile": 72,
+        "anchor_id": "contact-hero"
+      }
+    },
+    "jci_contact": {
+      "type": "jci-contact",
+      "blocks": {
+        "d1": {
+          "type": "detail",
+          "settings": {
+            "label": "Email",
+            "value": "admin@maisoncavalle.com",
+            "link": "mailto:admin@maisoncavalle.com",
+            "new_tab": false
+          }
+        },
+        "d2": {
+          "type": "detail",
+          "settings": {
+            "label": "Instagram",
+            "value": "@maison.cavalle",
+            "link": "https://www.instagram.com/maison.cavalle/",
+            "new_tab": true
+          }
+        },
+        "d3": {
+          "type": "detail",
+          "settings": {
+            "label": "Hours",
+            "value": "Monday–Friday\n9am–5pm AEST",
+            "link": "",
+            "new_tab": false
+          }
+        },
+        "d4": {
+          "type": "detail",
+          "settings": {
+            "label": "Location",
+            "value": "Queensland, Australia",
+            "link": "",
+            "new_tab": false
+          }
+        },
+        "s1": {
+          "type": "support",
+          "settings": {
+            "index": "01",
+            "title": "Find an answer",
+            "text": "Fit, delivery and returns.",
+            "link": "/pages/faq"
+          }
+        },
+        "s2": {
+          "type": "support",
+          "settings": {
+            "index": "02",
+            "title": "Read shipping",
+            "text": "From our house to yours.",
+            "link": "/pages/shipping"
+          }
+        },
+        "s3": {
+          "type": "support",
+          "settings": {
+            "index": "03",
+            "title": "Find your fit",
+            "text": "Measurements made simple.",
+            "link": "/pages/size-guide"
+          }
+        },
+        "e1": {
+          "type": "enquiry",
+          "settings": {
+            "label": "Customer Care",
+            "text": "For order, delivery, sizing and returns enquiries."
+          }
+        },
+        "e2": {
+          "type": "enquiry",
+          "settings": {
+            "label": "Collaborations & Partnerships",
+            "text": "For rider partnerships, events, media and collaboration enquiries."
+          }
+        },
+        "e3": {
+          "type": "enquiry",
+          "settings": {
+            "label": "General Enquiries",
+            "text": "For everything else Maison Cavallé."
+          }
+        }
+      },
+      "block_order": [
+        "d1",
+        "d2",
+        "d3",
+        "d4",
+        "s1",
+        "s2",
+        "s3",
+        "e1",
+        "e2",
+        "e3"
+      ],
+      "settings": {
+        "eyebrow": "Ways to reach us",
+        "title_line_one": "Good conversations",
+        "title_line_two": "start here.",
+        "status_label": "The Maison is open",
+        "availability": "We aim to respond to enquiries within 1–2 business days. For order questions, include your order number so we can help quickly.",
+        "form_anchor": "contact-form",
+        "form_eyebrow": "The open line",
+        "form_title": "Send a note.",
+        "form_stamp": "MC / 01",
+        "form_intro": "Tell us a little about what you need. A member of the Maison will be in touch shortly.",
+        "label_name": "Name",
+        "placeholder_name": "Your name",
+        "label_email": "Email",
+        "placeholder_email": "you@example.com",
+        "label_subject": "Subject",
+        "subject_options": "Order enquiry\nProduct question\nReturns & exchanges\nSize guidance\nSomething else",
+        "label_message": "Message",
+        "placeholder_message": "How can we help?",
+        "submit_label": "Send message",
+        "form_success": "Thank you. A member of the Maison will be in touch shortly.",
+        "background_color": "",
+        "heading_color": "",
+        "accent_color": "",
+        "index_color": "",
+        "body_color": "",
+        "card_background": "",
+        "field_background": "",
+        "column_gap": 50,
+        "padding_top": 136,
+        "padding_bottom": 136,
+        "padding_top_mobile": 72,
+        "padding_bottom_mobile": 72,
+        "anchor_id": "contact-content"
+      }
+    },
     "main": {
       "type": "main-page",
       "blocks": {
@@ -153,195 +357,6 @@
         "border_radius": 0,
         "padding-block-start": 32,
         "padding-block-end": 84
-      }
-    },
-    "jci_contact_hero": {
-      "type": "jci-contact-hero",
-      "blocks": {
-        "m1": {
-          "type": "meta",
-          "settings": {
-            "index": "01",
-            "label": "Ask about a piece"
-          }
-        },
-        "m2": {
-          "type": "meta",
-          "settings": {
-            "index": "02",
-            "label": "Track an order"
-          }
-        },
-        "m3": {
-          "type": "meta",
-          "settings": {
-            "index": "03",
-            "label": "Find your fit"
-          }
-        }
-      },
-      "block_order": [
-        "m1",
-        "m2",
-        "m3"
-      ],
-      "settings": {
-        "topline_left": "Maison Cavallé · Contact",
-        "topline_right": "Open line / 2026",
-        "eyebrow": "A note to the Maison",
-        "title_line_one": "Here when",
-        "title_line_two": "you need us.",
-        "intro": "Questions about a piece, your order or life around the stable? Send us a note and we’ll take care of the rest.",
-        "cta_label": "Start a conversation",
-        "cta_link": "#contact-form",
-        "feature_link": "#contact-form",
-        "image_alt": "Miriam Claire with Misha the horse",
-        "feature_index": "01 / 01",
-        "feature_eyebrow": "The Maison open line",
-        "feature_title": "Thoughtful answers, from our house to yours.",
-        "feature_link_label": "Write to us",
-        "image_ratio": 92,
-        "image_ratio_mobile": 82,
-        "image_saturate": 72,
-        "image_brightness": 80,
-        "watermark_opacity": 35,
-        "enable_tilt": true,
-        "tilt_strength": 6,
-        "min_height": 600,
-        "padding_top": 76,
-        "padding_bottom": 112,
-        "padding_top_mobile": 48,
-        "padding_bottom_mobile": 72,
-        "anchor_id": "contact-hero"
-      }
-    },
-    "jci_contact": {
-      "type": "jci-contact",
-      "blocks": {
-        "d1": {
-          "type": "detail",
-          "settings": {
-            "label": "Email",
-            "value": "admin@maisoncavalle.com",
-            "link": "mailto:admin@maisoncavalle.com",
-            "new_tab": false
-          }
-        },
-        "d2": {
-          "type": "detail",
-          "settings": {
-            "label": "Instagram",
-            "value": "@maison.cavalle",
-            "link": "https://www.instagram.com/maison.cavalle/",
-            "new_tab": true
-          }
-        },
-        "d3": {
-          "type": "detail",
-          "settings": {
-            "label": "Hours",
-            "value": "Monday–Friday\n9am–5pm AEST",
-            "link": "",
-            "new_tab": false
-          }
-        },
-        "d4": {
-          "type": "detail",
-          "settings": {
-            "label": "Location",
-            "value": "Queensland, Australia",
-            "link": "",
-            "new_tab": false
-          }
-        },
-        "s1": {
-          "type": "support",
-          "settings": {
-            "index": "01",
-            "title": "Find an answer",
-            "text": "Fit, delivery and returns.",
-            "link": "/pages/faq"
-          }
-        },
-        "s2": {
-          "type": "support",
-          "settings": {
-            "index": "02",
-            "title": "Read shipping",
-            "text": "From our house to yours.",
-            "link": "/pages/shipping"
-          }
-        },
-        "s3": {
-          "type": "support",
-          "settings": {
-            "index": "03",
-            "title": "Find your fit",
-            "text": "Measurements made simple.",
-            "link": "/pages/size-guide"
-          }
-        },
-        "e1": {
-          "type": "enquiry",
-          "settings": {
-            "label": "Customer Care",
-            "text": "For order, delivery, sizing and returns enquiries."
-          }
-        },
-        "e2": {
-          "type": "enquiry",
-          "settings": {
-            "label": "Collaborations & Partnerships",
-            "text": "For rider partnerships, events, media and collaboration enquiries."
-          }
-        },
-        "e3": {
-          "type": "enquiry",
-          "settings": {
-            "label": "General Enquiries",
-            "text": "For everything else Maison Cavallé."
-          }
-        }
-      },
-      "block_order": [
-        "d1",
-        "d2",
-        "d3",
-        "d4",
-        "s1",
-        "s2",
-        "s3",
-        "e1",
-        "e2",
-        "e3"
-      ],
-      "settings": {
-        "eyebrow": "Ways to reach us",
-        "title_line_one": "Good conversations",
-        "title_line_two": "start here.",
-        "status_label": "The Maison is open",
-        "availability": "We aim to respond to enquiries within 1–2 business days. For order questions, include your order number so we can help quickly.",
-        "form_anchor": "contact-form",
-        "form_eyebrow": "The open line",
-        "form_title": "Send a note.",
-        "form_stamp": "MC / 01",
-        "form_intro": "Tell us a little about what you need. A member of the Maison will be in touch shortly.",
-        "label_name": "Name",
-        "placeholder_name": "Your name",
-        "label_email": "Email",
-        "placeholder_email": "you@example.com",
-        "label_subject": "Subject",
-        "subject_options": "Order enquiry\nProduct question\nReturns & exchanges\nSize guidance\nSomething else",
-        "label_message": "Message",
-        "placeholder_message": "How can we help?",
-        "submit_label": "Send message",
-        "form_success": "Thank you. A member of the Maison will be in touch shortly.",
-        "column_gap": 50,
-        "padding_top": 136,
-        "padding_bottom": 136,
-        "padding_top_mobile": 72,
-        "padding_bottom_mobile": 72,
-        "anchor_id": "contact-content"
       }
     }
   },

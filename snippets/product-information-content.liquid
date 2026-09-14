@@ -124,7 +124,14 @@
 </div>
 
 {% stylesheet %}
+  /* Maison Cavalle: the gutter is the shared --jci-page-pad (styles.css:504
+     `.product-layout { padding: … var(--page-pad) … }`) instead of Horizon's
+     fixed 16px / 40px page margin. --page-width is re-derived here because the
+     body computed it from the old margin. */
   .product-information {
+    --page-margin: var(--jci-page-pad);
+    --page-width: calc(var(--page-content-width) + (var(--page-margin) * 2));
+
     gap: var(--gap) 0;
   }
 
@@ -151,8 +158,10 @@
     height: 100%;
   }
 
-  /* Mobile styles */
-  @media screen and (max-width: 749px) {
+  /* Mobile styles
+     Maison Cavalle: the prototype stacks at 680px, not Horizon's 749px
+     (styles.css:1679 `.product-layout { grid-template-columns: 1fr }`). */
+  @media screen and (max-width: 680px) {
     .product-information__media {
       grid-column: 1 / -1;
     }
@@ -163,7 +172,7 @@
   }
 
   /* Desktop styles */
-  @media screen and (min-width: 750px) {
+  @media screen and (min-width: 681px) {
     .product-information__grid {
       grid-column: 2;
     }
@@ -176,19 +185,16 @@
       }
     }
 
-    /* Position when there is media */
+    /* Position when there is media
+       Maison Cavalle: the prototype's 1.22fr / .78fr split and its fluid gap
+       (styles.css:504) replace Horizon's sidebar column and the --gap padding
+       on either side of it. */
     .product-information__grid:not(.product-information--media-none) {
+      column-gap: clamp(2.5rem, 6vw, 7rem);
+
       /* Media on the left side */
       &.product-information--media-left {
-        grid-template-columns: 1fr min(50vw, var(--sidebar-width));
-
-        .product-information__media {
-          padding-right: calc(var(--gap, 0) / 2);
-        }
-
-        .product-details {
-          padding-left: calc(var(--gap, 0) / 2);
-        }
+        grid-template-columns: minmax(0, 1.22fr) minmax(350px, 0.78fr);
 
         &:has(.media-gallery--extend) {
           grid-column: 1 / 3;
@@ -197,15 +203,13 @@
 
       /* Media on the right side */
       &.product-information--media-right {
-        grid-template-columns: min(50vw, var(--sidebar-width)) 1fr;
+        grid-template-columns: minmax(350px, 0.78fr) minmax(0, 1.22fr);
 
         .product-information__media {
-          padding-left: calc(var(--gap, 0) / 2);
           order: 1;
         }
 
         .product-details {
-          padding-right: calc(var(--gap, 0) / 2);
           order: 0;
         }
 
@@ -293,20 +297,30 @@
     }
   }
 
-  /* Wider sidebar for large screens */
-  @media screen and (min-width: 1200px) {
+  /* Maison Cavalle: tablet split (styles.css:1520). This replaces Horizon's
+     1200px "wider sidebar" step — the prototype has no step above 900px. */
+  @media screen and (min-width: 681px) and (max-width: 900px) {
     .product-information__grid:not(
         .product-information__grid--half,
         .product-information--media-none
-      ).product-information--media-left {
-      grid-template-columns: 2fr 1fr;
-    }
+      ) {
+      column-gap: 2.5rem;
 
-    .product-information__grid:not(
-        .product-information__grid--half,
-        .product-information--media-none
-      ).product-information--media-right {
-      grid-template-columns: 1fr 2fr;
+      &.product-information--media-left {
+        grid-template-columns: minmax(0, 1fr) minmax(280px, 0.72fr);
+      }
+
+      &.product-information--media-right {
+        grid-template-columns: minmax(280px, 0.72fr) minmax(0, 1fr);
+      }
+    }
+  }
+
+  /* Maison Cavalle: one column, 1.7rem between gallery and details
+     (styles.css:1679). */
+  @media screen and (max-width: 680px) {
+    .product-information__grid {
+      row-gap: 1.7rem;
     }
   }
 
