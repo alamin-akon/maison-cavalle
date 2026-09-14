@@ -713,11 +713,47 @@ Other border widths:
 | 6g | `sections/jci-newsletter.liquid` — Shopify customer form, ink panel | done |
 | 6h | `sections/jci-best-sellers.liquid` — piece blocks, scroll-dealt card stack | done |
 | 6i | `sections/jci-testimonials.liquid` — quote blocks, drag rail | done |
-| 6j | `sections/jci-social-media.liquid` — film card blocks, drifting drag band | built, not placed |
+| 6j | `sections/jci-social-media.liquid` — film card blocks, drifting drag band | done |
 | 7 | Verify in Theme Editor that every value round-trips | pending |
 | 8 | `sections/jci-footer.liquid` — menu-backed link columns, journal sign-off | done |
-| 9 | Product + collection templates | |
-| 10 | Content pages (story, journal, faq, shipping, size guide) | |
+| 9 | Product + collection templates | not started |
+| 10 | Content pages | in progress — see below |
+| 10a | FAQ page — `jci-faq-hero`, `jci-faq`, `jci-faq-assurance` | done |
+| 10b | Contact page — `jci-contact-hero`, `jci-contact` | done |
+| 10c | Story page | not started |
+| 10d | Journal page | not started |
+| 10e | Shipping & returns page | not started |
+| 10f | Size guide page | not started |
+| 11 | `sections/header.liquid` — Horizon's header carrying the prototype's design | done |
+
+### Where the build stands
+
+**Homepage — done.** `templates/index.json` renders all ten sections in
+prototype order: hero, marquee, story, product section, editorial banner, best
+sellers, testimonials, home FAQ, social media, newsletter.
+
+**Header — done, and it is Horizon's own section.** `jci-header` was replaced
+by `sections/header.liquid` customised in place: the prototype's three action
+icons and labels, nav links with the rust dot and underline wipe, the scroll
+shrink (86 → 72px, logo 78 → 64px) and the frosted background all live in
+Horizon's classes. `sections/jci-header.liquid` stays on disk, disabled, as a
+fallback. The cart drawer overlays the page instead of pushing it.
+
+**FAQ page — done.** `templates/page.faq.json` renders the hero, the question
+groups with search and topic nav, and the assurance cards. Horizon's
+`main-page` is switched off.
+
+**Contact page — done.** `templates/page.contact.json` renders the hero and the
+details/form section. The form is Shopify's own `{% form 'contact' %}`, so
+messages reach the shop inbox.
+
+**Not started:** product and collection templates (step 9), and the story,
+journal, shipping and size-guide pages. Those four page templates exist and
+return 200, but still render Horizon's stock `main-page`.
+
+**Shared behaviour:** `assets/jci-tilt.js` carries the pointer tilt for both
+the FAQ hero film and the contact feature — one file, two sections.
+
 
 **Status in this table follows §0.** `done` means all five conditions are
 met — including that a template actually renders the section. A section whose
