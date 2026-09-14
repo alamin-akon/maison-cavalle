@@ -1,0 +1,576 @@
+{% comment %}
+  Maison Cavallé — size guide page hero
+
+  Prototype source: maison-cavalle-main/app.js     → renderSizeGuidePage,
+                                                     section.journal-hero.service-hero.size-hero
+                    maison-cavalle-main/styles.css  → .journal-hero (1265-1291),
+                                                      .service-hero (730-778),
+                                                      .size-hero-feature (780),
+                                                      @900 / @680 blocks
+  Reference: MAISON-CAVALLE-SPEC.md §0, §1, §3, §5, §7
+
+  The prototype builds this by layering .service-hero and .size-hero over
+  .journal-hero. Structure is not design (§0), so there is no inherited base
+  here — the resolved values are written once, with the service and size
+  overrides already applied. Same markup as jci-contact-hero; the values that
+  differ are the washes, the title and meta measures, and the feature frame.
+
+  No letter-spacing or line-height is authored and the `font:` shorthands are
+  split (§0). Colours are palette entries or opacity steps (§7).
+{% endcomment %}
+
+{%- liquid
+  assign s = section.settings
+  assign meta = section.blocks | where: 'type', 'meta'
+
+  assign feature_image = s.image
+  assign image_asset = s.image_asset | strip
+-%}
+
+<section
+  class="jci-size-guide-hero"
+  {% if s.anchor_id != blank %}id="{{ s.anchor_id }}"{% endif %}
+  {{ section.shopify_attributes }}
+  style="
+    --jci-size-guide-hero-bg: {{ s.background_color | default: settings.color_palette.foreground }};
+    --jci-size-guide-hero-text: {{ s.text_color | default: settings.color_palette.background }};
+    --jci-size-guide-hero-accent: {{ s.accent_color | default: settings.color_palette.color7 }};
+    --jci-size-guide-hero-meta: {% if s.meta_color != blank %}{{ s.meta_color }}{% else %}rgb(var(--jci-paper-rgb) / 0.7){% endif %};
+    --jci-size-guide-hero-body: {% if s.body_color != blank %}{{ s.body_color }}{% else %}rgb(var(--jci-paper-rgb) / 0.82){% endif %};
+    --jci-size-guide-hero-frame: {{ s.frame_background | default: settings.color_palette.color1 }};
+    --jci-size-guide-hero-min-height: {{ s.min_height }}px;
+    --jci-size-guide-hero-pad-top: {{ s.padding_top }}px;
+    --jci-size-guide-hero-pad-bottom: {{ s.padding_bottom }}px;
+    --jci-size-guide-hero-pad-top-mobile: {{ s.padding_top_mobile }}px;
+    --jci-size-guide-hero-pad-bottom-mobile: {{ s.padding_bottom_mobile }}px;
+    --jci-size-guide-hero-image-ratio: {{ s.image_ratio | divided_by: 100.0 }};
+    --jci-size-guide-hero-image-ratio-mobile: {{ s.image_ratio_mobile | divided_by: 100.0 }};
+    --jci-size-guide-hero-image-saturate: {{ s.image_saturate | divided_by: 100.0 }};
+    --jci-size-guide-hero-image-brightness: {{ s.image_brightness | divided_by: 100.0 }};
+    --jci-size-guide-hero-watermark-opacity: {{ s.watermark_opacity | divided_by: 1000.0 }};
+  "
+>
+  <div class="jci-size-guide-hero-container">
+    <div class="jci-size-guide-hero-topline">
+      {%- if s.topline_left != blank -%}
+        <p class="jci-eyebrow jci-size-guide-hero-topline-eyebrow">{{ s.topline_left }}</p>
+      {%- endif -%}
+      {%- if s.topline_right != blank -%}
+        <span class="jci-size-guide-hero-topline-note">{{ s.topline_right }}</span>
+      {%- endif -%}
+    </div>
+
+    <div class="jci-size-guide-hero-main">
+      <div class="jci-size-guide-hero-copy">
+        {%- if s.eyebrow != blank -%}
+          <p class="jci-eyebrow jci-size-guide-hero-eyebrow">{{ s.eyebrow }}</p>
+        {%- endif -%}
+
+        {%- if s.title_line_one != blank or s.title_line_two != blank -%}
+          <h1 class="jci-size-guide-hero-title">
+            {{- s.title_line_one -}}
+            {%- if s.title_line_one != blank and s.title_line_two != blank -%}<br>{%- endif -%}
+            {%- if s.title_line_two != blank -%}
+              <em class="jci-size-guide-hero-title-accent">{{ s.title_line_two }}</em>
+            {%- endif -%}
+          </h1>
+        {%- endif -%}
+
+        {%- if s.intro != blank -%}
+          <p class="jci-size-guide-hero-text">{{ s.intro }}</p>
+        {%- endif -%}
+
+        {%- if s.cta_label != blank -%}
+          <a class="jci-text-link jci-size-guide-hero-cta" href="{{ s.cta_link | default: '#' }}">
+            {{- s.cta_label }}
+            {%- render 'jci-action-arrow', direction: 'down', class: 'jci-size-guide-hero-cta-arrow' -%}
+          </a>
+        {%- endif -%}
+
+        {%- if meta.size > 0 -%}
+          <div class="jci-size-guide-hero-meta">
+            {%- for block in meta -%}
+              <span class="jci-size-guide-hero-meta-item" {{ block.shopify_attributes }}>
+                <strong class="jci-size-guide-hero-meta-index">
+                  {{- block.settings.index | default: forloop.index | prepend: '0' | slice: -2, 2 -}}
+                </strong>
+                <small class="jci-size-guide-hero-meta-label">{{ block.settings.label }}</small>
+              </span>
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+      </div>
+
+      {%- comment -%}
+        The tilt is the shared jci-tilt behaviour — it sets --jci-tilt-x / -y
+        here and the CSS decides what to do with them.
+      {%- endcomment -%}
+      <a
+        class="jci-size-guide-hero-feature"
+        href="{{ s.feature_link | default: s.cta_link | default: '#' }}"
+        {% if s.enable_tilt %}data-jci-tilt{% endif %}
+        data-jci-tilt-strength="{{ s.tilt_strength }}"
+      >
+        {%- if image_asset != blank -%}
+          <img
+            class="jci-size-guide-hero-image"
+            src="{{ image_asset | asset_url }}"
+            alt="{{ s.image_alt | escape }}"
+            width="640"
+            height="696"
+            loading="eager"
+            fetchpriority="high"
+          >
+        {%- elsif feature_image != blank -%}
+          <img
+            class="jci-size-guide-hero-image"
+            src="{{ feature_image | image_url: width: 1000 }}"
+            srcset="
+              {{ feature_image | image_url: width: 500 }} 500w,
+              {{ feature_image | image_url: width: 750 }} 750w,
+              {{ feature_image | image_url: width: 1000 }} 1000w
+            "
+            sizes="(max-width: 680px) 92vw, 52vw"
+            alt="{{ feature_image.alt | escape | default: s.image_alt | escape }}"
+            width="{{ feature_image.width }}"
+            height="{{ feature_image.height }}"
+            loading="eager"
+            fetchpriority="high"
+          >
+        {%- endif -%}
+
+        {%- if s.feature_index != blank -%}
+          <span class="jci-size-guide-hero-feature-index">{{ s.feature_index }}</span>
+        {%- endif -%}
+
+        <div class="jci-size-guide-hero-feature-copy">
+          {%- if s.feature_eyebrow != blank -%}
+            <p class="jci-eyebrow jci-size-guide-hero-feature-eyebrow">{{ s.feature_eyebrow }}</p>
+          {%- endif -%}
+          {%- if s.feature_title != blank -%}
+            <h2 class="jci-size-guide-hero-feature-title">{{ s.feature_title }}</h2>
+          {%- endif -%}
+          {%- if s.feature_link_label != blank -%}
+            <span class="jci-size-guide-hero-feature-link">
+              {{- s.feature_link_label }}
+              {%- render 'jci-action-arrow', direction: 'down-right', class: 'jci-size-guide-hero-feature-arrow' -%}
+            </span>
+          {%- endif -%}
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<script src="{{ 'jci-tilt.js' | asset_url }}" type="module"></script>
+
+{% stylesheet %}
+  /* styles.css:1265 with the .service-hero background from :730 already
+     resolved in — two radial washes over ink rather than journal's one. */
+  .jci-size-guide-hero {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+    color: var(--jci-size-guide-hero-text);
+    background:
+      radial-gradient(circle at 84% 12%, rgb(var(--jci-olive-rgb) / 0.24), transparent 24rem),
+      radial-gradient(circle at 16% 95%, rgb(var(--jci-rust-rgb) / 0.1), transparent 20rem),
+      var(--jci-size-guide-hero-bg);
+  }
+
+  /* styles.css:1266 — the oversized MC watermark. */
+  .jci-size-guide-hero::before {
+    content: 'MC';
+    position: absolute;
+    right: 2%;
+    bottom: -14%;
+    z-index: -1;
+    color: rgb(var(--jci-paper-rgb) / var(--jci-size-guide-hero-watermark-opacity));
+    font-family: var(--jci-font-display);
+    font-size: clamp(190px, 31vw, 500px);
+    font-weight: 600;
+    pointer-events: none;
+  }
+
+  .jci-size-guide-hero-container {
+    padding-block: var(--jci-size-guide-hero-pad-top) var(--jci-size-guide-hero-pad-bottom);
+  }
+
+  /* styles.css:1267-1269 */
+  .jci-size-guide-hero-topline {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-block-end: 1.2rem;
+    border-bottom: 1px solid rgb(var(--jci-paper-rgb) / 0.16);
+    color: var(--jci-size-guide-hero-meta);
+  }
+
+  .jci-size-guide-hero-topline-eyebrow {
+    color: var(--jci-size-guide-hero-meta);
+  }
+
+  .jci-size-guide-hero-topline-note {
+    font-family: var(--jci-font-label);
+    font-size: 12px;
+    text-transform: uppercase;
+  }
+
+  /* styles.css:1270 — .service-hero keeps journal's 560px min-height. */
+  .jci-size-guide-hero-main {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 0.86fr) minmax(0, 1.14fr);
+    gap: clamp(3rem, 8vw, 9rem);
+    min-height: var(--jci-size-guide-hero-min-height);
+    padding-block-start: clamp(4rem, 8vw, 7.5rem);
+  }
+
+  /* styles.css:1271-1276, with :737-739 applied. */
+  .jci-size-guide-hero-copy {
+    max-width: 590px;
+  }
+
+  .jci-size-guide-hero-eyebrow {
+    margin-block-end: 1.5rem;
+    color: var(--jci-size-guide-hero-meta);
+  }
+
+  /* All page heroes share the hero title size (§3). */
+  .jci-size-guide-hero-title {
+    max-width: 670px;
+    margin: 0 0 1.8rem;
+    font-family: var(--jci-font-display);
+    font-size: var(--jci-hero-title-size);
+    font-weight: 500;
+  }
+
+  .jci-size-guide-hero-title-accent {
+    color: var(--jci-size-guide-hero-accent);
+    font-style: italic;
+  }
+
+  .jci-size-guide-hero-text {
+    max-width: 390px;
+    margin: 0 0 2.2rem;
+    color: var(--jci-size-guide-hero-body);
+    font-family: var(--jci-font-sans);
+    font-size: var(--jci-subtitle-size);
+  }
+
+  .jci-size-guide-hero-cta {
+    margin-block-end: 2.6rem;
+    color: var(--jci-size-guide-hero-text);
+  }
+
+  .jci-size-guide-hero-cta-arrow {
+    width: 13px;
+    height: 13px;
+  }
+
+  /* styles.css:743-778 */
+  .jci-size-guide-hero-meta {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.7rem;
+    max-width: 470px;
+    padding-block-start: 1.1rem;
+    border-top: 1px solid rgb(var(--jci-paper-rgb) / 0.18);
+  }
+
+  .jci-size-guide-hero-meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    min-width: 0;
+    color: var(--jci-size-guide-hero-meta);
+  }
+
+  .jci-size-guide-hero-meta-index {
+    color: var(--jci-size-guide-hero-text);
+    font-family: var(--jci-font-label);
+    font-size: 12px;
+    font-weight: 400;
+  }
+
+  .jci-size-guide-hero-meta-label {
+    font-family: var(--jci-font-label);
+    font-size: 12px;
+    text-transform: uppercase;
+  }
+
+  /* styles.css:1279-1284, with .service-hero's feature width and ratio
+     from :740. */
+  .jci-size-guide-hero-feature {
+    position: relative;
+    display: block;
+    width: min(100%, 650px);
+    aspect-ratio: var(--jci-size-guide-hero-image-ratio);
+    justify-self: end;
+    overflow: hidden;
+    color: var(--jci-size-guide-hero-text);
+    background: var(--jci-size-guide-hero-frame);
+    box-shadow:
+      22px 25px 0 rgb(var(--jci-paper-rgb) / 0.06),
+      0 25px 60px rgb(0 0 0 / 0.25);
+    transform:
+      perspective(1200px)
+      rotateX(var(--jci-tilt-x, 0deg))
+      rotateY(var(--jci-tilt-y, 0deg))
+      translateY(var(--jci-tilt-lift, 0));
+    transform-style: preserve-3d;
+    transition:
+      transform 0.6s var(--jci-ease),
+      box-shadow 0.6s var(--jci-ease);
+  }
+
+  /* styles.css:1280 — inner rule */
+  .jci-size-guide-hero-feature::before {
+    content: '';
+    position: absolute;
+    inset: 13px;
+    z-index: 2;
+    border: 1px solid rgb(var(--jci-paper-rgb) / 0.35);
+    pointer-events: none;
+  }
+
+  /* styles.css:1281 — scrim up from the base */
+  .jci-size-guide-hero-feature::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: linear-gradient(180deg, rgb(17 21 17 / 0.06) 35%, rgb(17 21 17 / 0.78));
+    pointer-events: none;
+  }
+
+  /* styles.css:1282 with .size-hero-feature's object-position from :780. */
+  .jci-size-guide-hero-image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 26%;
+    filter:
+      saturate(var(--jci-size-guide-hero-image-saturate))
+      brightness(var(--jci-size-guide-hero-image-brightness));
+    transition: transform 1s var(--jci-ease);
+  }
+
+  /* styles.css:1283-1284 */
+  .jci-size-guide-hero-feature:hover,
+  .jci-size-guide-hero-feature:focus-visible {
+    --jci-tilt-lift: -6px;
+
+    box-shadow:
+      22px 30px 0 rgb(var(--jci-paper-rgb) / 0.06),
+      0 32px 65px rgb(0 0 0 / 0.3);
+  }
+
+  .jci-size-guide-hero-feature:hover .jci-size-guide-hero-image,
+  .jci-size-guide-hero-feature:focus-visible .jci-size-guide-hero-image {
+    transform: scale(1.045);
+  }
+
+  /* styles.css:1285-1290 */
+  .jci-size-guide-hero-feature-index {
+    position: absolute;
+    top: 1.4rem;
+    right: 1.4rem;
+    z-index: 3;
+    color: var(--jci-size-guide-hero-meta);
+    font-family: var(--jci-font-label);
+    font-size: 12px;
+  }
+
+  .jci-size-guide-hero-feature-copy {
+    position: absolute;
+    right: 1.5rem;
+    bottom: 1.5rem;
+    left: 1.5rem;
+    z-index: 3;
+  }
+
+  .jci-size-guide-hero-feature-eyebrow {
+    margin-block-end: 0.7rem;
+    color: var(--jci-size-guide-hero-accent);
+  }
+
+  .jci-size-guide-hero-feature-title {
+    max-width: 380px;
+    margin: 0 0 1.2rem;
+    font-family: var(--jci-font-display);
+    font-size: clamp(26px, 3.2vw, 44px);
+    font-weight: 500;
+  }
+
+  .jci-size-guide-hero-feature-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding-block-end: 0.35rem;
+    border-bottom: 1px solid rgb(var(--jci-paper-rgb) / 0.6);
+    color: var(--jci-size-guide-hero-text);
+    font-family: var(--jci-font-label);
+    font-size: 12px;
+    text-transform: uppercase;
+  }
+
+  .jci-size-guide-hero-feature-arrow {
+    width: 13px;
+    height: 13px;
+    transition: transform 0.3s var(--jci-ease);
+  }
+
+  /* styles.css:1291 */
+  .jci-size-guide-hero-feature:hover .jci-size-guide-hero-feature-arrow,
+  .jci-size-guide-hero-feature:focus-visible .jci-size-guide-hero-feature-arrow {
+    transform: translate(3px, 3px);
+  }
+
+  /* styles.css:1239 */
+  .jci-size-guide-hero-feature:focus-visible {
+    outline: 2px solid var(--jci-rust);
+    outline-offset: 4px;
+  }
+
+  /* styles.css:@900 — the two columns stack. */
+  @media screen and (max-width: 900px) {
+    .jci-size-guide-hero-main {
+      grid-template-columns: 1fr;
+      gap: 2.8rem;
+      min-height: auto;
+    }
+
+    .jci-size-guide-hero-feature {
+      width: min(100%, 720px);
+      justify-self: end;
+    }
+  }
+
+  /* styles.css:@680 */
+  @media screen and (max-width: 680px) {
+    .jci-size-guide-hero-container {
+      padding-block: var(--jci-size-guide-hero-pad-top-mobile) var(--jci-size-guide-hero-pad-bottom-mobile);
+    }
+
+    .jci-size-guide-hero-topline {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.6rem;
+    }
+
+    .jci-size-guide-hero-main {
+      min-height: auto;
+      padding-block-start: 3.5rem;
+    }
+
+    .jci-size-guide-hero-cta {
+      margin-block-end: 2rem;
+    }
+
+    .jci-size-guide-hero-meta {
+      max-width: none;
+    }
+
+    .jci-size-guide-hero-feature {
+      width: calc(100% - 0.75rem);
+      margin-inline-start: auto;
+      aspect-ratio: var(--jci-size-guide-hero-image-ratio-mobile);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .jci-size-guide-hero-feature,
+    .jci-size-guide-hero-image,
+    .jci-size-guide-hero-feature-arrow {
+      transition: none;
+    }
+
+    .jci-size-guide-hero-feature:hover .jci-size-guide-hero-image {
+      transform: none;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Size guide hero",
+  "tag": "section",
+  "class": "jci-size-guide-hero-section",
+  "max_blocks": 4,
+  "blocks": [
+    {
+      "type": "meta",
+      "name": "Meta item",
+      "settings": [
+        { "type": "text", "id": "index", "label": "Number", "info": "Leave empty to number automatically." },
+        { "type": "text", "id": "label", "label": "Label", "default": "XS through XL" }
+      ]
+    }
+  ],
+  "settings": [
+    { "type": "header", "content": "Top rule" },
+    { "type": "text", "id": "topline_left", "label": "Top left", "default": "Maison Cavallé · Fit" },
+    { "type": "text", "id": "topline_right", "label": "Top right", "default": "Size guide / 2026" },
+
+    { "type": "header", "content": "Copy" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "The considered fit" },
+    { "type": "text", "id": "title_line_one", "label": "Title first line", "default": "Find your" },
+    { "type": "text", "id": "title_line_two", "label": "Title second line (italic)", "default": "natural fit." },
+    { "type": "textarea", "id": "intro", "label": "Intro", "default": "Clear measurements for pieces made to move with you — from the saddle, to the stable and every place in between." },
+    { "type": "text", "id": "cta_label", "label": "Link label", "default": "Explore measurements" },
+    { "type": "url", "id": "cta_link", "label": "Link" },
+
+    { "type": "header", "content": "Feature" },
+    { "type": "text", "id": "image_asset", "label": "Image file in theme assets", "info": "Filename only. Takes priority over the picker below." },
+    { "type": "image_picker", "id": "image", "label": "Image" },
+    { "type": "text", "id": "image_alt", "label": "Image description", "default": "Maison Cavallé rider wearing the Active Turtleneck Top" },
+    { "type": "url", "id": "feature_link", "label": "Link", "info": "Falls back to the copy link above." },
+    { "type": "text", "id": "feature_index", "label": "Corner index", "default": "01 / 01" },
+    { "type": "text", "id": "feature_eyebrow", "label": "Eyebrow", "default": "Fit notes" },
+    { "type": "text", "id": "feature_title", "label": "Title", "default": "Made for comfort in motion." },
+    { "type": "text", "id": "feature_link_label", "label": "Link label", "default": "See the guide" },
+
+    { "type": "header", "content": "Media treatment" },
+    { "type": "range", "id": "image_ratio", "label": "Image ratio", "min": 60, "max": 140, "step": 2, "unit": "%", "default": 102, "info": "Width over height — 102 is the prototype's 1.02." },
+    { "type": "range", "id": "image_ratio_mobile", "label": "Image ratio on mobile", "min": 60, "max": 140, "step": 2, "unit": "%", "default": 84 },
+    { "type": "range", "id": "image_saturate", "label": "Saturation", "min": 0, "max": 180, "step": 2, "unit": "%", "default": 72 },
+    { "type": "range", "id": "image_brightness", "label": "Brightness", "min": 20, "max": 150, "step": 2, "unit": "%", "default": 80 },
+    { "type": "range", "id": "watermark_opacity", "label": "Watermark strength", "min": 0, "max": 120, "step": 5, "unit": "%", "default": 35, "info": "Thousandths — 35 is the prototype's 0.035." },
+
+    { "type": "header", "content": "Motion" },
+    { "type": "checkbox", "id": "enable_tilt", "label": "Tilt the feature towards the pointer", "default": true },
+    { "type": "range", "id": "tilt_strength", "label": "Tilt strength", "min": 0, "max": 20, "step": 1, "unit": "deg", "default": 6 },
+
+    { "type": "header", "content": "Colors", "info": "Left empty, each of these follows the theme colour palette." },
+    { "type": "color", "id": "background_color", "label": "Background" },
+    { "type": "color", "id": "text_color", "label": "Text" },
+    { "type": "color", "id": "accent_color", "label": "Accent" },
+    { "type": "color", "id": "body_color", "label": "Body text" },
+    { "type": "color", "id": "meta_color", "label": "Metadata" },
+    { "type": "color", "id": "frame_background", "label": "Image frame" },
+
+    { "type": "header", "content": "Layout" },
+    { "type": "range", "id": "min_height", "label": "Minimum height", "min": 300, "max": 900, "step": 10, "unit": "px", "default": 560 },
+    { "type": "range", "id": "padding_top", "label": "Padding top", "min": 0, "max": 200, "step": 4, "unit": "px", "default": 76 },
+    { "type": "range", "id": "padding_bottom", "label": "Padding bottom", "min": 0, "max": 240, "step": 4, "unit": "px", "default": 112 },
+    { "type": "range", "id": "padding_top_mobile", "label": "Padding top on mobile", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 48 },
+    { "type": "range", "id": "padding_bottom_mobile", "label": "Padding bottom on mobile", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 72 },
+
+    { "type": "header", "content": "Anchor" },
+    { "type": "text", "id": "anchor_id", "label": "Anchor ID", "default": "size-guide-hero" }
+  ],
+  "presets": [
+    {
+      "name": "Size guide hero",
+      "blocks": [
+        { "type": "meta", "settings": { "index": "01", "label": "XS through XL" } },
+        { "type": "meta", "settings": { "index": "02", "label": "Designed to move" } },
+        { "type": "meta", "settings": { "index": "03", "label": "Personal fit help" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

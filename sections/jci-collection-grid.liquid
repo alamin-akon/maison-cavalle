@@ -18,8 +18,11 @@
   product section, with the collection's taller ratio, shadow and hover lift
   passed in through the card's custom properties.
 
-  "Load more pieces" appends Shopify's next page (jci-collection-grid.js). With
-  no JS it is a plain link to that page.
+  Choosing a filter or a sort swaps this section in place through the Section
+  Rendering API, as the prototype re-renders without a page load, and a filter
+  resets the sort to Featured as the prototype's does. "Load more pieces"
+  appends Shopify's next page. All of it is jci-collection-grid.js; with no JS
+  every one of them is a plain link.
 
   The prototype swaps the filter buttons for the dropdown at 1174px. §5 allows
   900px and 680px only, so the swap happens at 900px.
@@ -106,6 +109,7 @@
               <a
                 class="jci-collection-grid-filter{% if is_active %} is-active{% endif %}"
                 href="{{ filter_url }}"
+                data-jci-collection-grid-link
                 {% if is_active %}aria-current="page"{% endif %}
                 {{ block.shopify_attributes }}
               >
@@ -145,6 +149,7 @@
                   <a
                     class="jci-collection-grid-menu-item{% if is_active %} is-selected{% endif %}"
                     href="{{ filter_url }}"
+                    data-jci-collection-grid-link
                     {% if is_active %}aria-current="page"{% endif %}
                   >
                     {{- filter_text -}}
@@ -182,6 +187,7 @@
                   <a
                     class="jci-collection-grid-menu-item{% if value == current_sort %} is-selected{% endif %}"
                     href="{{ collection.url }}?sort_by={{ value }}"
+                    data-jci-collection-grid-link
                     {% if value == current_sort %}aria-current="true"{% endif %}
                   >
                     {{- sort_labels[label_index] -}}
@@ -418,6 +424,7 @@
     display: grid;
     grid-template-columns: repeat(var(--jci-collection-grid-columns), 1fr);
     gap: var(--jci-collection-grid-row-gap) clamp(0.8rem, 2vw, 1.75rem);
+    transition: opacity 0.25s;
   }
 
   /* styles.css:488 */
@@ -445,6 +452,11 @@
     display: flex;
     justify-content: center;
     margin-block-start: 3.7rem;
+  }
+
+  /* Dimmed while a filter, sort or next page is on its way. */
+  .jci-collection-grid-list[aria-busy='true'] {
+    opacity: 0.45;
   }
 
   .jci-collection-grid-more-link[aria-busy='true'] {
@@ -509,7 +521,8 @@
 
   @media (prefers-reduced-motion: reduce) {
     .jci-collection-grid-filter,
-    .jci-collection-grid-chevron {
+    .jci-collection-grid-chevron,
+    .jci-collection-grid-list {
       transition: none;
     }
 

@@ -9,6 +9,73 @@
  */
 {
   "sections": {
+    "jci_size_guide_hero": {
+      "type": "jci-size-guide-hero",
+      "blocks": {
+        "m1": {
+          "type": "meta",
+          "settings": {
+            "index": "01",
+            "label": "XS through XL"
+          }
+        },
+        "m2": {
+          "type": "meta",
+          "settings": {
+            "index": "02",
+            "label": "Designed to move"
+          }
+        },
+        "m3": {
+          "type": "meta",
+          "settings": {
+            "index": "03",
+            "label": "Personal fit help"
+          }
+        }
+      },
+      "block_order": [
+        "m1",
+        "m2",
+        "m3"
+      ],
+      "settings": {
+        "topline_left": "Maison Cavallé · Fit",
+        "topline_right": "Size guide / 2026",
+        "eyebrow": "The considered fit",
+        "title_line_one": "Find your",
+        "title_line_two": "natural fit.",
+        "intro": "Clear measurements for pieces made to move with you — from the saddle, to the stable and every place in between.",
+        "cta_label": "Explore measurements",
+        "cta_link": "#size-details",
+        "image_asset": "jci-active-turtleneck-front.webp",
+        "image_alt": "Maison Cavallé rider wearing the Active Turtleneck Top",
+        "feature_link": "#size-details",
+        "feature_index": "01 / 01",
+        "feature_eyebrow": "Fit notes",
+        "feature_title": "Made for comfort in motion.",
+        "feature_link_label": "See the guide",
+        "image_ratio": 102,
+        "image_ratio_mobile": 84,
+        "image_saturate": 72,
+        "image_brightness": 80,
+        "watermark_opacity": 35,
+        "enable_tilt": true,
+        "tilt_strength": 6,
+        "background_color": "",
+        "text_color": "",
+        "accent_color": "",
+        "body_color": "",
+        "meta_color": "",
+        "frame_background": "",
+        "min_height": 560,
+        "padding_top": 76,
+        "padding_bottom": 112,
+        "padding_top_mobile": 48,
+        "padding_bottom_mobile": 72,
+        "anchor_id": "size-guide-hero"
+      }
+    },
     "main": {
       "type": "main-page",
       "blocks": {
@@ -52,10 +119,12 @@
         "background_color": "{{ settings.color_palette.background }}",
         "padding-block-start": 40,
         "padding-block-end": 80
-      }
+      },
+      "disabled": true
     }
   },
   "order": [
+    "jci_size_guide_hero",
     "main"
   ]
 }

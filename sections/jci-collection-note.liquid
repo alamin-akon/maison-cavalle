@@ -1,0 +1,257 @@
+{% comment %}
+  Maison Cavallé — collection note
+
+  Prototype source: maison-cavalle-main/app.js      → renderCollection, section.collection-note
+                    maison-cavalle-main/styles.css  → .collection-note (491-501),
+                                                      @900 (1515-1516), @680 (1675-1678)
+  Reference: MAISON-CAVALLE-SPEC.md §0, §1, §5, §7
+
+  A quote mark, the Maison's point of view and three numbered details on an
+  olive band. The quote keeps its own size like the testimonial quotes — it is
+  a pull quote, not a section heading.
+
+  The prototype's pale accent (#dbe1c6) is the hero accent lifted 30% towards
+  paper, so it follows the palette rather than sitting in the CSS as hex.
+
+  Container width and section padding come from the shared defaults (§0). No
+  letter-spacing or line-height is authored and the `font:` shorthands are
+  split (§0), which also resets the weight and style they carried.
+{% endcomment %}
+
+{%- liquid
+  assign s = section.settings
+  assign details = section.blocks | where: 'type', 'detail'
+  assign quote_id = 'jci-collection-note-quote-' | append: section.id
+-%}
+
+<section
+  class="jci-collection-note"
+  {% if s.anchor_id != blank %}id="{{ s.anchor_id | handleize }}"{% endif %}
+  {% if s.quote != blank %}aria-labelledby="{{ quote_id }}"{% endif %}
+  {{ section.shopify_attributes }}
+  style="
+    --jci-collection-note-bg: {{ s.background_color | default: settings.color_palette.color5 }};
+    --jci-collection-note-text: {{ s.text_color | default: settings.color_palette.background }};
+    --jci-collection-note-accent: {% if s.accent_color != blank %}{{ s.accent_color }}{% else %}color-mix(in srgb, var(--jci-hero-accent), var(--jci-paper) 30%){% endif %};
+    --jci-collection-note-pad-top: {{ s.padding_top }}px;
+    --jci-collection-note-pad-bottom: {{ s.padding_bottom }}px;
+    --jci-collection-note-pad-top-mobile: {{ s.padding_top_mobile }}px;
+    --jci-collection-note-pad-bottom-mobile: {{ s.padding_bottom_mobile }}px;
+  "
+>
+  <div class="jci-collection-note-container">
+    {%- if s.mark != blank -%}
+      <div class="jci-collection-note-mark" aria-hidden="true">{{ s.mark }}</div>
+    {%- endif -%}
+
+    <div class="jci-collection-note-copy">
+      {%- if s.eyebrow != blank -%}
+        <p class="jci-eyebrow jci-collection-note-eyebrow">{{ s.eyebrow }}</p>
+      {%- endif -%}
+      {%- if s.quote != blank -%}
+        <blockquote class="jci-collection-note-quote" id="{{ quote_id }}">{{ s.quote }}</blockquote>
+      {%- endif -%}
+      {%- if s.cite != blank -%}
+        <cite class="jci-collection-note-cite">{{ s.cite }}</cite>
+      {%- endif -%}
+    </div>
+
+    {%- if details.size > 0 -%}
+      <div class="jci-collection-note-details">
+        {%- for block in details -%}
+          <div class="jci-collection-note-detail" {{ block.shopify_attributes }}>
+            <strong class="jci-collection-note-detail-index">
+              {{- block.settings.index | default: forloop.index | prepend: '0' | slice: -2, 2 -}}
+            </strong>
+            <span class="jci-collection-note-detail-label">{{ block.settings.label }}</span>
+          </div>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+
+{% stylesheet %}
+  /* styles.css:491 — the band. The grid moves onto the container so width and
+     gutter stay shared (§0). */
+  .jci-collection-note {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+    color: var(--jci-collection-note-text);
+    background: var(--jci-collection-note-bg);
+  }
+
+  /* styles.css:492 — the ringed circle in the bottom-right corner. */
+  .jci-collection-note::after {
+    content: '';
+    position: absolute;
+    right: -7rem;
+    bottom: -12rem;
+    z-index: -1;
+    width: 25rem;
+    height: 25rem;
+    border: 1px solid rgb(var(--jci-paper-rgb) / 0.18);
+    border-radius: 50%;
+    box-shadow:
+      0 0 0 3rem rgb(var(--jci-paper-rgb) / 0.04),
+      0 0 0 6rem rgb(var(--jci-paper-rgb) / 0.025);
+    pointer-events: none;
+  }
+
+  .jci-collection-note-container {
+    display: grid;
+    grid-template-columns: 90px minmax(0, 1.25fr) minmax(240px, 0.75fr);
+    align-items: center;
+    gap: clamp(1.5rem, 5vw, 5rem);
+    padding-block: var(--jci-collection-note-pad-top) var(--jci-collection-note-pad-bottom);
+  }
+
+  /* styles.css:493 */
+  .jci-collection-note-mark {
+    display: grid;
+    place-items: center;
+    width: 76px;
+    height: 76px;
+    border: 1px solid rgb(var(--jci-paper-rgb) / 0.45);
+    border-radius: 50%;
+    color: var(--jci-collection-note-accent);
+    font-family: var(--jci-font-display);
+    font-size: 86px;
+  }
+
+  /* styles.css:495-497 */
+  .jci-collection-note-eyebrow {
+    margin-block-end: 1.2rem;
+    color: var(--jci-collection-note-accent);
+  }
+
+  .jci-collection-note-quote {
+    max-width: 650px;
+    margin: 0 0 1.2rem;
+    font-family: var(--jci-font-display);
+    font-size: clamp(28px, 3.8vw, 52px);
+    font-style: italic;
+    font-weight: 500;
+  }
+
+  .jci-collection-note-cite {
+    color: var(--jci-collection-note-accent);
+    font-family: var(--jci-font-label);
+    font-size: 12px;
+    font-style: normal;
+    text-transform: uppercase;
+  }
+
+  /* styles.css:498-501 */
+  .jci-collection-note-details {
+    display: grid;
+    gap: 0.9rem;
+  }
+
+  .jci-collection-note-detail {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    padding-block: 0.8rem;
+    border-bottom: 1px solid rgb(var(--jci-paper-rgb) / 0.22);
+  }
+
+  .jci-collection-note-detail-index {
+    color: var(--jci-collection-note-accent);
+    font-family: var(--jci-font-label);
+    font-size: 14px;
+    font-weight: 400;
+  }
+
+  .jci-collection-note-detail-label {
+    font-family: var(--jci-font-display);
+    font-size: 15px;
+  }
+
+  /* styles.css:1515-1516 — the details drop under the quote. */
+  @media screen and (max-width: 900px) {
+    .jci-collection-note-container {
+      grid-template-columns: 70px minmax(0, 1fr);
+    }
+
+    .jci-collection-note-details {
+      grid-column: 2;
+    }
+  }
+
+  /* styles.css:1675-1678 */
+  @media screen and (max-width: 680px) {
+    .jci-collection-note-container {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 2rem;
+      padding-block: var(--jci-collection-note-pad-top-mobile) var(--jci-collection-note-pad-bottom-mobile);
+    }
+
+    .jci-collection-note-mark {
+      width: 62px;
+      height: 62px;
+      font-size: 69px;
+    }
+
+    .jci-collection-note-quote {
+      font-size: 34px;
+    }
+
+    .jci-collection-note-details {
+      width: 100%;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Collection note",
+  "tag": "div",
+  "class": "jci-collection-note-wrapper",
+  "max_blocks": 4,
+  "blocks": [
+    {
+      "type": "detail",
+      "name": "Detail",
+      "settings": [
+        { "type": "text", "id": "index", "label": "Number", "info": "Leave empty to number automatically." },
+        { "type": "text", "id": "label", "label": "Label", "default": "Considered design" }
+      ]
+    }
+  ],
+  "settings": [
+    { "type": "header", "content": "Copy" },
+    { "type": "text", "id": "mark", "label": "Quote mark", "default": "“" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "The Maison point of view" },
+    { "type": "textarea", "id": "quote", "label": "Quote", "default": "We believe in creating fewer, better pieces — clothing you reach for season after season." },
+    { "type": "text", "id": "cite", "label": "Attribution", "default": "Maison Cavallé philosophy" },
+
+    { "type": "header", "content": "Colors", "info": "Left empty, each of these follows the theme colour palette." },
+    { "type": "color", "id": "background_color", "label": "Background" },
+    { "type": "color", "id": "text_color", "label": "Text" },
+    { "type": "color", "id": "accent_color", "label": "Accent" },
+
+    { "type": "header", "content": "Layout" },
+    { "type": "range", "id": "padding_top", "label": "Padding top", "min": 0, "max": 240, "step": 4, "unit": "px", "default": 136 },
+    { "type": "range", "id": "padding_bottom", "label": "Padding bottom", "min": 0, "max": 240, "step": 4, "unit": "px", "default": 136 },
+    { "type": "range", "id": "padding_top_mobile", "label": "Padding top on mobile", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 72 },
+    { "type": "range", "id": "padding_bottom_mobile", "label": "Padding bottom on mobile", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 72 },
+
+    { "type": "header", "content": "Anchor" },
+    { "type": "text", "id": "anchor_id", "label": "Anchor ID", "default": "collection-note" }
+  ],
+  "presets": [
+    {
+      "name": "Collection note",
+      "blocks": [
+        { "type": "detail", "settings": { "label": "Considered design" } },
+        { "type": "detail", "settings": { "label": "Made to move" } },
+        { "type": "detail", "settings": { "label": "Quiet confidence" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

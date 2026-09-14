@@ -15,24 +15,33 @@
         "piece_1": {
           "type": "piece",
           "settings": {
+            "product": "",
             "image_asset": "jci-lux-jacket-front-horse.webp",
             "image_alt": "Lux Jacket in powder blue",
+            "link": "",
+            "index": "",
             "focus_y": 50
           }
         },
         "piece_2": {
           "type": "piece",
           "settings": {
+            "product": "",
             "image_asset": "jci-active-turtleneck-front.webp",
             "image_alt": "Active Turtleneck Top in cocoa",
+            "link": "",
+            "index": "",
             "focus_y": 28
           }
         },
         "piece_3": {
           "type": "piece",
           "settings": {
+            "product": "",
             "image_asset": "jci-groomi-horse-shedder-lifestyle.webp",
             "image_alt": "The Groomi Horse Shedder",
+            "link": "",
+            "index": "",
             "focus_y": 50
           }
         }
@@ -42,7 +51,34 @@
         "piece_2",
         "piece_3"
       ],
-      "settings": {}
+      "settings": {
+        "content_source": "section",
+        "eyebrow": "Maison Cavallé · 2026",
+        "title_line_one": "The opening",
+        "title_line_two": "collection.",
+        "intro": "Timeless equestrian influence, considered fabrics and pieces made to live beyond the ride.",
+        "mosaic_label": "Featured Maison Cavallé pieces",
+        "visual_eyebrow": "Maison Cavallé · The first edit",
+        "visual_title": "Made for the moments between.",
+        "orbit_label": "01",
+        "image_saturate": 65,
+        "image_saturate_hover": 92,
+        "watermark_opacity": 45,
+        "background_color": "",
+        "text_color": "",
+        "accent_color": "",
+        "body_color": "",
+        "meta_color": "",
+        "frame_background": "",
+        "min_height": 670,
+        "visual_height": 430,
+        "visual_height_mobile": 360,
+        "padding_top": 136,
+        "padding_bottom": 136,
+        "padding_top_mobile": 72,
+        "padding_bottom_mobile": 72,
+        "anchor_id": "collection-hero"
+      }
     },
     "jci_collection_grid": {
       "type": "jci-collection-grid",
@@ -50,7 +86,7 @@
         "f_all": {
           "type": "filter",
           "settings": {
-            "collection": "",
+            "collection": "frontpage",
             "label": "All pieces"
           }
         },
@@ -64,7 +100,7 @@
         "f_jackets": {
           "type": "filter",
           "settings": {
-            "collection": "jackets",
+            "collection": "tops-copy",
             "label": "Jackets"
           }
         },
@@ -106,7 +142,90 @@
         "f_kids",
         "f_accessories"
       ],
-      "settings": {}
+      "settings": {
+        "filter_heading": "Filter",
+        "filter_label": "Filter products",
+        "show_sort": true,
+        "sort_heading": "Sort",
+        "sort_label": "Sort products",
+        "sort_featured_label": "Featured",
+        "sort_low_label": "Price: Low to high",
+        "sort_high_label": "Price: High to low",
+        "products_per_page": 12,
+        "columns": 3,
+        "image_index": 0,
+        "load_more_label": "Load more pieces",
+        "subtitle_metafield": "custom.subtitle",
+        "swatch_option": "Color",
+        "swatch_metafield": "custom.colour_swatches",
+        "show_quick_add": true,
+        "quick_add_label": "Quick add",
+        "badge_source": "always",
+        "badge_text": "New",
+        "empty_title": "Coming to the Maison soon.",
+        "empty_text": "We are making room for something beautiful.",
+        "background_color": "",
+        "text_color": "",
+        "label_color": "",
+        "selected_color": "",
+        "media_background": "",
+        "subtitle_color": "#6d7066",
+        "padding_top": 136,
+        "padding_bottom": 136,
+        "padding_top_mobile": 72,
+        "padding_bottom_mobile": 72,
+        "row_gap": 56,
+        "row_gap_mobile": 40,
+        "image_ratio": 83,
+        "image_zoom": 35,
+        "card_lift": 5,
+        "anchor_id": "collection-grid"
+      }
+    },
+    "jci_collection_note": {
+      "type": "jci-collection-note",
+      "blocks": {
+        "detail_1": {
+          "type": "detail",
+          "settings": {
+            "index": "01",
+            "label": "Considered design"
+          }
+        },
+        "detail_2": {
+          "type": "detail",
+          "settings": {
+            "index": "02",
+            "label": "Made to move"
+          }
+        },
+        "detail_3": {
+          "type": "detail",
+          "settings": {
+            "index": "03",
+            "label": "Quiet confidence"
+          }
+        }
+      },
+      "block_order": [
+        "detail_1",
+        "detail_2",
+        "detail_3"
+      ],
+      "settings": {
+        "mark": "“",
+        "eyebrow": "The Maison point of view",
+        "quote": "We believe in creating fewer, better pieces — clothing you reach for season after season.",
+        "cite": "Maison Cavallé philosophy",
+        "background_color": "",
+        "text_color": "",
+        "accent_color": "",
+        "padding_top": 136,
+        "padding_bottom": 136,
+        "padding_top_mobile": 72,
+        "padding_bottom_mobile": 72,
+        "anchor_id": "collection-note"
+      }
     },
     "section": {
       "type": "section",
@@ -121,10 +240,12 @@
             "alignment": "left",
             "type_preset": "h2",
             "font": "var(--font-body--family)",
+            "font_size": "1rem",
             "line_height": "normal",
             "letter_spacing": "normal",
             "case": "none",
             "wrap": "pretty",
+            "text_color": "",
             "background": false,
             "background_color": "#00000026",
             "corner_radius": 0,
@@ -145,10 +266,12 @@
             "alignment": "left",
             "type_preset": "rte",
             "font": "var(--font-body--family)",
+            "font_size": "1rem",
             "line_height": "normal",
             "letter_spacing": "normal",
             "case": "none",
             "wrap": "pretty",
+            "text_color": "",
             "background": false,
             "background_color": "#00000026",
             "corner_radius": 0,
@@ -164,6 +287,7 @@
         "text_tqQTNE",
         "text_twGGkJ"
       ],
+      "disabled": true,
       "name": "t:names.heading",
       "settings": {
         "content_direction": "column",
@@ -175,23 +299,24 @@
         "vertical_alignment_flex_direction_column": "center",
         "gap": 12,
         "section_width": "page-width",
+        "section_height": "",
         "section_height_custom": 50,
         "background_media": "none",
         "background_color": "{{ settings.color_palette.background }}",
         "video_position": "cover",
         "background_image_position": "cover",
-        "border": "none",
-        "border_width": 1,
-        "border_opacity": 100,
-        "border_radius": 0,
         "toggle_overlay": false,
         "overlay_color": "#00000026",
         "overlay_style": "solid",
         "gradient_direction": "to top",
+        "border": "none",
+        "border_width": 1,
+        "border_opacity": 100,
+        "border_color": "",
+        "border_radius": 0,
         "padding-block-start": 48,
         "padding-block-end": 48
-      },
-      "disabled": true
+      }
     },
     "main": {
       "type": "main-collection",
@@ -208,6 +333,8 @@
             "show_filter_label": false,
             "enable_sorting": true,
             "enable_grid_density": true,
+            "background_color": "",
+            "text_color": "",
             "padding-block-start": 8,
             "padding-block-end": 8,
             "padding-inline-start": 0,
@@ -222,9 +349,11 @@
           "static": true,
           "settings": {
             "product_card_gap": 4,
+            "background_color": "",
             "border": "none",
             "border_width": 1,
             "border_opacity": 100,
+            "border_color": "",
             "border_radius": 0,
             "padding-block-start": 0,
             "padding-block-end": 0,
@@ -239,6 +368,7 @@
                 "border": "none",
                 "border_width": 1,
                 "border_opacity": 100,
+                "border_color": "",
                 "border_radius": 0,
                 "padding-block-start": 0,
                 "padding-block-end": 0,
@@ -261,6 +391,7 @@
                 "letter_spacing": "normal",
                 "case": "none",
                 "wrap": "pretty",
+                "text_color": "",
                 "background": false,
                 "background_color": "#00000026",
                 "corner_radius": 0,
@@ -285,6 +416,7 @@
                 "line_height": "normal",
                 "letter_spacing": "normal",
                 "case": "none",
+                "text_color": "",
                 "padding-block-start": 0,
                 "padding-block-end": 0,
                 "padding-inline-start": 0,
@@ -300,10 +432,13 @@
           ]
         }
       },
+      "disabled": true,
       "settings": {
         "layout_type": "grid",
         "product_card_size": "medium",
         "mobile_product_card_size": "small",
+        "enable_infinite_scroll": true,
+        "products_per_page": 24,
         "product_grid_width": "centered",
         "full_width_on_mobile": true,
         "columns_gap_horizontal": 16,
@@ -313,13 +448,13 @@
         "background_color": "{{ settings.color_palette.background }}",
         "padding-block-start": 0,
         "padding-block-end": 32
-      },
-      "disabled": true
+      }
     }
   },
   "order": [
     "jci_collection_hero",
     "jci_collection_grid",
+    "jci_collection_note",
     "section",
     "main"
   ]
