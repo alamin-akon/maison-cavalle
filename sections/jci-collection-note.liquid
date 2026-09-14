@@ -72,10 +72,14 @@
 </section>
 
 {% stylesheet %}
-  /* styles.css:491 — the band. The grid moves onto the container so width and
-     gutter stay shared (§0). */
+  /* styles.css:491 — the band. The prototype's #app caps every section at the
+     content width (styles.css:32), so the olive panel is capped and centred
+     like the footer rather than running full-bleed. The grid moves onto the
+     container so the gutter stays shared (§0). */
   .jci-collection-note {
     position: relative;
+    width: var(--jci-container-width, min(100%, var(--jci-content-max)));
+    margin-inline: var(--jci-container-offset, auto) auto;
     overflow: hidden;
     isolation: isolate;
     color: var(--jci-collection-note-text);

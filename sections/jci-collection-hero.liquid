@@ -185,10 +185,14 @@
 </section>
 
 {% stylesheet %}
-  /* styles.css:436 — background, overflow and the stacking root. Width and
-     gutter stay on the shared container (§0). */
+  /* styles.css:436 — background, overflow and the stacking root. The
+     prototype's #app caps the section at the content width (styles.css:32), so
+     the ink panel is capped and centred like the footer, not full-bleed. The
+     gutter stays on the shared container (§0). */
   .jci-collection-hero {
     position: relative;
+    width: var(--jci-container-width, min(100%, var(--jci-content-max)));
+    margin-inline: var(--jci-container-offset, auto) auto;
     overflow: hidden;
     isolation: isolate;
     color: var(--jci-collection-hero-text);
