@@ -278,6 +278,72 @@
     },
     {
       "type": "header",
+      "content": "Captions",
+      "visible_if": "{{ block.settings.media_presentation == 'grid' }}"
+    },
+    {
+      "type": "text",
+      "id": "head_label",
+      "label": "Gallery head",
+      "info": "The product's category follows it when the custom.category metafield is filled in.",
+      "default": "Maison Cavallé",
+      "visible_if": "{{ block.settings.media_presentation == 'grid' }}"
+    },
+    {
+      "type": "text",
+      "id": "views_label",
+      "label": "Image count label",
+      "default": "views",
+      "visible_if": "{{ block.settings.media_presentation == 'grid' }}"
+    },
+    {
+      "type": "text",
+      "id": "caption_first",
+      "label": "First image caption",
+      "default": "The piece",
+      "visible_if": "{{ block.settings.media_presentation == 'grid' }}"
+    },
+    {
+      "type": "text",
+      "id": "caption_second",
+      "label": "Second image caption",
+      "default": "In motion",
+      "visible_if": "{{ block.settings.media_presentation == 'grid' }}"
+    },
+    {
+      "type": "text",
+      "id": "caption_rest",
+      "label": "Other image captions",
+      "default": "Details",
+      "visible_if": "{{ block.settings.media_presentation == 'grid' }}"
+    },
+    {
+      "type": "text",
+      "id": "hint_text",
+      "label": "Hint under the gallery",
+      "default": "Swipe or hover to explore the details",
+      "visible_if": "{{ block.settings.media_presentation == 'grid' }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_tilt",
+      "label": "Tilt images towards the pointer",
+      "default": true,
+      "visible_if": "{{ block.settings.media_presentation == 'grid' }}"
+    },
+    {
+      "type": "range",
+      "id": "tilt_strength",
+      "label": "Tilt strength",
+      "min": 0,
+      "max": 20,
+      "step": 1,
+      "unit": "deg",
+      "default": 4,
+      "visible_if": "{{ block.settings.media_presentation == 'grid' and block.settings.enable_tilt }}"
+    },
+    {
+      "type": "header",
       "content": "t:content.padding"
     },
     {

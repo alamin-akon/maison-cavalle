@@ -59,7 +59,7 @@
           assign variant_style = block_settings.variant_style
 
           if swatch_count > 0 and block_settings.show_swatches
-            if block_settings.variant_style == 'dropdown'
+            if block_settings.variant_style == 'dropdowns'
               assign variant_style = 'swatch_dropdown'
             else
               assign variant_style = 'swatch'
@@ -100,6 +100,11 @@
               {%- endif %}
             </legend>
             {%- for product_option_value in product_option.values -%}
+              <!--
+Value: {{ product_option_value }}
+Swatch: {{ product_option_value.swatch }}
+Color: {{ product_option_value.swatch.color }}
+-->
               {% if product_option_value.size > longest_value and option_id_attribute %}
                 {% assign longest_value = product_option_value.size %}
               {% endif %}

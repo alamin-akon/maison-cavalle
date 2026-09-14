@@ -319,6 +319,12 @@
   /* Maison Cavalle: one column, 1.7rem between gallery and details
      (styles.css:1679). */
   @media screen and (max-width: 680px) {
+    /* styles.css:1679 `padding-top: 0` — the gallery head sits straight under
+       the header on mobile, whatever the desktop top padding is. */
+    .product-information.spacing-style {
+      padding-block-start: 0;
+    }
+
     .product-information__grid {
       row-gap: 1.7rem;
     }

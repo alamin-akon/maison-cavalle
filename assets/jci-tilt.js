@@ -83,13 +83,26 @@ const instances = new WeakMap();
 function bind(root = document) {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-  for (const element of root.querySelectorAll?.(HOOK) ?? []) {
+  const elements = [...(root.querySelectorAll?.(HOOK) ?? [])];
+  if (root instanceof Element && root.matches(HOOK)) elements.push(root);
+
+  for (const element of elements) {
     if (instances.has(element)) continue;
     instances.set(element, new JciTilt(element));
   }
 }
 
 bind();
+
+// Horizon replaces the product media gallery outright when a variant changes,
+// with no section event, so hooks are also picked up as they enter the page.
+new MutationObserver((records) => {
+  for (const record of records) {
+    for (const node of record.addedNodes) {
+      if (node instanceof Element) bind(node);
+    }
+  }
+}).observe(document.body, { childList: true, subtree: true });
 
 // The Theme Editor swaps section markup in place, so new nodes are bound and
 // the old ones released.
