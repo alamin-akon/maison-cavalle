@@ -326,13 +326,14 @@
               <details
                 class="jci-product-accordion{% if stacked %} jci-product-accordion-stacked{% endif %}"
                 name="jci-product-accordion-{{ section.id }}"
+                data-jci-accordion
                 {% if bs.open %}
                   open
                 {% endif %}
                 {{ block.shopify_attributes }}
               >
-                <summary class="jci-product-accordion-summary">{{ bs.heading | escape }}</summary>
-                <div class="jci-product-accordion-content">{{ accordion_content }}</div>
+                <summary class="jci-product-accordion-summary" data-jci-accordion-summary>{{ bs.heading | escape }}</summary>
+                <div class="jci-product-accordion-content" data-jci-accordion-content>{{ accordion_content }}</div>
               </details>
           {%- endcase -%}
 
@@ -1231,7 +1232,9 @@
     content: '−';
   }
 
+  /* Height is animated by jci-product.js, so the content clips as it moves. */
   .jci-product-accordion-content {
+    overflow: hidden;
     padding-top: 1rem;
     font-family: var(--jci-font-sans);
     font-size: var(--jci-subtitle-size);

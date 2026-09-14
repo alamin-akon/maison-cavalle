@@ -46,6 +46,7 @@
             "show_selected_value": true,
             "show_rule_above": true,
             "show_size_guide": false,
+            "size_guide_url": "",
             "size_guide_new_tab": true,
             "size_guide_label": "Size guide",
             "size_guide_eyebrow": "Fit guidance",
@@ -58,7 +59,8 @@
           "type": "description",
           "settings": {
             "source": "product",
-            "first_paragraph_only": true
+            "first_paragraph_only": true,
+            "custom_text": ""
           }
         },
         "rule": {
@@ -177,6 +179,7 @@
             "media_columns": "two",
             "image_gap": 10,
             "large_first_image": true,
+            "icons_style": "arrow",
             "slideshow_controls_style": "counter",
             "slideshow_mobile_controls_style": "dots",
             "thumbnail_position": "right",
@@ -263,6 +266,7 @@
                 "border_opacity": 100,
                 "border_color": "",
                 "border_radius": 0,
+                "link": "",
                 "open_in_new_tab": false,
                 "placeholder": "",
                 "padding-block-start": 0,
@@ -459,6 +463,7 @@
       "block_order": [
         "disclosures_g9mWze"
       ],
+      "disabled": true,
       "settings": {
         "content_width": "content-center-aligned",
         "desktop_media_position": "left",
@@ -469,8 +474,7 @@
         "background_color": "{{ settings.color_palette.background }}",
         "padding-block-start": 56,
         "padding-block-end": 136
-      },
-      "disabled": true
+      }
     },
     "jci_related_products": {
       "type": "jci-product-section",
@@ -493,6 +497,7 @@
         "badge_source": "always",
         "badge_text": "New",
         "cta_label": "",
+        "cta_url": "",
         "background_color": "",
         "heading_color": "",
         "accent_color": "",
@@ -511,11 +516,51 @@
         "placeholder_subtitle": "Choose a collection to show real products",
         "anchor_id": "more-from-the-maison"
       }
+    },
+    "jci_newsletter_ie8tz6": {
+      "type": "jci-newsletter",
+      "name": "Newsletter",
+      "settings": {
+        "eyebrow": "The Maison letter",
+        "title": "Stay close to the",
+        "title_accent": "Maison.",
+        "body": "Sign up for first access to new pieces, stories from the stable and thoughtful notes from our world.",
+        "fineprint": "No noise. Just considered notes from the Maison.",
+        "placeholder": "Your email address",
+        "button_label": "Join",
+        "button_aria_label": "Join the Maison letter",
+        "customer_tag": "newsletter",
+        "background_color": "",
+        "text_color": "",
+        "accent_color": "#c6cda9",
+        "body_color": "#c4c7ba",
+        "placeholder_color": "#bfc1b7",
+        "message_color": "#c8d19d",
+        "fineprint_color": "#92998b",
+        "ring_color": "#d3d5c9",
+        "button_background": "",
+        "button_text_color": "",
+        "button_background_hover": "",
+        "button_text_hover": "",
+        "background_width": "content",
+        "space_above": 32,
+        "padding_top": 96,
+        "padding_bottom": 96,
+        "padding_top_mobile": 52,
+        "padding_bottom_mobile": 52,
+        "column_gap": 160,
+        "copy_max_width": 420,
+        "frame_inset": 100,
+        "frame_opacity": 13,
+        "ring_size": 280,
+        "anchor_id": "newsletter"
+      }
     }
   },
   "order": [
     "jci_product",
     "main",
-    "jci_related_products"
+    "jci_related_products",
+    "jci_newsletter_ie8tz6"
   ]
 }

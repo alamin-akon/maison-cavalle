@@ -10,7 +10,8 @@
  *     hidden variant id, the lead image and the ?variant= URL;
  *   - the quantity stepper;
  *   - the lightbox (buttons, arrow keys, Escape, swipe, focus trap);
- *   - the mobile sticky add-to-bag bar.
+ *   - the mobile sticky add-to-bag bar;
+ *   - the details accordions, animated open and shut like the home FAQ.
  *
  * The add itself is Horizon's product-form-component, which reads the hidden
  * `id` and `quantity` inputs this file keeps current.
@@ -18,12 +19,15 @@
 const ROOT = '[data-jci-product]';
 const SWIPE_THRESHOLD = 45;
 const pad = (value) => String(value).padStart(2, '0');
+const ACCORDION_DURATION = 320;
+const ACCORDION_EASING = 'cubic-bezier(0.22, 0.61, 0.36, 1)';
 
 class JciProduct {
   #frame = 0;
   #returnFocus = null;
   #swipe = null;
   #lightboxIndex = 0;
+  #accordionAnimations = new WeakMap();
 
   constructor(root) {
     this.root = root;
@@ -33,6 +37,17 @@ class JciProduct {
     this.addButton = this.form?.querySelector('button[name="add"]') ?? null;
     this.lightbox = root.querySelector('[data-jci-lightbox]');
     this.sticky = root.querySelector('[data-jci-product-sticky]');
+    this.accordions = [...root.querySelectorAll('[data-jci-accordion]')];
+    this.reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // The shared `name` makes the browser close the other accordion the
+    // instant one opens, which would cut its closing animation short. With
+    // motion on, single-open is kept here instead; the attribute stays in the
+    // markup so the no-JS and reduced-motion cases still get it for free.
+    this.accordionsSingle = this.accordions.some((accordion) => accordion.name);
+    if (!this.reducedMotion) {
+      for (const accordion of this.accordions) accordion.removeAttribute('name');
+    }
 
     const initial =
       this.variants.find((variant) => String(variant.id) === this.variantInput?.value) ?? this.variants[0];
@@ -75,6 +90,15 @@ class JciProduct {
     const target = event.target instanceof Element ? event.target : null;
     if (!target) return;
 
+    const summary = target.closest('[data-jci-accordion-summary]');
+    if (summary && !this.reducedMotion) {
+      // The browser would toggle `open` immediately; the height animation
+      // needs to drive that instead.
+      event.preventDefault();
+      this.#toggleAccordion(summary.closest('[data-jci-accordion]'));
+      return;
+    }
+
     const option = target.closest('[data-jci-option]');
     if (option && !option.disabled) {
       this.#selectOption(Number(option.getAttribute('data-jci-option')) - 1, option.getAttribute('data-jci-option-value'));
@@ -110,6 +134,104 @@ class JciProduct {
       this.#showLightboxImage(this.#lightboxIndex + (control.getAttribute('data-jci-lightbox-control') === 'next' ? 1 : -1));
     }
   };
+
+  /* -- Accordions (same treatment as jci-home-faq.js) ---------------------- */
+
+  #toggleAccordion(accordion) {
+    if (!accordion) return;
+
+    if (accordion.open) {
+      this.#closeAccordion(accordion);
+      return;
+    }
+
+    if (this.accordionsSingle) {
+      for (const other of this.accordions) {
+        if (other !== accordion && other.open) this.#closeAccordion(other);
+      }
+    }
+
+    this.#openAccordion(accordion);
+  }
+
+  /**
+   * The content's resting top padding, which has to travel with the height.
+   * Under `box-sizing: border-box` an element at `height: 0` is still as tall
+   * as its padding, so animating height alone leaves a padding-tall strip.
+   */
+  #accordionPad(content) {
+    return getComputedStyle(content).paddingTop || '0px';
+  }
+
+  #openAccordion(accordion) {
+    const content = accordion.querySelector('[data-jci-accordion-content]');
+    if (!content) {
+      accordion.open = true;
+      return;
+    }
+
+    this.#accordionAnimations.get(content)?.cancel();
+    accordion.open = true;
+
+    const animation = content.animate(
+      {
+        height: ['0px', `${content.scrollHeight}px`],
+        paddingTop: ['0px', this.#accordionPad(content)],
+        opacity: [0, 1],
+      },
+      { duration: ACCORDION_DURATION, easing: ACCORDION_EASING }
+    );
+
+    this.#settleAccordion(content, animation, accordion, true);
+  }
+
+  #closeAccordion(accordion) {
+    const content = accordion.querySelector('[data-jci-accordion-content]');
+    if (!content) {
+      accordion.open = false;
+      return;
+    }
+
+    this.#accordionAnimations.get(content)?.cancel();
+
+    // Measured, not read off scrollHeight: a cancelled animation can leave an
+    // inline height behind, and collapsing from the wrong start makes it kick.
+    const from = content.getBoundingClientRect().height || content.scrollHeight;
+
+    const animation = content.animate(
+      {
+        height: [`${from}px`, '0px'],
+        paddingTop: [this.#accordionPad(content), '0px'],
+        opacity: [1, 0],
+      },
+      { duration: ACCORDION_DURATION, easing: ACCORDION_EASING }
+    );
+
+    // `open` comes off only once the content has collapsed, so the row never
+    // jumps ahead of the animation.
+    this.#settleAccordion(content, animation, accordion, false);
+  }
+
+  /**
+   * Applies the intended `open` state once the animation lands, and only if
+   * this animation is still the current one. `cancel()` rejects `finished`
+   * rather than resolving it, so an interrupting click owns the state.
+   */
+  #settleAccordion(content, animation, accordion, open) {
+    this.#accordionAnimations.set(content, animation);
+
+    animation.finished
+      .then(() => {
+        if (this.#accordionAnimations.get(content) !== animation) return;
+        accordion.open = open;
+      })
+      .catch(() => {
+        /* cancelled - whichever click replaced it owns the state now */
+      })
+      .finally(() => {
+        if (this.#accordionAnimations.get(content) === animation) this.#accordionAnimations.delete(content);
+      });
+  }
 
   /* -- Variant ----------------------------------------------------------- */
 
