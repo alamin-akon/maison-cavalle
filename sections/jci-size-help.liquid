@@ -1,0 +1,167 @@
+{% comment %}
+  Maison Cavallé — size help card
+
+  Prototype source: maison-cavalle-main/app.js     → renderSizeGuidePage, section.size-help
+                    maison-cavalle-main/styles.css  → .size-help, .size-help-card (797-803),
+                                                      @680 (1819-1820)
+  Reference: MAISON-CAVALLE-SPEC.md §0, §1, §3, §5, §7
+
+  The ink card that closes the size guide. The prototype sets the section's
+  top padding to 0 so the card sits under the measuring cards; that is the
+  top padding default here. Width and bottom padding are the shared container
+  and rhythm (§0), not the prototype's 1180px measure.
+  No letter-spacing or line-height is authored (§0).
+{% endcomment %}
+
+{%- assign s = section.settings -%}
+
+<section
+  class="jci-size-help"
+  {% if s.anchor_id != blank %}id="{{ s.anchor_id | handleize }}"{% endif %}
+  style="
+    --jci-size-help-bg: {{ s.background_color | default: settings.color_palette.background }};
+    --jci-size-help-card-bg: {{ s.card_background | default: settings.color_palette.foreground }};
+    --jci-size-help-text: {{ s.text_color | default: settings.color_palette.background }};
+    --jci-size-help-accent: {{ s.accent_color | default: settings.color_palette.color7 }};
+    --jci-size-help-pad-top: {{ s.padding_top }}px;
+    --jci-size-help-pad-bottom: {{ s.padding_bottom }}px;
+    --jci-size-help-pad-top-mobile: {{ s.padding_top_mobile }}px;
+    --jci-size-help-pad-bottom-mobile: {{ s.padding_bottom_mobile }}px;
+  "
+>
+  <div class="jci-size-help-container">
+    <div class="jci-size-help-card">
+      <div class="jci-size-help-heading">
+        {%- if s.eyebrow != blank -%}
+          <p class="jci-eyebrow jci-size-help-eyebrow">{{ s.eyebrow }}</p>
+        {%- endif -%}
+
+        {%- if s.title_line_one != blank or s.title_line_two != blank -%}
+          <h2 class="jci-size-help-title">
+            {{- s.title_line_one -}}
+            {%- if s.title_line_one != blank and s.title_line_two != blank -%}<br>{%- endif -%}
+            {%- if s.title_line_two != blank -%}
+              <em class="jci-size-help-title-accent">{{ s.title_line_two }}</em>
+            {%- endif -%}
+          </h2>
+        {%- endif -%}
+      </div>
+
+      <div class="jci-size-help-body">
+        {%- if s.text != blank -%}
+          <p class="jci-size-help-text">{{ s.text }}</p>
+        {%- endif -%}
+
+        {%- if s.link_label != blank -%}
+          <a
+            class="jci-text-link jci-size-help-link"
+            href="{{ s.link | default: '/pages/contact' }}"
+          >
+            {{- s.link_label }}
+            {% render 'jci-action-arrow' %}
+          </a>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+  .jci-size-help {
+    display: block;
+    padding-block: var(--jci-size-help-pad-top) var(--jci-size-help-pad-bottom);
+    background: var(--jci-size-help-bg);
+  }
+
+  /* styles.css:798 */
+  .jci-size-help-card {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 0.7fr);
+    gap: clamp(2rem, 8vw, 8rem);
+    align-items: end;
+    padding: clamp(2rem, 4vw, 4rem);
+    color: var(--jci-size-help-text);
+    background: var(--jci-size-help-card-bg);
+  }
+
+  /* styles.css:799 — #cdd3b5 is the hero accent, a touch towards paper. */
+  .jci-size-help-eyebrow {
+    margin-bottom: 1rem;
+    color: color-mix(in srgb, var(--jci-size-help-accent) 95%, var(--jci-size-help-text));
+  }
+
+  /* styles.css:800-801 */
+  .jci-size-help-title {
+    margin: 0;
+    font-family: var(--jci-font-display);
+    font-size: var(--jci-section-title-size);
+    font-weight: 500;
+  }
+
+  .jci-size-help-title-accent {
+    color: var(--jci-size-help-accent);
+    font-style: italic;
+  }
+
+  /* styles.css:802 — #c4c8bd is paper at 75% on ink. */
+  .jci-size-help-text {
+    max-width: 360px;
+    margin: 0 0 1.7rem;
+    color: rgb(var(--jci-paper-rgb) / 0.75);
+    font-family: var(--jci-font-sans);
+    font-size: var(--jci-subtitle-size);
+  }
+
+  /* styles.css:803 */
+  .jci-size-help-link {
+    color: var(--jci-size-help-text);
+  }
+
+  /* styles.css:@680 (1819-1820) */
+  @media screen and (max-width: 680px) {
+    .jci-size-help {
+      padding-block: var(--jci-size-help-pad-top-mobile) var(--jci-size-help-pad-bottom-mobile);
+    }
+
+    .jci-size-help-card {
+      display: block;
+    }
+
+    .jci-size-help-body {
+      margin-top: 2rem;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Size help",
+  "tag": "div",
+  "class": "jci-size-help-section",
+  "settings": [
+    { "type": "header", "content": "Copy" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Still unsure?" },
+    { "type": "text", "id": "title_line_one", "label": "Title first line", "default": "Let’s find your" },
+    { "type": "text", "id": "title_line_two", "label": "Title second line (italic)", "default": "right feeling." },
+    { "type": "textarea", "id": "text", "label": "Text", "default": "Send us your usual size, measurements and how you prefer a piece to fit. We’ll be happy to offer a personal recommendation." },
+    { "type": "text", "id": "link_label", "label": "Link label", "default": "Ask the Maison" },
+    { "type": "url", "id": "link", "label": "Link", "info": "Left empty, it goes to the contact page." },
+
+    { "type": "header", "content": "Colors", "info": "Left empty, each of these follows the theme colour palette." },
+    { "type": "color", "id": "background_color", "label": "Section background" },
+    { "type": "color", "id": "card_background", "label": "Card background" },
+    { "type": "color", "id": "text_color", "label": "Text" },
+    { "type": "color", "id": "accent_color", "label": "Accent" },
+
+    { "type": "header", "content": "Layout" },
+    { "type": "range", "id": "padding_top", "label": "Padding top", "min": 0, "max": 240, "step": 4, "unit": "px", "default": 0, "info": "0 keeps the card under the section above it." },
+    { "type": "range", "id": "padding_bottom", "label": "Padding bottom", "min": 0, "max": 240, "step": 4, "unit": "px", "default": 136 },
+    { "type": "range", "id": "padding_top_mobile", "label": "Padding top on mobile", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 0 },
+    { "type": "range", "id": "padding_bottom_mobile", "label": "Padding bottom on mobile", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 72 },
+
+    { "type": "header", "content": "Anchor" },
+    { "type": "text", "id": "anchor_id", "label": "Anchor ID", "default": "size-help" }
+  ],
+  "presets": [{ "name": "Size help" }]
+}
+{% endschema %}

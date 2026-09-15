@@ -76,6 +76,138 @@
         "anchor_id": "size-guide-hero"
       }
     },
+    "jci_size_guide": {
+      "type": "jci-size-guide",
+      "blocks": {
+        "row_xs": {
+          "type": "row",
+          "settings": {
+            "cell_1": "XS",
+            "cell_2": "6–8",
+            "cell_3": "80–85",
+            "cell_4": "62–67",
+            "cell_5": "88–93"
+          }
+        },
+        "row_s": {
+          "type": "row",
+          "settings": {
+            "cell_1": "S",
+            "cell_2": "8–10",
+            "cell_3": "85–90",
+            "cell_4": "67–72",
+            "cell_5": "93–98"
+          }
+        },
+        "row_m": {
+          "type": "row",
+          "settings": {
+            "cell_1": "M",
+            "cell_2": "10–12",
+            "cell_3": "90–95",
+            "cell_4": "72–77",
+            "cell_5": "98–103"
+          }
+        },
+        "row_l": {
+          "type": "row",
+          "settings": {
+            "cell_1": "L",
+            "cell_2": "12–14",
+            "cell_3": "95–101",
+            "cell_4": "77–83",
+            "cell_5": "103–109"
+          }
+        },
+        "row_xl": {
+          "type": "row",
+          "settings": {
+            "cell_1": "XL",
+            "cell_2": "14–16",
+            "cell_3": "101–107",
+            "cell_4": "83–89",
+            "cell_5": "109–115"
+          }
+        },
+        "measure_bust": {
+          "type": "measure",
+          "settings": {
+            "index": "01",
+            "eyebrow": "Bust",
+            "title": "Across the fullest point.",
+            "text": "Keep the tape level around your chest, without pulling it tight."
+          }
+        },
+        "measure_waist": {
+          "type": "measure",
+          "settings": {
+            "index": "02",
+            "eyebrow": "Waist",
+            "title": "Where your body naturally bends.",
+            "text": "Measure around the narrowest part of your waist and breathe normally."
+          }
+        },
+        "measure_hip": {
+          "type": "measure",
+          "settings": {
+            "index": "03",
+            "eyebrow": "Hip",
+            "title": "At the fullest point.",
+            "text": "Stand naturally and measure around the widest part of your hips."
+          }
+        }
+      },
+      "block_order": [
+        "row_xs",
+        "row_s",
+        "row_m",
+        "row_l",
+        "row_xl",
+        "measure_bust",
+        "measure_waist",
+        "measure_hip"
+      ],
+      "settings": {
+        "eyebrow": "Women’s tops",
+        "title_line_one": "Choose your",
+        "title_line_two": "usual size.",
+        "intro": "Our tops are designed for an easy, considered fit. Measure over a light layer and choose the size that feels most like you. If you are between sizes, we recommend choosing the larger size.",
+        "caption": "Maison Cavallé women’s tops size chart",
+        "column_1": "Size",
+        "column_2": "AU / UK",
+        "column_3": "Bust (cm)",
+        "column_4": "Waist (cm)",
+        "column_5": "Hip (cm)",
+        "background_color": "",
+        "card_background": "",
+        "row_hover_color": "",
+        "padding_top": 136,
+        "padding_bottom": 136,
+        "padding_top_mobile": 72,
+        "padding_bottom_mobile": 72,
+        "anchor_id": "size-details"
+      }
+    },
+    "jci_size_help": {
+      "type": "jci-size-help",
+      "settings": {
+        "eyebrow": "Still unsure?",
+        "title_line_one": "Let’s find your",
+        "title_line_two": "right feeling.",
+        "text": "Send us your usual size, measurements and how you prefer a piece to fit. We’ll be happy to offer a personal recommendation.",
+        "link_label": "Ask the Maison",
+        "link": "shopify://pages/contact",
+        "background_color": "",
+        "card_background": "",
+        "text_color": "",
+        "accent_color": "",
+        "padding_top": 0,
+        "padding_bottom": 136,
+        "padding_top_mobile": 0,
+        "padding_bottom_mobile": 72,
+        "anchor_id": "size-help"
+      }
+    },
     "main": {
       "type": "main-page",
       "blocks": {
@@ -125,6 +257,8 @@
   },
   "order": [
     "jci_size_guide_hero",
+    "jci_size_guide",
+    "jci_size_help",
     "main"
   ]
 }
