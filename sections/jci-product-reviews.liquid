@@ -1,0 +1,572 @@
+{% comment %}
+  Maison Cavallé — product reviews
+
+  Prototype source: maison-cavalle-main/app.js     → productReviewsSection
+                    maison-cavalle-main/styles.css  → .product-reviews-section … .product-review-empty
+                                                      (600-650), @900 (1524-1527), @680 (1685-1699)
+  Reference: MAISON-CAVALLE-SPEC.md §0, §1, §3, §5, §7
+
+  The section owns the prototype's heading; the reviews themselves come from
+  the Junip app block placed inside it. Junip renders its widget into the
+  page (not an iframe) and sets its colours as --junip* custom properties on
+  :root, so the section redefines those for its own scope and restyles
+  Junip's markup to the prototype's summary, toolbar and review rows.
+
+  Junip's classes are third-party and not ours to rename, so they are reached
+  only through .jci-product-reviews (§1). JS and behaviour stay Junip's.
+
+  Container width and section padding are the shared defaults (§0). No
+  letter-spacing or line-height is authored (§0).
+{% endcomment %}
+
+{%- assign s = section.settings -%}
+
+<section
+  class="jci-product-reviews"
+  {% if s.anchor_id != blank %}id="{{ s.anchor_id | handleize }}"{% endif %}
+  style="
+    --jci-product-reviews-bg: {{ s.background_color | default: settings.color_palette.color2 }};
+    --jci-product-reviews-text: {{ s.text_color | default: settings.color_palette.foreground }};
+    --jci-product-reviews-text-rgb: {{ s.text_color.rgb | default: settings.color_palette.foreground.rgb }};
+    --jci-product-reviews-accent: {{ s.accent_color | default: settings.color_palette.color5 }};
+    --jci-product-reviews-highlight: {{ s.highlight_color | default: settings.color_palette.color6 }};
+    --jci-product-reviews-button-text: {{ s.button_text_color | default: settings.color_palette.background }};
+    --jci-product-reviews-pad-top: {% render 'jci-fluid-space', max: s.padding_top, min: s.padding_top_mobile %};
+    --jci-product-reviews-pad-bottom: {% render 'jci-fluid-space', max: s.padding_bottom, min: s.padding_bottom_mobile %};
+    --jci-product-reviews-pad-top-mobile: {{ s.padding_top_mobile }}px;
+    --jci-product-reviews-pad-bottom-mobile: {{ s.padding_bottom_mobile }}px;
+  "
+  {{ section.shopify_attributes }}
+>
+  <div class="jci-product-reviews-container">
+    <div class="jci-product-reviews-header">
+      <div class="jci-product-reviews-heading">
+        {%- if s.kicker != blank -%}
+          <p class="jci-product-reviews-kicker">{{ s.kicker }}</p>
+        {%- endif -%}
+
+        {%- if s.title_line_one != blank or s.title_line_two != blank -%}
+          <h2 class="jci-product-reviews-title">
+            {{- s.title_line_one -}}
+            {%- if s.title_line_one != blank and s.title_line_two != blank -%}<br>{%- endif -%}
+            {%- if s.title_line_two != blank -%}
+              <em class="jci-product-reviews-title-accent">{{ s.title_line_two }}</em>
+            {%- endif -%}
+          </h2>
+        {%- endif -%}
+      </div>
+
+      {%- if s.intro != blank -%}
+        <p class="jci-product-reviews-intro">{{ s.intro }}</p>
+      {%- endif -%}
+    </div>
+
+    <div class="jci-product-reviews-app">
+      {%- for block in section.blocks -%}
+        {% render block %}
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+  /* styles.css:600 — sand ground, and Junip's colours for this scope. */
+  .jci-product-reviews {
+    --junipPrimaryColor: var(--jci-product-reviews-highlight);
+    --junipStarColor: var(--jci-product-reviews-highlight);
+    --junipButtonColor: var(--jci-product-reviews-text);
+    --junipButtonTextColor: var(--jci-product-reviews-button-text);
+    --junipButtonOutlineColor: rgb(var(--jci-product-reviews-text-rgb) / 0.3);
+    --junipBorderColor: rgb(var(--jci-product-reviews-text-rgb) / 0.15);
+
+    position: relative;
+    display: block;
+    overflow: hidden;
+    padding-block: var(--jci-product-reviews-pad-top) var(--jci-product-reviews-pad-bottom);
+    color: var(--jci-product-reviews-text);
+    background: var(--jci-product-reviews-bg);
+  }
+
+  /* styles.css:601 — the MC watermark. */
+  .jci-product-reviews::after {
+    content: 'MC';
+    position: absolute;
+    right: 2%;
+    bottom: -13%;
+    color: rgb(var(--jci-olive-rgb) / 0.065);
+    font-family: var(--jci-font-display);
+    font-size: clamp(11rem, 24vw, 23rem);
+    font-weight: 600;
+    pointer-events: none;
+  }
+
+  .jci-product-reviews-container {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* styles.css:603 */
+  .jci-product-reviews-header {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(270px, 0.55fr);
+    align-items: end;
+    gap: clamp(2rem, 8vw, 8rem);
+    margin-bottom: clamp(3rem, 6vw, 5.5rem);
+  }
+
+  /* styles.css:604-605 */
+  .jci-product-reviews-kicker {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 0 0 1.2rem;
+    color: var(--jci-product-reviews-highlight);
+    font-family: var(--jci-font-label);
+    font-size: 12px;
+    text-transform: uppercase;
+  }
+
+  .jci-product-reviews-kicker::after {
+    content: '';
+    width: 165px;
+    height: 1px;
+    background: currentcolor;
+  }
+
+  /* styles.css:606-607 */
+  .jci-product-reviews-title {
+    max-width: 720px;
+    margin: 0;
+    font-family: var(--jci-font-display);
+    font-size: var(--jci-section-title-size);
+    font-weight: 500;
+  }
+
+  .jci-product-reviews-title-accent {
+    color: var(--jci-product-reviews-accent);
+    font-style: italic;
+  }
+
+  /* styles.css:608 — #676b61 is ink at 65% on sand. */
+  .jci-product-reviews-intro {
+    max-width: 380px;
+    margin: 0;
+    padding-left: 1.4rem;
+    border-left: 1px solid var(--jci-product-reviews-highlight);
+    color: rgb(var(--jci-product-reviews-text-rgb) / 0.65);
+    font-family: var(--jci-font-sans);
+    font-size: var(--jci-subtitle-size);
+  }
+
+  /* -- Junip widget ------------------------------------------------------ */
+
+  .jci-product-reviews .junip-product-review-container {
+    max-width: none;
+    padding: 0;
+    color: var(--jci-product-reviews-text);
+    font-family: var(--jci-font-sans);
+  }
+
+  /* The section heading replaces Junip's own title. */
+  .jci-product-reviews .junip-product-review-title,
+  .jci-product-reviews .junip-separator,
+  .jci-product-reviews .junip-review-product {
+    display: none;
+  }
+
+  /* styles.css:609 — score, distribution and the write button in one row. */
+  .jci-product-reviews .junip-product-review-summary-container {
+    display: grid;
+    grid-template-columns: minmax(0, 1.12fr) minmax(150px, 1fr);
+    align-items: center;
+    gap: clamp(2rem, 5vw, 5rem);
+    margin: 0;
+    padding: 2rem 0 2.5rem;
+    border-top: 1px solid rgb(var(--jci-product-reviews-text-rgb) / 0.18);
+  }
+
+  .jci-product-reviews .junip-product-review-summary-flex-wrapper {
+    display: grid;
+    grid-template-columns: minmax(130px, 0.42fr) minmax(230px, 0.7fr);
+    align-items: center;
+    gap: clamp(2rem, 5vw, 5rem);
+  }
+
+  /* styles.css:610-613 */
+  .jci-product-reviews .junip-product-review-average-container {
+    display: grid;
+    justify-items: center;
+    gap: 0.35rem;
+  }
+
+  .jci-product-reviews .junip-product-review-average {
+    margin: 0;
+    font-family: var(--jci-font-display);
+    font-size: 54px;
+    font-weight: 500;
+  }
+
+  .jci-product-reviews .junip-product-review-count {
+    color: rgb(var(--jci-product-reviews-text-rgb) / 0.65);
+    font-family: var(--jci-font-label);
+    font-size: 12px;
+  }
+
+  .jci-product-reviews .junip-star-ratings-container {
+    margin: 0;
+  }
+
+  .jci-product-reviews .junip-stars-filled,
+  .jci-product-reviews .junip-stars-outline {
+    gap: 3px;
+  }
+
+  .jci-product-reviews .junip-star-ratings-container .junip-star {
+    width: 16px;
+    height: 16px;
+    padding: 0;
+  }
+
+  /* styles.css:614-617 */
+  .jci-product-reviews .junip-product-review-bars-container {
+    display: grid;
+    gap: 0.48rem;
+    width: auto;
+  }
+
+  .jci-product-reviews .junip-product-review-bar-wrapper {
+    display: grid;
+    grid-template-columns: 12px minmax(120px, 1fr);
+    align-items: center;
+    gap: 0.7rem;
+    margin: 0;
+    color: rgb(var(--jci-product-reviews-text-rgb) / 0.7);
+    font-family: var(--jci-font-label);
+    font-size: 12px;
+  }
+
+  .jci-product-reviews .junip-product-review-bar-rating {
+    width: auto;
+    margin: 0;
+    font-size: 12px;
+  }
+
+  .jci-product-reviews .junip-product-review-bar {
+    height: 5px;
+    overflow: hidden;
+    border-radius: 0;
+    background: rgb(var(--jci-product-reviews-text-rgb) / 0.1);
+  }
+
+  .jci-product-reviews .junip-product-review-bar-filled {
+    height: 100%;
+    border-radius: 0;
+    font-size: 0;
+  }
+
+  /* styles.css:618 and the prototype .button (styles.css:114). */
+  /* Junip widens the actions and the button to 100% on its md and xs
+     container sizes; the prototype keeps the button sized to its label. */
+  .jci-product-reviews .junip-product-review-container .junip-product-review-summary-container .junip-product-review-summary-actions {
+    justify-self: end;
+    width: auto;
+    margin: 0;
+  }
+
+  .jci-product-reviews .junip-product-review-container .junip-product-review-summary-actions .junip-btn.junip-write-review-cta {
+    width: auto;
+  }
+
+  .jci-product-reviews .junip-btn.junip-write-review-cta {
+    min-width: 165px;
+    min-height: var(--jci-button-min-height);
+    padding: var(--jci-button-padding);
+    border: 1px solid var(--junipButtonColor);
+    border-radius: 0;
+    font-family: var(--jci-font-label);
+    font-size: var(--jci-button-size);
+    font-weight: 400;
+    text-transform: uppercase;
+    transition: color 0.3s, background 0.3s, border-color 0.3s;
+  }
+
+  .jci-product-reviews .junip-btn.junip-write-review-cta:hover {
+    color: var(--junipButtonColor);
+    background: transparent;
+  }
+
+  /* styles.css:633-636 — the sort and filter toolbar. */
+  .jci-product-reviews .junip-filters {
+    margin: 0;
+    padding: 1rem 0;
+    border-top: 1px solid rgb(var(--jci-product-reviews-text-rgb) / 0.14);
+    border-bottom: 1px solid rgb(var(--jci-product-reviews-text-rgb) / 0.14);
+  }
+
+  .jci-product-reviews .junip-filters-toggle {
+    border: 1px solid rgb(var(--jci-product-reviews-text-rgb) / 0.15);
+    border-radius: 0;
+    background: rgb(var(--jci-paper-rgb) / 0.55);
+    font-family: var(--jci-font-label);
+    font-size: 12px;
+    text-transform: uppercase;
+  }
+
+  .jci-product-reviews .junip-filters-container {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.8rem;
+    margin: 0;
+  }
+
+  .jci-product-reviews .junip-filters-container .junip-select {
+    width: auto;
+    min-width: 190px;
+    height: auto;
+    padding: 0.7rem 0.85rem;
+    border: 1px solid rgb(var(--jci-product-reviews-text-rgb) / 0.15);
+    border-radius: 0;
+    color: var(--jci-product-reviews-text);
+    background: rgb(var(--jci-paper-rgb) / 0.55);
+    font-family: var(--jci-font-sans);
+    font-size: 13px;
+  }
+
+  .jci-product-reviews .junip-filters-container .junip-filter-checkbox-container {
+    width: auto;
+    color: rgb(var(--jci-product-reviews-text-rgb) / 0.75);
+    font-family: var(--jci-font-sans);
+    font-size: 13px;
+  }
+
+  /* styles.css:637-649 — one review per ruled row. */
+  .jci-product-reviews .junip-reviews-container {
+    padding-top: 0;
+  }
+
+  .jci-product-reviews .junip-review-list-item-container {
+    display: grid;
+    grid-template-columns: 185px minmax(0, 1fr);
+    gap: clamp(1.5rem, 4vw, 4rem);
+    padding: 2.4rem 0;
+    border-bottom: 1px solid rgb(var(--jci-product-reviews-text-rgb) / 0.14);
+  }
+
+  .jci-product-reviews .junip-review-list-item-container .junip-review-customer {
+    min-width: 0;
+    max-width: none;
+  }
+
+  .jci-product-reviews .junip-review-list-item-container .junip-review-customer .junip-customer-container {
+    align-items: flex-start;
+    gap: 0.8rem;
+  }
+
+  .jci-product-reviews .junip-avatar {
+    width: 44px;
+    min-width: 44px;
+    height: 44px;
+    margin: 0;
+    border: 0;
+    background: var(--jci-product-reviews-accent);
+  }
+
+  .jci-product-reviews .junip-avatar .junip-avatar-initials {
+    color: var(--jci-product-reviews-button-text);
+    background: transparent;
+    font-family: var(--jci-font-label);
+    font-size: 12px;
+  }
+
+  .jci-product-reviews .junip-customer-name {
+    max-width: none;
+    font-family: var(--jci-font-sans);
+    font-size: 14px;
+  }
+
+  .jci-product-reviews .junip-verified,
+  .jci-product-reviews .junip-review-date,
+  .jci-product-reviews .junip-review-vote-container {
+    color: rgb(var(--jci-product-reviews-text-rgb) / 0.65);
+    font-family: var(--jci-font-label);
+    font-size: 11px;
+    opacity: 1;
+  }
+
+  .jci-product-reviews .junip-review-list-item {
+    min-width: 0;
+  }
+
+  .jci-product-reviews .junip-review-content-container {
+    max-width: 720px;
+  }
+
+  .jci-product-reviews .junip-review-title {
+    margin: 0.75rem 0 0.55rem;
+    font-family: var(--jci-font-display);
+    font-size: 22px;
+    font-weight: 500;
+  }
+
+  .jci-product-reviews .junip-review-list-item .junip-review-body {
+    color: rgb(var(--jci-product-reviews-text-rgb) / 0.75);
+    font-family: var(--jci-font-sans);
+    font-size: var(--jci-subtitle-size);
+  }
+
+  .jci-product-reviews .junip-recommendation-text {
+    color: var(--jci-product-reviews-highlight);
+    font-family: var(--jci-font-label);
+    font-size: 12px;
+  }
+
+  /* styles.css:650 */
+  .jci-product-reviews .junip-no-reviews {
+    padding: 3rem 0;
+    border-top: 1px solid rgb(var(--jci-product-reviews-text-rgb) / 0.18);
+    color: rgb(var(--jci-product-reviews-text-rgb) / 0.65);
+    font-family: var(--jci-font-sans);
+    font-size: var(--jci-subtitle-size);
+  }
+
+  .jci-product-reviews .junip-powered-by-footer {
+    margin-top: 2rem;
+  }
+
+  /* -- Breakpoints (§5 — 900 and 680 only) ------------------------------- */
+
+  /* styles.css:1524-1527 */
+  @media screen and (max-width: 900px) {
+    .jci-product-reviews-header {
+      grid-template-columns: minmax(0, 1fr) minmax(250px, 0.6fr);
+      gap: 3rem;
+    }
+
+    .jci-product-reviews .junip-product-review-summary-container {
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 2rem;
+    }
+
+    .jci-product-reviews .junip-product-review-summary-flex-wrapper {
+      grid-template-columns: 130px minmax(220px, 1fr);
+      gap: 2rem;
+    }
+
+    .jci-product-reviews .junip-review-list-item-container {
+      grid-template-columns: 155px minmax(0, 1fr);
+      gap: 1.5rem 2rem;
+    }
+  }
+
+  /* styles.css:1685-1699 */
+  @media screen and (max-width: 680px) {
+    .jci-product-reviews {
+      padding-block: var(--jci-product-reviews-pad-top-mobile) var(--jci-product-reviews-pad-bottom-mobile);
+    }
+
+    .jci-product-reviews-header {
+      display: block;
+    }
+
+    .jci-product-reviews-intro {
+      max-width: 520px;
+      margin-top: 1.7rem;
+      padding-left: 1rem;
+    }
+
+    .jci-product-reviews-kicker::after {
+      width: 95px;
+    }
+
+    .jci-product-reviews .junip-product-review-summary-container {
+      grid-template-columns: 1fr;
+      justify-items: start;
+      gap: 1.8rem;
+    }
+
+    /* The score and the distribution stay side by side; the button drops below. */
+    .jci-product-reviews .junip-product-review-summary-flex-wrapper {
+      grid-template-columns: auto minmax(0, 1fr);
+      justify-self: stretch;
+      gap: clamp(1.5rem, 6vw, 2.5rem);
+    }
+
+    .jci-product-reviews .junip-product-review-average-container {
+      justify-items: start;
+    }
+
+    .jci-product-reviews .junip-product-review-bars-container {
+      width: min(100%, 320px);
+    }
+
+    .jci-product-reviews .junip-product-review-bar-wrapper {
+      grid-template-columns: 12px minmax(0, 1fr);
+    }
+
+    .jci-product-reviews .junip-product-review-container .junip-product-review-summary-container .junip-product-review-summary-actions {
+      justify-self: start;
+    }
+
+    .jci-product-reviews .junip-filters-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .jci-product-reviews .junip-filters-container .junip-select {
+      width: 100%;
+      min-width: 0;
+    }
+
+    .jci-product-reviews .junip-filters-container .junip-filter-checkbox-container {
+      grid-column: 1 / -1;
+    }
+
+    .jci-product-reviews .junip-review-list-item-container {
+      grid-template-columns: 1fr;
+      gap: 1.3rem;
+      padding: 2rem 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .jci-product-reviews .junip-btn.junip-write-review-cta {
+      transition: none;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Product reviews",
+  "tag": "div",
+  "class": "jci-product-reviews-wrapper",
+  "blocks": [{ "type": "@app" }],
+  "settings": [
+    { "type": "paragraph", "content": "Add the Junip product reviews app block to this section." },
+
+    { "type": "header", "content": "Copy" },
+    { "type": "text", "id": "kicker", "label": "Kicker", "default": "Reviews" },
+    { "type": "text", "id": "title_line_one", "label": "Title first line", "default": "Loved around" },
+    { "type": "text", "id": "title_line_two", "label": "Title second line (italic)", "default": "the Maison." },
+    { "type": "textarea", "id": "intro", "label": "Intro", "default": "Verified notes from riders who choose thoughtful pieces for the saddle, the stable and every moment between." },
+
+    { "type": "header", "content": "Colors", "info": "Left empty, each of these follows the theme colour palette. The review stars, rating bars and button take these too." },
+    { "type": "color", "id": "background_color", "label": "Background" },
+    { "type": "color", "id": "text_color", "label": "Text and button" },
+    { "type": "color", "id": "button_text_color", "label": "Button text and avatar initials" },
+    { "type": "color", "id": "accent_color", "label": "Title accent and avatar" },
+    { "type": "color", "id": "highlight_color", "label": "Kicker, stars and rating bars" },
+
+    { "type": "header", "content": "Layout" },
+    { "type": "range", "id": "padding_top", "label": "Padding top", "min": 0, "max": 240, "step": 4, "unit": "px", "default": 136 },
+    { "type": "range", "id": "padding_bottom", "label": "Padding bottom", "min": 0, "max": 240, "step": 4, "unit": "px", "default": 136 },
+    { "type": "range", "id": "padding_top_mobile", "label": "Padding top on mobile", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 72 },
+    { "type": "range", "id": "padding_bottom_mobile", "label": "Padding bottom on mobile", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 72 },
+
+    { "type": "header", "content": "Anchor" },
+    { "type": "text", "id": "anchor_id", "label": "Anchor ID", "default": "reviews" }
+  ],
+  "presets": [{ "name": "Product reviews" }]
+}
+{% endschema %}

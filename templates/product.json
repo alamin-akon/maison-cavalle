@@ -149,8 +149,8 @@
         "padding_bottom_mobile": 72
       }
     },
-    "1789458250e2763454": {
-      "type": "_blocks",
+    "jci_product_reviews": {
+      "type": "jci-product-reviews",
       "blocks": {
         "junip_junip_product_review_VAERUX": {
           "type": "shopify://apps/junip/blocks/junip-product-review/dc14f5a8-ed15-41b1-ad08-cfba23f9789b",
@@ -166,32 +166,20 @@
         "junip_junip_product_review_VAERUX"
       ],
       "settings": {
-        "content_direction": "column",
-        "vertical_on_mobile": true,
-        "horizontal_alignment": "flex-start",
-        "vertical_alignment": "center",
-        "align_baseline": false,
-        "horizontal_alignment_flex_direction_column": "flex-start",
-        "vertical_alignment_flex_direction_column": "center",
-        "gap": 12,
-        "section_width": "page-width",
-        "section_height": "",
-        "section_height_custom": 50,
-        "background_media": "none",
+        "kicker": "Reviews",
+        "title_line_one": "Loved around",
+        "title_line_two": "the Maison.",
+        "intro": "Verified notes from riders who choose thoughtful pieces for the saddle, the stable and every moment between.",
         "background_color": "",
-        "video_position": "cover",
-        "background_image_position": "cover",
-        "toggle_overlay": false,
-        "overlay_color": "#00000026",
-        "overlay_style": "solid",
-        "gradient_direction": "to top",
-        "border": "none",
-        "border_width": 1,
-        "border_opacity": 100,
-        "border_color": "",
-        "border_radius": 0,
-        "padding-block-start": 0,
-        "padding-block-end": 0
+        "text_color": "",
+        "button_text_color": "",
+        "accent_color": "",
+        "highlight_color": "",
+        "padding_top": 136,
+        "padding_bottom": 136,
+        "padding_top_mobile": 72,
+        "padding_bottom_mobile": 72,
+        "anchor_id": "reviews"
       }
     },
     "main": {
@@ -607,7 +595,7 @@
   },
   "order": [
     "jci_product",
-    "1789458250e2763454",
+    "jci_product_reviews",
     "main",
     "jci_related_products",
     "jci_newsletter_ie8tz6"
