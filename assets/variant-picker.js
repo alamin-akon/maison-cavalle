@@ -263,7 +263,9 @@ export default class VariantPicker extends Component {
     let productUrl = selectedOption.dataset.connectedProductUrl || this.#pendingRequestUrl || this.dataset.productUrl;
     this.#pendingRequestUrl = productUrl;
     const params = [];
-    const viewParamValue = getViewParameterValue();
+    // Inside the quick add modal the picker came from templates/product.quick-add.json,
+    // so its re-renders must come from that view too (see quick-add.js).
+    const viewParamValue = this.closest('quick-add-dialog') ? 'quick-add' : getViewParameterValue();
 
     // preserve view parameter, if it exists, for alternative product view testing
     if (viewParamValue) params.push(`view=${viewParamValue}`);

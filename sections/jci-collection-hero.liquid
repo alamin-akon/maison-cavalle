@@ -6,9 +6,12 @@
                                                       @900 (1511-1512), @680 (1664-1669)
   Reference: MAISON-CAVALLE-SPEC.md §0, §1, §3, §5, §7
 
-  The prototype swaps the headline per category filter. On Shopify every
-  collection is its own page, so the section either shows its own text or the
-  collection's title and description (Content source).
+  The prototype swaps the headline per category filter ("The tights / edit.").
+  On Shopify every collection is its own page, so each headline is a Collection
+  title block that names its collection. The block matching the collection
+  being viewed wins; with no match the section shows its own text, or the
+  collection's title and description (Content source). jci-collection-grid.js
+  re-renders this section with the grid, so the headline follows each filter.
 
   The mosaic's lead piece spans both rows. The prototype targets it with
   :first-child and positions pieces two and three with :nth-child; here the
@@ -24,6 +27,19 @@
   assign s = section.settings
   assign pieces = section.blocks | where: 'type', 'piece'
   assign piece_count = pieces.size
+  if piece_count > 3
+    assign piece_count = 3
+  endif
+
+  assign title_block = blank
+  if collection != blank
+    for block in section.blocks
+      if block.type == 'title' and block.settings.collection != blank and block.settings.collection.handle == collection.handle
+        assign title_block = block
+        break
+      endif
+    endfor
+  endif
 
   assign use_collection = false
   if s.content_source == 'collection' and collection != blank
@@ -73,7 +89,15 @@
         {%- endif -%}
       </div>
 
-      {%- if use_collection -%}
+      {%- if title_block != blank -%}
+        <h1 class="jci-collection-hero-title" {{ title_block.shopify_attributes }}>
+          {{- title_block.settings.title_line_one -}}
+          {%- if title_block.settings.title_line_one != blank and title_block.settings.title_line_two != blank -%}<br>{%- endif -%}
+          {%- if title_block.settings.title_line_two != blank -%}
+            <em class="jci-collection-hero-title-accent">{{ title_block.settings.title_line_two }}</em>
+          {%- endif -%}
+        </h1>
+      {%- elsif use_collection -%}
         <h1 class="jci-collection-hero-title">{{ collection.title }}</h1>
       {%- elsif s.title_line_one != blank or s.title_line_two != blank -%}
         <h1 class="jci-collection-hero-title">
@@ -95,7 +119,7 @@
     <div class="jci-collection-hero-visual">
       {%- if piece_count > 0 -%}
         <div class="jci-collection-hero-mosaic" role="group" aria-label="{{ s.mosaic_label | escape }}">
-          {%- for block in pieces -%}
+          {%- for block in pieces limit: 3 -%}
             {%- liquid
               assign b = block.settings
               assign product = b.product
@@ -466,12 +490,22 @@
   "name": "Collection hero",
   "tag": "section",
   "class": "jci-collection-hero-section",
-  "max_blocks": 3,
+  "max_blocks": 15,
   "blocks": [
+    {
+      "type": "title",
+      "name": "Collection title",
+      "settings": [
+        { "type": "collection", "id": "collection", "label": "Collection", "info": "The title shows while this collection is being viewed." },
+        { "type": "text", "id": "title_line_one", "label": "Title first line", "default": "The" },
+        { "type": "text", "id": "title_line_two", "label": "Title second line (italic)", "default": "edit." }
+      ]
+    },
     {
       "type": "piece",
       "name": "Piece",
       "settings": [
+        { "type": "paragraph", "content": "The first three pieces are shown." },
         { "type": "product", "id": "product", "label": "Product", "info": "Sets the link, and the image when none is chosen below." },
         { "type": "image_picker", "id": "image", "label": "Image", "info": "Replaces the file and product images." },
         { "type": "text", "id": "image_asset", "label": "Image file in theme assets", "info": "Filename only. Used when no image is chosen above, ahead of the product's image." },
@@ -488,6 +522,7 @@
       "type": "select",
       "id": "content_source",
       "label": "Content source",
+      "info": "Used when no Collection title block matches the collection being viewed.",
       "options": [
         { "value": "section", "label": "Text below" },
         { "value": "collection", "label": "Collection title and description" }

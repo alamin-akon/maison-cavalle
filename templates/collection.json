@@ -44,12 +44,66 @@
             "index": "",
             "focus_y": 50
           }
+        },
+        "title_tops": {
+          "type": "title",
+          "settings": {
+            "collection": "tops",
+            "title_line_one": "The tops",
+            "title_line_two": "edit."
+          }
+        },
+        "title_jackets": {
+          "type": "title",
+          "settings": {
+            "collection": "tops-copy",
+            "title_line_one": "The jacket",
+            "title_line_two": "edit."
+          }
+        },
+        "title_tights": {
+          "type": "title",
+          "settings": {
+            "collection": "tights",
+            "title_line_one": "The tights",
+            "title_line_two": "edit."
+          }
+        },
+        "title_base_layers": {
+          "type": "title",
+          "settings": {
+            "collection": "base-layers",
+            "title_line_one": "The base layer",
+            "title_line_two": "edit."
+          }
+        },
+        "title_kids": {
+          "type": "title",
+          "settings": {
+            "collection": "kids",
+            "title_line_one": "The young rider",
+            "title_line_two": "edit."
+          }
+        },
+        "title_accessories": {
+          "type": "title",
+          "settings": {
+            "collection": "accessories",
+            "title_line_one": "Caps &",
+            "title_line_two": "accessories."
+          }
         }
       },
       "block_order": [
         "piece_1",
         "piece_2",
-        "piece_3"
+        "piece_3",
+        "title_tops",
+        "title_jackets",
+        "title_tights",
+        "title_base_layers",
+        "title_kids",
+        "title_accessories"
       ],
       "settings": {
         "content_source": "section",

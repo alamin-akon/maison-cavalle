@@ -895,7 +895,7 @@ button.shopify-payment-button__button--unbranded {
 button.shopify-payment-button__button--unbranded:hover:not([disabled]) {
   --button-color: var(--color-primary-button-hover-text);
   --button-background-color: var(--color-primary-button-hover-background);
-  --button-border-color: var(--color-primary-button-hover-border);
+  --button-border-color: var(--color-primary-button-hover-text);
 }
 
 .button-secondary {
@@ -1179,9 +1179,9 @@ summary:hover {
 }
 
 .layout-panel-flex--column {
-  flex-flow: column var(--flex-wrap);
-  align-items: var(--horizontal-alignment);
-  justify-content: var(--vertical-alignment);
+    flex-flow: column var(--flex-wrap);
+    align-items: var(--horizontal-alignment);
+    justify-content: center;
 }
 
 @media screen and (max-width: 749px) {

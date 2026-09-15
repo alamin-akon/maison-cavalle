@@ -202,8 +202,14 @@ export class QuickAddComponent extends Component {
     this.#abortController?.abort();
     this.#abortController = new AbortController();
 
+    // The default product template renders jci-product, which has no
+    // [data-product-grid-content]; templates/product.quick-add.json carries
+    // Horizon's product-information for this modal.
+    const requestUrl = new URL(productPageUrl, window.location.origin);
+    requestUrl.searchParams.set('view', 'quick-add');
+
     try {
-      const response = await fetch(productPageUrl, {
+      const response = await fetch(requestUrl, {
         signal: this.#abortController.signal,
       });
 
