@@ -66,8 +66,8 @@
     --jci-story-frame-min: {{ s.frame_min_height }}px;
     --jci-story-film-saturate: {{ s.film_saturate | divided_by: 100.0 }};
     --jci-story-film-contrast: {{ s.film_contrast | divided_by: 100.0 }};
-    --jci-story-pad-top: {{ s.padding_top }}px;
-    --jci-story-pad-bottom: {{ s.padding_bottom }}px;
+    --jci-story-pad-top: {% render 'jci-fluid-space', max: s.padding_top, min: s.padding_top_mobile %};
+    --jci-story-pad-bottom: {% render 'jci-fluid-space', max: s.padding_bottom, min: s.padding_bottom_mobile %};
     --jci-story-pad-top-mobile: {{ s.padding_top_mobile }}px;
     --jci-story-pad-bottom-mobile: {{ s.padding_bottom_mobile }}px;
   "

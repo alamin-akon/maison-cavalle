@@ -71,8 +71,8 @@
     --jci-collection-hero-min-height: {{ s.min_height }}px;
     --jci-collection-hero-visual-height: {{ s.visual_height }}px;
     --jci-collection-hero-visual-height-mobile: {{ s.visual_height_mobile }}px;
-    --jci-collection-hero-pad-top: {{ s.padding_top }}px;
-    --jci-collection-hero-pad-bottom: {{ s.padding_bottom }}px;
+    --jci-collection-hero-pad-top: {% render 'jci-fluid-space', max: s.padding_top, min: s.padding_top_mobile %};
+    --jci-collection-hero-pad-bottom: {% render 'jci-fluid-space', max: s.padding_bottom, min: s.padding_bottom_mobile %};
     --jci-collection-hero-pad-top-mobile: {{ s.padding_top_mobile }}px;
     --jci-collection-hero-pad-bottom-mobile: {{ s.padding_bottom_mobile }}px;
     --jci-collection-hero-image-saturate: {{ s.image_saturate | divided_by: 100.0 }};

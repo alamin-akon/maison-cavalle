@@ -36,8 +36,8 @@
     --jci-product-card-zoom: {{ s.image_zoom | divided_by: 1000.0 | plus: 1 }};
     --jci-product-grid-columns: {{ s.columns }};
     --jci-product-grid-columns-tablet: {{ s.columns_tablet }};
-    --jci-product-section-pad-top: {{ s.padding_top }}px;
-    --jci-product-section-pad-bottom: {{ s.padding_bottom }}px;
+    --jci-product-section-pad-top: {% render 'jci-fluid-space', max: s.padding_top, min: s.padding_top_mobile %};
+    --jci-product-section-pad-bottom: {% render 'jci-fluid-space', max: s.padding_bottom, min: s.padding_bottom_mobile %};
     --jci-product-section-pad-top-mobile: {{ s.padding_top_mobile }}px;
     --jci-product-section-pad-bottom-mobile: {{ s.padding_bottom_mobile }}px;
     --jci-product-grid-columns-mobile: {{ s.columns_mobile }};

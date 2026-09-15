@@ -45,8 +45,8 @@
     --jci-newsletter-button-text: {{ s.button_text_color | default: settings.color_palette.foreground }};
     --jci-newsletter-button-bg-hover: {{ s.button_background_hover | default: settings.color_palette.color5 }};
     --jci-newsletter-button-text-hover: {{ s.button_text_hover | default: settings.color_palette.background }};
-    --jci-newsletter-pad-top: {{ s.padding_top }}px;
-    --jci-newsletter-pad-bottom: {{ s.padding_bottom }}px;
+    --jci-newsletter-pad-top: {% render 'jci-fluid-space', max: s.padding_top, min: s.padding_top_mobile %};
+    --jci-newsletter-pad-bottom: {% render 'jci-fluid-space', max: s.padding_bottom, min: s.padding_bottom_mobile %};
     --jci-newsletter-pad-top-mobile: {{ s.padding_top_mobile }}px;
     --jci-newsletter-pad-bottom-mobile: {{ s.padding_bottom_mobile }}px;
     --jci-newsletter-space-above: {{ s.space_above }}px;

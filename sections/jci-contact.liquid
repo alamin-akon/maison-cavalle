@@ -40,8 +40,8 @@
     --jci-contact-card-bg: {{ s.card_background | default: settings.color_palette.color3 }};
     --jci-contact-field-bg: {% if s.field_background != blank %}{{ s.field_background }}{% else %}rgb(var(--jci-ink-rgb) / 0.04){% endif %};
     --jci-contact-gap: {{ s.column_gap }}px;
-    --jci-contact-pad-top: {{ s.padding_top }}px;
-    --jci-contact-pad-bottom: {{ s.padding_bottom }}px;
+    --jci-contact-pad-top: {% render 'jci-fluid-space', max: s.padding_top, min: s.padding_top_mobile %};
+    --jci-contact-pad-bottom: {% render 'jci-fluid-space', max: s.padding_bottom, min: s.padding_bottom_mobile %};
     --jci-contact-pad-top-mobile: {{ s.padding_top_mobile }}px;
     --jci-contact-pad-bottom-mobile: {{ s.padding_bottom_mobile }}px;
   "

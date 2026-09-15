@@ -70,8 +70,8 @@
     --jci-collection-grid-text: {{ s.text_color | default: settings.color_palette.foreground }};
     --jci-collection-grid-label: {{ s.label_color | default: settings.color_palette.color5 }};
     --jci-collection-grid-selected: {{ s.selected_color | default: settings.color_palette.color5 }};
-    --jci-collection-grid-pad-top: {{ s.padding_top }}px;
-    --jci-collection-grid-pad-bottom: {{ s.padding_bottom }}px;
+    --jci-collection-grid-pad-top: {% render 'jci-fluid-space', max: s.padding_top, min: s.padding_top_mobile %};
+    --jci-collection-grid-pad-bottom: {% render 'jci-fluid-space', max: s.padding_bottom, min: s.padding_bottom_mobile %};
     --jci-collection-grid-pad-top-mobile: {{ s.padding_top_mobile }}px;
     --jci-collection-grid-pad-bottom-mobile: {{ s.padding_bottom_mobile }}px;
     --jci-collection-grid-columns: {{ s.columns }};

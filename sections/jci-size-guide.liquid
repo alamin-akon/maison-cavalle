@@ -30,8 +30,8 @@
     --jci-size-guide-bg: {{ s.background_color | default: settings.color_palette.background }};
     --jci-size-guide-card-bg: {{ s.card_background | default: settings.color_palette.color3 }};
     --jci-size-guide-row-hover: {{ s.row_hover_color | default: settings.color_palette.color3 }};
-    --jci-size-guide-pad-top: {{ s.padding_top }}px;
-    --jci-size-guide-pad-bottom: {{ s.padding_bottom }}px;
+    --jci-size-guide-pad-top: {% render 'jci-fluid-space', max: s.padding_top, min: s.padding_top_mobile %};
+    --jci-size-guide-pad-bottom: {% render 'jci-fluid-space', max: s.padding_bottom, min: s.padding_bottom_mobile %};
     --jci-size-guide-pad-top-mobile: {{ s.padding_top_mobile }}px;
     --jci-size-guide-pad-bottom-mobile: {{ s.padding_bottom_mobile }}px;
   "

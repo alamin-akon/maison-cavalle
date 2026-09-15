@@ -35,8 +35,8 @@
     --jci-contact-hero-body: {% if s.body_color != blank %}{{ s.body_color }}{% else %}rgb(var(--jci-paper-rgb) / 0.82){% endif %};
     --jci-contact-hero-frame: {{ s.frame_background | default: settings.color_palette.color1 }};
     --jci-contact-hero-min-height: {{ s.min_height }}px;
-    --jci-contact-hero-pad-top: {{ s.padding_top }}px;
-    --jci-contact-hero-pad-bottom: {{ s.padding_bottom }}px;
+    --jci-contact-hero-pad-top: {% render 'jci-fluid-space', max: s.padding_top, min: s.padding_top_mobile %};
+    --jci-contact-hero-pad-bottom: {% render 'jci-fluid-space', max: s.padding_bottom, min: s.padding_bottom_mobile %};
     --jci-contact-hero-pad-top-mobile: {{ s.padding_top_mobile }}px;
     --jci-contact-hero-pad-bottom-mobile: {{ s.padding_bottom_mobile }}px;
     --jci-contact-hero-image-ratio: {{ s.image_ratio | divided_by: 100.0 }};

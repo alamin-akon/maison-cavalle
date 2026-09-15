@@ -45,8 +45,8 @@
     --jci-best-sellers-card-eyebrow: {{ s.card_eyebrow_color | default: settings.color_palette.color5 }};
     --jci-best-sellers-card-subtitle: {{ s.card_subtitle_color }};
     --jci-best-sellers-scroll-length: {{ s.scroll_length }}vh;
-    --jci-best-sellers-pad-top: {{ s.padding_top }}px;
-    --jci-best-sellers-pad-bottom: {{ s.padding_bottom }}px;
+    --jci-best-sellers-pad-top: {% render 'jci-fluid-space', max: s.padding_top %};
+    --jci-best-sellers-pad-bottom: {% render 'jci-fluid-space', max: s.padding_bottom %};
     --jci-best-sellers-gap: clamp(2.5rem, 8vw, {{ s.column_gap }}px);
     --jci-best-sellers-card-width: {{ s.card_width }}px;
     --jci-best-sellers-card-height: {{ s.card_height }}px;

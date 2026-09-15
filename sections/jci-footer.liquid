@@ -40,8 +40,8 @@
     --jci-footer-bottom: {{ s.bottom_color }};
     --jci-footer-rule-opacity: {{ s.rule_opacity | divided_by: 100.0 }};
     --jci-footer-space-above: {{ s.space_above }}px;
-    --jci-footer-pad-top: {{ s.padding_top }}px;
-    --jci-footer-pad-bottom: {{ s.padding_bottom }}px;
+    --jci-footer-pad-top: {% render 'jci-fluid-space', max: s.padding_top %};
+    --jci-footer-pad-bottom: {% render 'jci-fluid-space', max: s.padding_bottom %};
     --jci-footer-top-gap: {{ s.top_gap }}px;
     --jci-footer-top-space: {{ s.top_space }}px;
     --jci-footer-logo-width: {{ s.logo_width }}px;

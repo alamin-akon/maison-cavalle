@@ -50,8 +50,8 @@
   data-jci-product-url="{{ product.url }}"
   style="
     --jci-product-bg: {{ s.background_color | default: settings.color_palette.background }};
-    --jci-product-pad-top: {{ s.padding_top }}px;
-    --jci-product-pad-bottom: {{ s.padding_bottom }}px;
+    --jci-product-pad-top: {% render 'jci-fluid-space', max: s.padding_top, min: s.padding_top_mobile %};
+    --jci-product-pad-bottom: {% render 'jci-fluid-space', max: s.padding_bottom, min: s.padding_bottom_mobile %};
     --jci-product-pad-top-mobile: {{ s.padding_top_mobile }}px;
     --jci-product-pad-bottom-mobile: {{ s.padding_bottom_mobile }}px;
   "

@@ -35,8 +35,8 @@
     --jci-home-faq-side-text-rgb: {{ s.side_text_color.rgb | default: settings.color_palette.background.rgb }};
     --jci-home-faq-side-eyebrow: {{ s.side_eyebrow_color }};
     --jci-home-faq-side-body: {{ s.side_body_color }};
-    --jci-home-faq-pad-top: {{ s.padding_top }}px;
-    --jci-home-faq-pad-bottom: {{ s.padding_bottom }}px;
+    --jci-home-faq-pad-top: {% render 'jci-fluid-space', max: s.padding_top, min: s.padding_top_mobile %};
+    --jci-home-faq-pad-bottom: {% render 'jci-fluid-space', max: s.padding_bottom, min: s.padding_bottom_mobile %};
     --jci-home-faq-pad-top-mobile: {{ s.padding_top_mobile }}px;
     --jci-home-faq-pad-bottom-mobile: {{ s.padding_bottom_mobile }}px;
     --jci-home-faq-head-gap: clamp({{ s.head_gap | times: 0.25 | round }}px, 8vw, {{ s.head_gap }}px);

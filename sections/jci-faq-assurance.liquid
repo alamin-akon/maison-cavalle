@@ -37,8 +37,8 @@
     --jci-faq-assurance-card-min-height: {{ s.card_min_height }}px;
     --jci-faq-assurance-card-min-height-mobile: {{ s.card_min_height_mobile }}px;
     --jci-faq-assurance-lift: {{ s.hover_lift }}px;
-    --jci-faq-assurance-pad-top: {{ s.padding_top }}px;
-    --jci-faq-assurance-pad-bottom: {{ s.padding_bottom }}px;
+    --jci-faq-assurance-pad-top: {% render 'jci-fluid-space', max: s.padding_top, min: s.padding_top_mobile %};
+    --jci-faq-assurance-pad-bottom: {% render 'jci-fluid-space', max: s.padding_bottom, min: s.padding_bottom_mobile %};
     --jci-faq-assurance-pad-top-mobile: {{ s.padding_top_mobile }}px;
     --jci-faq-assurance-pad-bottom-mobile: {{ s.padding_bottom_mobile }}px;
   "

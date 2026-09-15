@@ -33,8 +33,8 @@
     --jci-collection-note-bg: {{ s.background_color | default: settings.color_palette.color5 }};
     --jci-collection-note-text: {{ s.text_color | default: settings.color_palette.background }};
     --jci-collection-note-accent: {% if s.accent_color != blank %}{{ s.accent_color }}{% else %}color-mix(in srgb, var(--jci-hero-accent), var(--jci-paper) 30%){% endif %};
-    --jci-collection-note-pad-top: {{ s.padding_top }}px;
-    --jci-collection-note-pad-bottom: {{ s.padding_bottom }}px;
+    --jci-collection-note-pad-top: {% render 'jci-fluid-space', max: s.padding_top, min: s.padding_top_mobile %};
+    --jci-collection-note-pad-bottom: {% render 'jci-fluid-space', max: s.padding_bottom, min: s.padding_bottom_mobile %};
     --jci-collection-note-pad-top-mobile: {{ s.padding_top_mobile }}px;
     --jci-collection-note-pad-bottom-mobile: {{ s.padding_bottom_mobile }}px;
   "

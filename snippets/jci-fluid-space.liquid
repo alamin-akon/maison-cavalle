@@ -1,0 +1,35 @@
+{% doc %}
+  Outputs a length that eases from a section's mobile spacing to its desktop
+  spacing as the screen widens, instead of jumping between the two at 680px.
+
+  The value is the mobile number at 680px and below, the desktop number from
+  1600px (the content max width) up, and a straight line in between. The 680px
+  rules in each section still apply the mobile setting outright.
+
+  When a section has no mobile setting, the mobile number is derived from the
+  desktop one at the shared 136 → 72 ratio.
+
+  Reference: MAISON-CAVALLE-SPEC.md §5
+
+  @param {number} max - Desktop spacing in px
+  @param {number} [min] - Mobile spacing in px
+
+  @example
+  --jci-faq-pad-top: {% render 'jci-fluid-space', max: s.padding_top, min: s.padding_top_mobile %};
+{% enddoc %}
+
+{%- liquid
+  assign space_max = max | default: 0 | times: 1
+  if min == blank
+    assign space_min = space_max | times: 72 | divided_by: 136.0 | round
+  else
+    assign space_min = min | times: 1
+  endif
+
+  if space_min >= space_max
+    echo space_max | append: 'px'
+  else
+    assign space_range = space_max | minus: space_min
+    echo 'clamp(' | append: space_min | append: 'px, calc(' | append: space_min | append: 'px + ' | append: space_range | append: ' * (100vw - 680px) / 920), ' | append: space_max | append: 'px)'
+  endif
+-%}

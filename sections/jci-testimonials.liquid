@@ -52,8 +52,8 @@
     --jci-testimonials-featured-stars: {{ s.featured_stars_color }};
     --jci-testimonials-featured-meta: {{ s.featured_meta_color }};
     --jci-testimonials-soft-bg: {{ s.soft_background }};
-    --jci-testimonials-pad-top: {{ s.padding_top }}px;
-    --jci-testimonials-pad-bottom: {{ s.padding_bottom }}px;
+    --jci-testimonials-pad-top: {% render 'jci-fluid-space', max: s.padding_top, min: s.padding_top_mobile %};
+    --jci-testimonials-pad-bottom: {% render 'jci-fluid-space', max: s.padding_bottom, min: s.padding_bottom_mobile %};
     --jci-testimonials-pad-top-mobile: {{ s.padding_top_mobile }}px;
     --jci-testimonials-pad-bottom-mobile: {{ s.padding_bottom_mobile }}px;
     --jci-testimonials-header-gap: clamp({{ s.header_gap | times: 0.25 | round }}px, 8vw, {{ s.header_gap }}px);

@@ -23,8 +23,8 @@
     --jci-size-help-card-bg: {{ s.card_background | default: settings.color_palette.foreground }};
     --jci-size-help-text: {{ s.text_color | default: settings.color_palette.background }};
     --jci-size-help-accent: {{ s.accent_color | default: settings.color_palette.color7 }};
-    --jci-size-help-pad-top: {{ s.padding_top }}px;
-    --jci-size-help-pad-bottom: {{ s.padding_bottom }}px;
+    --jci-size-help-pad-top: {% render 'jci-fluid-space', max: s.padding_top, min: s.padding_top_mobile %};
+    --jci-size-help-pad-bottom: {% render 'jci-fluid-space', max: s.padding_bottom, min: s.padding_bottom_mobile %};
     --jci-size-help-pad-top-mobile: {{ s.padding_top_mobile }}px;
     --jci-size-help-pad-bottom-mobile: {{ s.padding_bottom_mobile }}px;
   "

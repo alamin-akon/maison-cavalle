@@ -44,8 +44,8 @@
     --jci-social-card-bg: {{ s.card_background | default: settings.color_palette.color3 }};
     --jci-social-card-label: {{ s.card_label_color | default: settings.color_palette.background }};
     --jci-social-focus: {{ s.focus_color | default: settings.color_palette.color6 }};
-    --jci-social-pad-top: {{ s.padding_top }}px;
-    --jci-social-pad-bottom: {{ s.padding_bottom }}px;
+    --jci-social-pad-top: {% render 'jci-fluid-space', max: s.padding_top, min: s.padding_top_mobile %};
+    --jci-social-pad-bottom: {% render 'jci-fluid-space', max: s.padding_bottom, min: s.padding_bottom_mobile %};
     --jci-social-pad-top-mobile: {{ s.padding_top_mobile }}px;
     --jci-social-pad-bottom-mobile: {{ s.padding_bottom_mobile }}px;
     --jci-social-intro-gap: clamp({{ s.intro_gap | times: 0.22 | round }}px, 8vw, {{ s.intro_gap }}px);

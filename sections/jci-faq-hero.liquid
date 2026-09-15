@@ -30,8 +30,8 @@
     --jci-faq-hero-body: {% if s.body_color != blank %}{{ s.body_color }}{% else %}rgb(var(--jci-paper-rgb) / 0.78){% endif %};
     --jci-faq-hero-meta: {% if s.meta_color != blank %}{{ s.meta_color }}{% else %}rgb(var(--jci-paper-rgb) / 0.64){% endif %};
     --jci-faq-hero-min-height: {{ s.min_height }}px;
-    --jci-faq-hero-pad-top: {{ s.padding_top }}px;
-    --jci-faq-hero-pad-bottom: {{ s.padding_bottom }}px;
+    --jci-faq-hero-pad-top: {% render 'jci-fluid-space', max: s.padding_top, min: s.padding_top_mobile %};
+    --jci-faq-hero-pad-bottom: {% render 'jci-fluid-space', max: s.padding_bottom, min: s.padding_bottom_mobile %};
     --jci-faq-hero-pad-top-mobile: {{ s.padding_top_mobile }}px;
     --jci-faq-hero-pad-bottom-mobile: {{ s.padding_bottom_mobile }}px;
     --jci-faq-hero-image-ratio: {{ s.image_ratio | divided_by: 100.0 }};

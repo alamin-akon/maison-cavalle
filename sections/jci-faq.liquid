@@ -51,8 +51,8 @@
     --jci-faq-card-text: {{ s.card_text_color | default: settings.color_palette.background }};
     --jci-faq-card-body: {% if s.card_body_color != blank %}{{ s.card_body_color }}{% else %}rgb(var(--jci-paper-rgb) / 0.72){% endif %};
     --jci-faq-content-max: {{ s.content_width }}px;
-    --jci-faq-pad-top: {{ s.padding_top }}px;
-    --jci-faq-pad-bottom: {{ s.padding_bottom }}px;
+    --jci-faq-pad-top: {% render 'jci-fluid-space', max: s.padding_top, min: s.padding_top_mobile %};
+    --jci-faq-pad-bottom: {% render 'jci-fluid-space', max: s.padding_bottom, min: s.padding_bottom_mobile %};
     --jci-faq-pad-top-mobile: {{ s.padding_top_mobile }}px;
     --jci-faq-pad-bottom-mobile: {{ s.padding_bottom_mobile }}px;
     --jci-faq-sticky-top: {{ s.nav_sticky_top }}px;
