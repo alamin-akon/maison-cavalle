@@ -513,6 +513,13 @@
       grid-template-columns: 1fr 1fr;
     }
 
+    /* Junip's own narrow-container layout sets the filter columns; the
+       filters stack in one column here (developer instruction). */
+    .jci-product-reviews .junip-container-xs .junip-filters-container {
+      grid-template-columns: 1fr !important;
+      padding-top: 10px;
+    }
+
     .jci-product-reviews .junip-filters-container .junip-select {
       width: 100%;
       min-width: 0;
