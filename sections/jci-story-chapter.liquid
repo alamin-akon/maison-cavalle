@@ -1,0 +1,454 @@
+{% comment %}
+  Maison Cavallé — story chapter
+
+  Prototype source: maison-cavalle-main/app.js      → renderStoryPage,
+                                                      section.story-journal-intro (chapter 01),
+                                                      section.story-chapters (chapter 03)
+                    maison-cavalle-main/styles.css  → .journal-index-head (1294-1297),
+                                                      .story-origin-copy, .story-continuing-copy (1298-1302),
+                                                      .timeline (711-714),
+                                                      @900 (1532-1549), @680 (1621-1632, 1767)
+  Reference: MAISON-CAVALLE-SPEC.md §0, §1, §3, §5, §7
+
+  One section for both text chapters of the story page. Chapter 01 is the
+  Origin layout - three columns of copy; chapter 03 is Continuing - two
+  columns and a timeline. Paragraphs and timeline steps are blocks.
+
+  The prototype's .page-content caps these at 1180px; they take the shared
+  container instead (§0).
+
+  The prototype only dresses these chapters at 900px and below: the ruled
+  head, the bordered intro, the background wash, the big chapter number and
+  the ruled timeline all live in its @900 block, and the desktop view is the
+  plain journal layout. That split is cloned as authored.
+
+  Paragraph tone replaces the prototype's :first-child and :last-child rules,
+  and the ruled last paragraph and timeline dividers use forloop state (§1).
+
+  No letter-spacing or line-height is authored (§0).
+{% endcomment %}
+
+{%- liquid
+  assign s = section.settings
+  assign paragraphs = section.blocks | where: 'type', 'paragraph'
+  assign steps = section.blocks | where: 'type', 'step'
+
+  assign layout_class = 'is-origin'
+  if s.layout == 'continuing'
+    assign layout_class = 'is-continuing'
+  endif
+-%}
+
+<section
+  class="jci-story-chapter {{ layout_class }}"
+  {% if s.anchor_id != blank %}id="{{ s.anchor_id | handleize }}"{% endif %}
+  {{ section.shopify_attributes }}
+  style="
+    --jci-story-chapter-bg: {{ s.background_color | default: settings.color_palette.color3 }};
+    --jci-story-chapter-text: {{ s.text_color | default: settings.color_palette.foreground }};
+    --jci-story-chapter-text-rgb: {{ s.text_color.rgb | default: settings.color_palette.foreground.rgb }};
+    --jci-story-chapter-accent: {{ s.accent_color | default: settings.color_palette.color5 }};
+    --jci-story-chapter-wash-angle: {% if s.layout == 'continuing' %}315deg{% else %}135deg{% endif %};
+    --jci-story-chapter-pad-top: {% render 'jci-fluid-space', max: s.padding_top, min: s.padding_top_mobile %};
+    --jci-story-chapter-pad-bottom: {% render 'jci-fluid-space', max: s.padding_bottom, min: s.padding_bottom_mobile %};
+    --jci-story-chapter-pad-top-mobile: {{ s.padding_top_mobile }}px;
+    --jci-story-chapter-pad-bottom-mobile: {{ s.padding_bottom_mobile }}px;
+  "
+  {% if s.number != blank %}data-jci-story-chapter-number="{{ s.number | escape }}"{% endif %}
+>
+  <div class="jci-story-chapter-container">
+    <div class="jci-story-chapter-head">
+      <div class="jci-story-chapter-headline">
+        {%- if s.eyebrow != blank -%}
+          <p class="jci-eyebrow jci-story-chapter-eyebrow">{{ s.eyebrow }}</p>
+        {%- endif -%}
+
+        {%- if s.title_line_one != blank or s.title_line_two != blank -%}
+          <h2 class="jci-story-chapter-title">
+            {{- s.title_line_one -}}
+            {%- if s.title_line_one != blank and s.title_line_two != blank -%}<br>{%- endif -%}
+            {%- if s.title_line_two != blank -%}
+              <em class="jci-story-chapter-title-accent">{{ s.title_line_two }}</em>
+            {%- endif -%}
+          </h2>
+        {%- endif -%}
+      </div>
+
+      {%- if s.intro != blank -%}
+        <p class="jci-story-chapter-intro">{{ s.intro }}</p>
+      {%- endif -%}
+    </div>
+
+    {%- if paragraphs.size > 0 -%}
+      <div class="jci-story-chapter-copy">
+        {%- for block in paragraphs -%}
+          <p
+            class="jci-story-chapter-paragraph is-{{ block.settings.tone }}{% if forloop.last %} is-last{% endif %}"
+            {{ block.shopify_attributes }}
+          >
+            {{- block.settings.text -}}
+          </p>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+
+    {%- if steps.size > 0 -%}
+      <div class="jci-story-chapter-timeline">
+        {%- for block in steps -%}
+          <div class="jci-story-chapter-step{% if forloop.first %} is-first{% endif %}" {{ block.shopify_attributes }}>
+            {%- if block.settings.label != blank -%}
+              <span class="jci-story-chapter-step-label">{{ block.settings.label }}</span>
+            {%- endif -%}
+            {%- if block.settings.title != blank -%}
+              <h3 class="jci-story-chapter-step-title">{{ block.settings.title }}</h3>
+            {%- endif -%}
+            {%- if block.settings.text != blank -%}
+              <p class="jci-story-chapter-step-text">{{ block.settings.text }}</p>
+            {%- endif -%}
+          </div>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+
+{% stylesheet %}
+  .jci-story-chapter {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    padding-block: var(--jci-story-chapter-pad-top) var(--jci-story-chapter-pad-bottom);
+    color: var(--jci-story-chapter-text);
+    background: var(--jci-story-chapter-bg);
+  }
+
+  /* styles.css:1294-1297 */
+  .jci-story-chapter-head {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 1.1fr 0.75fr;
+    align-items: end;
+    gap: 3rem;
+    margin-bottom: 2.7rem;
+  }
+
+  .jci-story-chapter-eyebrow {
+    margin-bottom: 0.9rem;
+    color: var(--jci-story-chapter-text);
+  }
+
+  .jci-story-chapter-title {
+    margin: 0;
+    font-family: var(--jci-font-display);
+    font-size: var(--jci-section-title-size);
+    font-weight: 500;
+  }
+
+  .jci-story-chapter-title-accent {
+    color: var(--jci-story-chapter-accent);
+    font-style: italic;
+  }
+
+  /* #62665d is ink at 70% on cream. */
+  .jci-story-chapter-intro {
+    max-width: 350px;
+    margin: 0;
+    color: rgb(var(--jci-story-chapter-text-rgb) / 0.7);
+    font-family: var(--jci-font-sans);
+    font-size: var(--jci-subtitle-size);
+  }
+
+  /* styles.css:1298-1302 */
+  .jci-story-chapter-copy {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: clamp(1rem, 3vw, 3rem);
+    margin-top: 2.8rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--jci-line);
+  }
+
+  .is-continuing .jci-story-chapter-copy {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    max-width: 820px;
+    margin-top: 2.4rem;
+  }
+
+  .jci-story-chapter-paragraph {
+    max-width: 360px;
+    margin: 0;
+    color: rgb(var(--jci-story-chapter-text-rgb) / 0.7);
+    font-family: var(--jci-font-sans);
+    font-size: var(--jci-subtitle-size);
+  }
+
+  .jci-story-chapter-paragraph.is-lead {
+    color: var(--jci-story-chapter-text);
+  }
+
+  .jci-story-chapter-paragraph.is-statement {
+    color: var(--jci-story-chapter-accent);
+    font-family: var(--jci-font-display);
+    font-size: clamp(1.2rem, 2vw, 1.65rem);
+    font-weight: 500;
+  }
+
+  /* styles.css:711-714 */
+  .jci-story-chapter-timeline {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    margin-top: 4rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--jci-line);
+  }
+
+  .jci-story-chapter-step-label {
+    display: block;
+    margin-bottom: 0.9rem;
+    color: var(--jci-story-chapter-accent);
+    font-family: var(--jci-font-label);
+    font-size: 14px;
+  }
+
+  .jci-story-chapter-step-title {
+    margin: 0 0 0.6rem;
+    font-family: var(--jci-font-display);
+    font-size: 23px;
+    font-weight: 400;
+  }
+
+  /* #65695f is ink at 68% on paper. */
+  .jci-story-chapter-step-text {
+    margin: 0;
+    color: rgb(var(--jci-story-chapter-text-rgb) / 0.68);
+    font-family: var(--jci-font-sans);
+    font-size: var(--jci-subtitle-size);
+  }
+
+  /* -- Breakpoints (§5 — 900 and 680 only) ------------------------------- */
+
+  /* styles.css:@900 1532-1549 — the chapter layouts proper. */
+  @media screen and (max-width: 900px) {
+    .jci-story-chapter {
+      background:
+        linear-gradient(var(--jci-story-chapter-wash-angle), rgb(var(--jci-olive-rgb) / 0.08), transparent 43%),
+        var(--jci-story-chapter-bg);
+    }
+
+    .jci-story-chapter::after {
+      content: attr(data-jci-story-chapter-number);
+      position: absolute;
+      top: 2.5rem;
+      right: var(--jci-page-pad);
+      color: rgb(var(--jci-olive-rgb) / 0.08);
+      font-family: var(--jci-font-display);
+      font-size: clamp(8rem, 19vw, 11rem);
+      font-weight: 500;
+      pointer-events: none;
+    }
+
+    .jci-story-chapter-head {
+      grid-template-columns: minmax(0, 1.08fr) minmax(260px, 0.72fr);
+      gap: clamp(2rem, 5vw, 4rem);
+      margin-bottom: 0;
+      padding-bottom: clamp(2rem, 4vw, 3rem);
+      border-bottom: 1px solid var(--jci-line);
+    }
+
+    .jci-story-chapter-intro {
+      max-width: 430px;
+      padding-left: 1.25rem;
+      border-left: 1px solid var(--jci-story-chapter-accent);
+    }
+
+    .jci-story-chapter-copy {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: clamp(2rem, 6vw, 4rem);
+      row-gap: 2rem;
+      margin-top: 0;
+      padding-top: clamp(2rem, 4vw, 3rem);
+      border-top: 0;
+    }
+
+    .jci-story-chapter-paragraph {
+      max-width: none;
+    }
+
+    .is-origin .jci-story-chapter-paragraph.is-last {
+      grid-column: 1 / -1;
+      max-width: 720px;
+      padding-top: 2rem;
+      border-top: 1px solid var(--jci-line);
+    }
+
+    .is-continuing .jci-story-chapter-copy {
+      max-width: none;
+      margin-top: 0;
+      padding: clamp(2rem, 4vw, 3rem) 0;
+    }
+
+    .is-continuing .jci-story-chapter-paragraph {
+      max-width: 460px;
+    }
+
+    .jci-story-chapter-timeline {
+      gap: 0;
+      margin-top: 0;
+      padding-top: 0;
+    }
+
+    .jci-story-chapter-step {
+      min-width: 0;
+      padding: 1.6rem clamp(1.2rem, 3vw, 2rem) 0 0;
+    }
+
+    .jci-story-chapter-step:not(.is-first) {
+      padding-left: clamp(1.2rem, 3vw, 2rem);
+      border-left: 1px solid var(--jci-line);
+    }
+  }
+
+  /* styles.css:@680 1621-1632, 1767 */
+  @media screen and (max-width: 680px) {
+    .jci-story-chapter {
+      padding-block: var(--jci-story-chapter-pad-top-mobile) var(--jci-story-chapter-pad-bottom-mobile);
+    }
+
+    .jci-story-chapter::after {
+      top: 3rem;
+      right: -0.5rem;
+      font-size: 8rem;
+    }
+
+    .jci-story-chapter-head {
+      grid-template-columns: 1fr;
+      gap: 1.75rem;
+      padding-bottom: 2rem;
+    }
+
+    .jci-story-chapter-intro {
+      max-width: 540px;
+      padding-left: 1rem;
+    }
+
+    .jci-story-chapter-copy,
+    .is-continuing .jci-story-chapter-copy {
+      grid-template-columns: 1fr;
+      gap: 1.65rem;
+      padding-top: 2rem;
+    }
+
+    .is-continuing .jci-story-chapter-copy {
+      padding-bottom: 2rem;
+    }
+
+    .is-continuing .jci-story-chapter-paragraph {
+      max-width: none;
+    }
+
+    .is-origin .jci-story-chapter-paragraph.is-last {
+      grid-column: auto;
+      max-width: none;
+      padding-top: 1.65rem;
+    }
+
+    .jci-story-chapter-timeline {
+      grid-template-columns: 1fr;
+      margin-top: 1rem;
+    }
+
+    .jci-story-chapter-step,
+    .jci-story-chapter-step:not(.is-first) {
+      padding: 1.4rem 0;
+      border-left: 0;
+      border-bottom: 1px solid var(--jci-line);
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Story chapter",
+  "tag": "div",
+  "class": "jci-story-chapter-section",
+  "max_blocks": 12,
+  "blocks": [
+    {
+      "type": "paragraph",
+      "name": "Paragraph",
+      "settings": [
+        { "type": "textarea", "id": "text", "label": "Text", "default": "Maison Cavallé is the next chapter of that story." },
+        {
+          "type": "select",
+          "id": "tone",
+          "label": "Tone",
+          "options": [
+            { "value": "body", "label": "Body" },
+            { "value": "lead", "label": "Lead — full-strength text" },
+            { "value": "statement", "label": "Statement — display face in the accent colour" }
+          ],
+          "default": "body"
+        }
+      ]
+    },
+    {
+      "type": "step",
+      "name": "Timeline step",
+      "settings": [
+        { "type": "text", "id": "label", "label": "Label", "default": "01 · Then" },
+        { "type": "text", "id": "title", "label": "Title", "default": "United Kingdom" },
+        { "type": "textarea", "id": "text", "label": "Text", "default": "A childhood among racehorses, competition and the rhythm of the stable." }
+      ]
+    }
+  ],
+  "settings": [
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Layout",
+      "options": [
+        { "value": "origin", "label": "Origin — copy in three columns" },
+        { "value": "continuing", "label": "Continuing — copy in two columns" }
+      ],
+      "default": "origin"
+    },
+
+    { "type": "header", "content": "Copy" },
+    { "type": "text", "id": "number", "label": "Chapter number", "default": "01", "info": "The large faded number at tablet width and below." },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Chapter 01 · Origin" },
+    { "type": "text", "id": "title_line_one", "label": "Title first line", "default": "More than an aesthetic." },
+    { "type": "text", "id": "title_line_two", "label": "Title second line (italic)", "default": "A way of life." },
+    { "type": "textarea", "id": "intro", "label": "Intro" },
+
+    { "type": "header", "content": "Colors", "info": "Left empty, each of these follows the theme colour palette." },
+    { "type": "color", "id": "background_color", "label": "Background" },
+    { "type": "color", "id": "text_color", "label": "Text" },
+    { "type": "color", "id": "accent_color", "label": "Accent" },
+
+    { "type": "header", "content": "Layout" },
+    { "type": "range", "id": "padding_top", "label": "Padding top", "min": 0, "max": 240, "step": 4, "unit": "px", "default": 136 },
+    { "type": "range", "id": "padding_bottom", "label": "Padding bottom", "min": 0, "max": 240, "step": 4, "unit": "px", "default": 136 },
+    { "type": "range", "id": "padding_top_mobile", "label": "Padding top on mobile", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 72 },
+    { "type": "range", "id": "padding_bottom_mobile", "label": "Padding bottom on mobile", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 72 },
+
+    { "type": "header", "content": "Anchor" },
+    { "type": "text", "id": "anchor_id", "label": "Anchor ID", "default": "story-origin" }
+  ],
+  "presets": [
+    {
+      "name": "Story chapter",
+      "blocks": [
+        { "type": "paragraph", "settings": { "tone": "lead", "text": "She began competing herself as a child, and the equestrian world became not simply an interest, but a way of life." } },
+        { "type": "paragraph", "settings": { "text": "That connection continued through adulthood." } },
+        { "type": "paragraph", "settings": { "text": "Today, more than fifty years after that journey began, the story continues." } }
+      ]
+    }
+  ]
+}
+{% endschema %}

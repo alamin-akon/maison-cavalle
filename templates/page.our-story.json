@@ -52,10 +52,205 @@
         "background_color": "{{ settings.color_palette.background }}",
         "padding-block-start": 40,
         "padding-block-end": 80
+      },
+      "disabled": true
+    },
+    "jci_story_hero": {
+      "type": "jci-story-hero",
+      "settings": {
+        "topline_left": "Maison Cavallé · Our story",
+        "topline_right": "Story / 03 chapters",
+        "eyebrow": "The Maison story",
+        "title_line_one": "A life shaped",
+        "title_line_two": "by horses.",
+        "intro": "More than fifty years around horses, brought into a modern wardrobe with considered design and a belief in things made well.",
+        "cta_label": "Begin the story",
+        "cta_link": "#story-origin",
+        "scroll_label": "Scroll to explore",
+        "video_asset": "jci-story-hero-film.mp4",
+        "poster_asset": "jci-lux-jacket-front-horse.webp",
+        "media_label": "Maison Cavallé story film",
+        "feature_link": "#story-origin",
+        "feature_index": "01 / 03",
+        "feature_eyebrow": "Heritage / present",
+        "feature_title": "A house shaped by horses.",
+        "feature_link_label": "Read the story",
+        "media_ratio": 106,
+        "media_ratio_mobile": 84,
+        "media_saturate": 72,
+        "media_brightness": 80,
+        "watermark_opacity": 35,
+        "enable_tilt": true,
+        "tilt_strength": 6,
+        "min_height": 560,
+        "padding_top": 76,
+        "padding_bottom": 112,
+        "padding_top_mobile": 48,
+        "padding_bottom_mobile": 72,
+        "anchor_id": "story-hero"
+      }
+    },
+    "jci_story_origin": {
+      "type": "jci-story-chapter",
+      "blocks": {
+        "paragraph_1": {
+          "type": "paragraph",
+          "settings": {
+            "text": "She began competing herself as a child, and the equestrian world became not simply an interest, but a way of life.",
+            "tone": "lead"
+          }
+        },
+        "paragraph_2": {
+          "type": "paragraph",
+          "settings": {
+            "text": "That connection continued through adulthood. Miriam married a National Hunt jockey before eventually making a new home in Australia, where horses remained an enduring part of family life.",
+            "tone": "body"
+          }
+        },
+        "paragraph_3": {
+          "type": "paragraph",
+          "settings": {
+            "text": "Today, more than fifty years after that journey began, Miriam still owns horses and remains immersed in the equestrian world. Now another generation continues the story, with her granddaughter competing successfully in Equestrian Australia show jumping at national level.",
+            "tone": "body"
+          }
+        }
+      },
+      "block_order": [
+        "paragraph_1",
+        "paragraph_2",
+        "paragraph_3"
+      ],
+      "settings": {
+        "layout": "origin",
+        "number": "01",
+        "eyebrow": "Chapter 01 · Origin",
+        "title_line_one": "More than an aesthetic.",
+        "title_line_two": "A way of life.",
+        "intro": "For founder Miriam Claire, horses have been part of life for as long as she can remember. Growing up in the United Kingdom as the daughter of a racehorse trainer, Miriam's childhood was spent surrounded by horses, racing and competition.",
+        "background_color": "",
+        "text_color": "",
+        "accent_color": "",
+        "padding_top": 136,
+        "padding_bottom": 136,
+        "padding_top_mobile": 72,
+        "padding_bottom_mobile": 72,
+        "anchor_id": "story-origin"
+      }
+    },
+    "jci_story_heritage": {
+      "type": "jci-story-heritage",
+      "settings": {
+        "video_asset": "jci-story-heritage-film.mp4",
+        "poster_asset": "jci-editorial-field-note.webp",
+        "media_label": "Horse grazing in an open field",
+        "caption_left": "Maison Cavallé",
+        "caption_right": "02 / 03",
+        "eyebrow": "Chapter 02 · The name",
+        "title": "A House of Horse.",
+        "text": "<p>It is this heritage that inspired Maison Cavallé.</p><p>MC are Miriam Claire’s own initials, while Maison Cavallé evokes the idea of a House of Horse — a home for a collection shaped by equestrian heritage, timeless style and an appreciation for exceptional quality.</p>",
+        "link_label": "Explore the collection",
+        "link": "",
+        "media_ratio": 92,
+        "grain_opacity": 12,
+        "background_color": "",
+        "text_color": "",
+        "frame_background": "",
+        "padding_top": 136,
+        "padding_bottom": 136,
+        "padding_top_mobile": 72,
+        "padding_bottom_mobile": 72,
+        "anchor_id": "story-name"
+      }
+    },
+    "jci_story_continuing": {
+      "type": "jci-story-chapter",
+      "blocks": {
+        "paragraph_1": {
+          "type": "paragraph",
+          "settings": {
+            "text": "From British racing yards to Australian stables, from one generation to the next, horses have always been there.",
+            "tone": "body"
+          }
+        },
+        "paragraph_2": {
+          "type": "paragraph",
+          "settings": {
+            "text": "Maison Cavallé is the next chapter of that story.",
+            "tone": "statement"
+          }
+        },
+        "step_1": {
+          "type": "step",
+          "settings": {
+            "label": "01 · Then",
+            "title": "United Kingdom",
+            "text": "A childhood among racehorses, competition and the rhythm of the stable."
+          }
+        },
+        "step_2": {
+          "type": "step",
+          "settings": {
+            "label": "02 · The journey",
+            "title": "A new home",
+            "text": "A life in Australia, with horses remaining at the heart of family life."
+          }
+        },
+        "step_3": {
+          "type": "step",
+          "settings": {
+            "label": "03 · Now",
+            "title": "The Maison",
+            "text": "A modern wardrobe inspired by heritage, made for the moments between."
+          }
+        }
+      },
+      "block_order": [
+        "paragraph_1",
+        "paragraph_2",
+        "step_1",
+        "step_2",
+        "step_3"
+      ],
+      "settings": {
+        "layout": "continuing",
+        "number": "03",
+        "eyebrow": "Chapter 03 · Continuing",
+        "title_line_one": "From one generation",
+        "title_line_two": "to the next.",
+        "intro": "Maison Cavallé isn't an interpretation of the equestrian lifestyle from the outside. It comes from a life lived within it.",
+        "background_color": "{{ settings.color_palette.background }}",
+        "text_color": "",
+        "accent_color": "",
+        "padding_top": 136,
+        "padding_bottom": 136,
+        "padding_top_mobile": 72,
+        "padding_bottom_mobile": 72,
+        "anchor_id": "story-continuing"
+      }
+    },
+    "jci_story_quote": {
+      "type": "jci-story-quote",
+      "settings": {
+        "quote": "“We believe in creating fewer, better pieces — clothing you reach for season after season.”",
+        "cite": "Maison Cavallé philosophy",
+        "signoff_label": "Maison Cavallé",
+        "signoff": "Equestrian by heritage. Refined by design.",
+        "background_color": "",
+        "text_color": "",
+        "padding_top": 136,
+        "padding_bottom": 136,
+        "padding_top_mobile": 72,
+        "padding_bottom_mobile": 72,
+        "anchor_id": "story-quote"
       }
     }
   },
   "order": [
+    "jci_story_hero",
+    "jci_story_origin",
+    "jci_story_heritage",
+    "jci_story_continuing",
+    "jci_story_quote",
     "main"
   ]
 }

@@ -1,0 +1,154 @@
+{% comment %}
+  Maison Cavallé — story quote
+
+  Prototype source: maison-cavalle-main/app.js      → renderStoryPage, section.quote-block.story-quote
+                    maison-cavalle-main/styles.css  → .quote-block (715-718), .story-signoff (1303-1304)
+  Reference: MAISON-CAVALLE-SPEC.md §0, §1, §3, §5, §7
+
+  The olive band that closes the story: a centred italic quote under a faded
+  opening mark, its attribution, and the Maison sign-off.
+
+  No letter-spacing or line-height is authored (§0).
+{% endcomment %}
+
+{%- assign s = section.settings -%}
+
+<section
+  class="jci-story-quote"
+  {% if s.anchor_id != blank %}id="{{ s.anchor_id | handleize }}"{% endif %}
+  {{ section.shopify_attributes }}
+  style="
+    --jci-story-quote-bg: {{ s.background_color | default: settings.color_palette.color5 }};
+    --jci-story-quote-text: {{ s.text_color | default: settings.color_palette.background }};
+    --jci-story-quote-text-rgb: {{ s.text_color.rgb | default: settings.color_palette.background.rgb }};
+    --jci-story-quote-pad-top: {% render 'jci-fluid-space', max: s.padding_top, min: s.padding_top_mobile %};
+    --jci-story-quote-pad-bottom: {% render 'jci-fluid-space', max: s.padding_bottom, min: s.padding_bottom_mobile %};
+    --jci-story-quote-pad-top-mobile: {{ s.padding_top_mobile }}px;
+    --jci-story-quote-pad-bottom-mobile: {{ s.padding_bottom_mobile }}px;
+  "
+>
+  <div class="jci-story-quote-container">
+    {%- if s.quote != blank -%}
+      <blockquote class="jci-story-quote-text">{{ s.quote }}</blockquote>
+    {%- endif -%}
+
+    {%- if s.cite != blank -%}
+      <cite class="jci-story-quote-cite">{{ s.cite }}</cite>
+    {%- endif -%}
+
+    {%- if s.signoff_label != blank or s.signoff != blank -%}
+      <p class="jci-story-quote-signoff">
+        {{- s.signoff_label -}}
+        {%- if s.signoff_label != blank and s.signoff != blank -%}<br>{%- endif -%}
+        {%- if s.signoff != blank -%}
+          <strong class="jci-story-quote-signoff-line">{{ s.signoff }}</strong>
+        {%- endif -%}
+      </p>
+    {%- endif -%}
+  </div>
+</section>
+
+{% stylesheet %}
+  /* styles.css:715 */
+  .jci-story-quote {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    padding-block: var(--jci-story-quote-pad-top) var(--jci-story-quote-pad-bottom);
+    color: var(--jci-story-quote-text);
+    background: var(--jci-story-quote-bg);
+    text-align: center;
+  }
+
+  /* styles.css:716 — the faded opening mark. */
+  .jci-story-quote::before {
+    content: '\201C';
+    position: absolute;
+    top: -2rem;
+    left: 50%;
+    color: rgb(var(--jci-story-quote-text-rgb) / 0.1);
+    font-family: var(--jci-font-display);
+    font-size: 250px;
+    transform: translateX(-50%);
+    pointer-events: none;
+  }
+
+  .jci-story-quote-container {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* styles.css:717 */
+  .jci-story-quote-text {
+    max-width: 800px;
+    margin: 0 auto 1.5rem;
+    font-family: var(--jci-font-display);
+    font-size: clamp(29px, 4.5vw, 58px);
+    font-style: italic;
+    font-weight: 500;
+  }
+
+  /* styles.css:718 — #c4cbb2 is paper at 75% on olive. */
+  .jci-story-quote-cite {
+    display: block;
+    color: rgb(var(--jci-story-quote-text-rgb) / 0.75);
+    font-family: var(--jci-font-label);
+    font-size: 14px;
+    font-style: normal;
+    text-transform: uppercase;
+  }
+
+  /* styles.css:1303-1304 */
+  .jci-story-quote-signoff {
+    margin: 2rem 0 0;
+    color: rgb(var(--jci-story-quote-text-rgb) / 0.75);
+    font-family: var(--jci-font-label);
+    font-size: 12px;
+    text-transform: uppercase;
+  }
+
+  .jci-story-quote-signoff-line {
+    display: inline-block;
+    margin-top: 0.5rem;
+    color: var(--jci-story-quote-text);
+    font-family: var(--jci-font-display);
+    font-size: 18px;
+    font-weight: 500;
+    text-transform: none;
+  }
+
+  @media screen and (max-width: 680px) {
+    .jci-story-quote {
+      padding-block: var(--jci-story-quote-pad-top-mobile) var(--jci-story-quote-pad-bottom-mobile);
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Story quote",
+  "tag": "div",
+  "class": "jci-story-quote-section",
+  "settings": [
+    { "type": "header", "content": "Copy" },
+    { "type": "textarea", "id": "quote", "label": "Quote", "default": "“We believe in creating fewer, better pieces — clothing you reach for season after season.”" },
+    { "type": "text", "id": "cite", "label": "Attribution", "default": "Maison Cavallé philosophy" },
+    { "type": "text", "id": "signoff_label", "label": "Sign-off label", "default": "Maison Cavallé" },
+    { "type": "text", "id": "signoff", "label": "Sign-off line", "default": "Equestrian by heritage. Refined by design." },
+
+    { "type": "header", "content": "Colors", "info": "Left empty, each of these follows the theme colour palette." },
+    { "type": "color", "id": "background_color", "label": "Background" },
+    { "type": "color", "id": "text_color", "label": "Text" },
+
+    { "type": "header", "content": "Layout" },
+    { "type": "range", "id": "padding_top", "label": "Padding top", "min": 0, "max": 240, "step": 4, "unit": "px", "default": 136 },
+    { "type": "range", "id": "padding_bottom", "label": "Padding bottom", "min": 0, "max": 240, "step": 4, "unit": "px", "default": 136 },
+    { "type": "range", "id": "padding_top_mobile", "label": "Padding top on mobile", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 72 },
+    { "type": "range", "id": "padding_bottom_mobile", "label": "Padding bottom on mobile", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 72 },
+
+    { "type": "header", "content": "Anchor" },
+    { "type": "text", "id": "anchor_id", "label": "Anchor ID", "default": "story-quote" }
+  ],
+  "presets": [{ "name": "Story quote" }]
+}
+{% endschema %}

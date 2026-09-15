@@ -1,0 +1,545 @@
+{% comment %}
+  Maison Cavallé — our story page hero
+
+  Prototype source: maison-cavalle-main/app.js      → renderStoryPage, section.journal-hero.story-journal-hero
+                    maison-cavalle-main/styles.css  → .journal-hero (1265-1291),
+                                                      @900 (1529-1531), @680 (1804-1807)
+  Reference: MAISON-CAVALLE-SPEC.md §0, §1, §3, §5, §7
+
+  The journal hero with a looping film in the feature card and a "scroll to
+  explore" note between the columns. Same shape as the contact and size guide
+  heroes, with the prototype's plain journal values (no contact overrides).
+
+  The prototype animates the scroll note's ring with `story-bob`, but never
+  declares that keyframe, so the ring sits still there - and here.
+
+  No letter-spacing or line-height is authored (§0). Colours are palette
+  entries or opacity steps (§7).
+{% endcomment %}
+
+{%- liquid
+  assign s = section.settings
+
+  assign poster_src = blank
+  if s.poster_asset != blank
+    assign poster_src = s.poster_asset | strip | asset_url
+  elsif s.poster != blank
+    assign poster_src = s.poster | image_url: width: 1400
+  elsif s.video != blank
+    assign poster_src = s.video.preview_image | image_url: width: 1400
+  endif
+
+  assign has_film = false
+  if s.video_asset != blank or s.video != blank
+    assign has_film = true
+  endif
+-%}
+
+<section
+  class="jci-story-hero"
+  {% if s.anchor_id != blank %}id="{{ s.anchor_id | handleize }}"{% endif %}
+  {{ section.shopify_attributes }}
+  style="
+    --jci-story-hero-bg: {{ s.background_color | default: settings.color_palette.foreground }};
+    --jci-story-hero-text: {{ s.text_color | default: settings.color_palette.background }};
+    --jci-story-hero-accent: {{ s.accent_color | default: settings.color_palette.color7 }};
+    --jci-story-hero-meta: {% if s.meta_color != blank %}{{ s.meta_color }}{% else %}rgb(var(--jci-paper-rgb) / 0.78){% endif %};
+    --jci-story-hero-body: {% if s.body_color != blank %}{{ s.body_color }}{% else %}rgb(var(--jci-paper-rgb) / 0.82){% endif %};
+    --jci-story-hero-frame: {{ s.frame_background | default: settings.color_palette.color1 }};
+    --jci-story-hero-min-height: {{ s.min_height }}px;
+    --jci-story-hero-pad-top: {% render 'jci-fluid-space', max: s.padding_top, min: s.padding_top_mobile %};
+    --jci-story-hero-pad-bottom: {% render 'jci-fluid-space', max: s.padding_bottom, min: s.padding_bottom_mobile %};
+    --jci-story-hero-pad-top-mobile: {{ s.padding_top_mobile }}px;
+    --jci-story-hero-pad-bottom-mobile: {{ s.padding_bottom_mobile }}px;
+    --jci-story-hero-media-ratio: {{ s.media_ratio | divided_by: 100.0 }};
+    --jci-story-hero-media-ratio-mobile: {{ s.media_ratio_mobile | divided_by: 100.0 }};
+    --jci-story-hero-media-saturate: {{ s.media_saturate | divided_by: 100.0 }};
+    --jci-story-hero-media-brightness: {{ s.media_brightness | divided_by: 100.0 }};
+    --jci-story-hero-watermark-opacity: {{ s.watermark_opacity | divided_by: 1000.0 }};
+  "
+>
+  <div class="jci-story-hero-container">
+    <div class="jci-story-hero-topline">
+      {%- if s.topline_left != blank -%}
+        <p class="jci-eyebrow jci-story-hero-topline-eyebrow">{{ s.topline_left }}</p>
+      {%- endif -%}
+      {%- if s.topline_right != blank -%}
+        <span class="jci-story-hero-topline-note">{{ s.topline_right }}</span>
+      {%- endif -%}
+    </div>
+
+    <div class="jci-story-hero-main">
+      <div class="jci-story-hero-copy">
+        {%- if s.eyebrow != blank -%}
+          <p class="jci-eyebrow jci-story-hero-eyebrow">{{ s.eyebrow }}</p>
+        {%- endif -%}
+
+        {%- if s.title_line_one != blank or s.title_line_two != blank -%}
+          <h1 class="jci-story-hero-title">
+            {{- s.title_line_one -}}
+            {%- if s.title_line_one != blank and s.title_line_two != blank -%}<br>{%- endif -%}
+            {%- if s.title_line_two != blank -%}
+              <em class="jci-story-hero-title-accent">{{ s.title_line_two }}</em>
+            {%- endif -%}
+          </h1>
+        {%- endif -%}
+
+        {%- if s.intro != blank -%}
+          <p class="jci-story-hero-text">{{ s.intro }}</p>
+        {%- endif -%}
+
+        {%- if s.cta_label != blank -%}
+          <a class="jci-text-link jci-story-hero-cta" href="{{ s.cta_link | default: '#' }}">
+            {{- s.cta_label }}
+            {%- render 'jci-action-arrow', class: 'jci-story-hero-cta-arrow' -%}
+          </a>
+        {%- endif -%}
+      </div>
+
+      {%- if s.scroll_label != blank -%}
+        <span class="jci-story-hero-scroll" aria-hidden="true">
+          {{- s.scroll_label -}}
+          <span class="jci-story-hero-scroll-ring">&darr;</span>
+        </span>
+      {%- endif -%}
+
+      {%- comment -%}
+        The tilt is the shared jci-tilt behaviour — it sets --jci-tilt-x / -y
+        here and the CSS decides what to do with them.
+      {%- endcomment -%}
+      <a
+        class="jci-story-hero-feature"
+        href="{{ s.feature_link | default: s.cta_link | default: '#' }}"
+        {% if s.enable_tilt %}data-jci-tilt{% endif %}
+        data-jci-tilt-strength="{{ s.tilt_strength }}"
+      >
+        {%- if has_film -%}
+          <video
+            class="jci-story-hero-media"
+            autoplay
+            muted
+            loop
+            playsinline
+            preload="metadata"
+            {% if poster_src != blank %}poster="{{ poster_src }}"{% endif %}
+            aria-label="{{ s.media_label | escape }}"
+          >
+            {%- comment -%}
+              A Files upload wins so the clip can exceed the 20 MB asset cap;
+              an assets/ filename is the fallback.
+            {%- endcomment -%}
+            {%- if s.video != blank -%}
+              {%- for source in s.video.sources -%}
+                {%- if source.format == 'mp4' -%}
+                  <source src="{{ source.url }}" type="{{ source.mime_type }}">
+                {%- endif -%}
+              {%- endfor -%}
+            {%- else -%}
+              <source src="{{ s.video_asset | strip | asset_url }}" type="video/mp4">
+            {%- endif -%}
+          </video>
+        {%- elsif poster_src != blank -%}
+          <img
+            class="jci-story-hero-media"
+            src="{{ poster_src }}"
+            alt="{{ s.media_label | escape }}"
+            width="1400"
+            height="1320"
+            loading="eager"
+            fetchpriority="high"
+          >
+        {%- endif -%}
+
+        {%- if s.feature_index != blank -%}
+          <span class="jci-story-hero-feature-index">{{ s.feature_index }}</span>
+        {%- endif -%}
+
+        <div class="jci-story-hero-feature-copy">
+          {%- if s.feature_eyebrow != blank -%}
+            <p class="jci-eyebrow jci-story-hero-feature-eyebrow">{{ s.feature_eyebrow }}</p>
+          {%- endif -%}
+          {%- if s.feature_title != blank -%}
+            <h2 class="jci-story-hero-feature-title">{{ s.feature_title }}</h2>
+          {%- endif -%}
+          {%- if s.feature_link_label != blank -%}
+            <span class="jci-story-hero-feature-link">
+              {{- s.feature_link_label }}
+              {%- render 'jci-action-arrow', class: 'jci-story-hero-feature-arrow' -%}
+            </span>
+          {%- endif -%}
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<script src="{{ 'jci-tilt.js' | asset_url }}" type="module"></script>
+
+{% stylesheet %}
+  /* styles.css:1265 — ink with one olive wash. */
+  .jci-story-hero {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    isolation: isolate;
+    color: var(--jci-story-hero-text);
+    background:
+      radial-gradient(circle at 84% 12%, rgb(var(--jci-olive-rgb) / 0.2), transparent 24rem),
+      var(--jci-story-hero-bg);
+  }
+
+  /* styles.css:1266 — the oversized MC watermark. */
+  .jci-story-hero::before {
+    content: 'MC';
+    position: absolute;
+    right: 2%;
+    bottom: -14%;
+    z-index: -1;
+    color: rgb(var(--jci-paper-rgb) / var(--jci-story-hero-watermark-opacity));
+    font-family: var(--jci-font-display);
+    font-size: clamp(190px, 31vw, 500px);
+    font-weight: 600;
+    pointer-events: none;
+  }
+
+  .jci-story-hero-container {
+    padding-block: var(--jci-story-hero-pad-top) var(--jci-story-hero-pad-bottom);
+  }
+
+  /* styles.css:1267-1269 */
+  .jci-story-hero-topline {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-block-end: 1.2rem;
+    border-bottom: 1px solid rgb(var(--jci-paper-rgb) / 0.16);
+    color: var(--jci-story-hero-meta);
+  }
+
+  .jci-story-hero-topline-eyebrow {
+    color: var(--jci-story-hero-meta);
+  }
+
+  .jci-story-hero-topline-note {
+    font-family: var(--jci-font-label);
+    font-size: 12px;
+    text-transform: uppercase;
+  }
+
+  /* styles.css:1270 */
+  .jci-story-hero-main {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 0.86fr) minmax(0, 1.14fr);
+    gap: clamp(3rem, 8vw, 9rem);
+    min-height: var(--jci-story-hero-min-height);
+    padding-block-start: clamp(4rem, 8vw, 7.5rem);
+  }
+
+  /* styles.css:1271-1276 */
+  .jci-story-hero-copy {
+    max-width: 590px;
+  }
+
+  .jci-story-hero-eyebrow {
+    margin-block-end: 1.5rem;
+    color: var(--jci-story-hero-meta);
+  }
+
+  /* All page heroes share the hero title size (§3). */
+  .jci-story-hero-title {
+    margin: 0 0 1.8rem;
+    font-family: var(--jci-font-display);
+    font-size: var(--jci-hero-title-size);
+    font-weight: 500;
+  }
+
+  .jci-story-hero-title-accent {
+    color: var(--jci-story-hero-accent);
+    font-style: italic;
+  }
+
+  .jci-story-hero-text {
+    max-width: 340px;
+    margin: 0 0 2.2rem;
+    color: var(--jci-story-hero-body);
+    font-family: var(--jci-font-sans);
+    font-size: var(--jci-subtitle-size);
+  }
+
+  .jci-story-hero-cta {
+    color: var(--jci-story-hero-text);
+  }
+
+  .jci-story-hero-cta-arrow {
+    width: 13px;
+    height: 13px;
+  }
+
+  /* styles.css:1277-1278 */
+  .jci-story-hero-scroll {
+    position: absolute;
+    bottom: 0.4rem;
+    left: 42%;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    color: rgb(var(--jci-paper-rgb) / 0.62);
+    font-family: var(--jci-font-label);
+    font-size: 12px;
+    text-transform: uppercase;
+  }
+
+  .jci-story-hero-scroll-ring {
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    border: 1px solid rgb(var(--jci-paper-rgb) / 0.35);
+    border-radius: 50%;
+  }
+
+  /* styles.css:1279-1284 */
+  .jci-story-hero-feature {
+    position: relative;
+    display: block;
+    width: min(100%, 700px);
+    aspect-ratio: var(--jci-story-hero-media-ratio);
+    justify-self: end;
+    overflow: hidden;
+    color: var(--jci-story-hero-text);
+    background: var(--jci-story-hero-frame);
+    box-shadow:
+      22px 25px 0 rgb(var(--jci-paper-rgb) / 0.06),
+      0 25px 60px rgb(0 0 0 / 0.25);
+    transform:
+      perspective(1200px)
+      rotateX(var(--jci-tilt-x, 0deg))
+      rotateY(var(--jci-tilt-y, 0deg))
+      translateY(var(--jci-tilt-lift, 0));
+    transform-style: preserve-3d;
+    transition:
+      transform 0.6s var(--jci-ease),
+      box-shadow 0.6s var(--jci-ease);
+  }
+
+  .jci-story-hero-feature::before {
+    content: '';
+    position: absolute;
+    inset: 13px;
+    z-index: 2;
+    border: 1px solid rgb(var(--jci-paper-rgb) / 0.35);
+    pointer-events: none;
+  }
+
+  .jci-story-hero-feature::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: linear-gradient(180deg, rgb(17 21 17 / 0.06) 35%, rgb(17 21 17 / 0.78));
+    pointer-events: none;
+  }
+
+  .jci-story-hero-media {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 52% center;
+    filter:
+      saturate(var(--jci-story-hero-media-saturate))
+      brightness(var(--jci-story-hero-media-brightness));
+    transition: transform 1s var(--jci-ease);
+  }
+
+  .jci-story-hero-feature:hover,
+  .jci-story-hero-feature:focus-visible {
+    --jci-tilt-lift: -6px;
+
+    box-shadow:
+      22px 30px 0 rgb(var(--jci-paper-rgb) / 0.06),
+      0 32px 65px rgb(0 0 0 / 0.3);
+  }
+
+  .jci-story-hero-feature:hover .jci-story-hero-media,
+  .jci-story-hero-feature:focus-visible .jci-story-hero-media {
+    transform: scale(1.045);
+  }
+
+  /* styles.css:1285-1291 */
+  .jci-story-hero-feature-index {
+    position: absolute;
+    top: 1.4rem;
+    right: 1.4rem;
+    z-index: 3;
+    color: rgb(var(--jci-paper-rgb) / 0.86);
+    font-family: var(--jci-font-label);
+    font-size: 12px;
+  }
+
+  .jci-story-hero-feature-copy {
+    position: absolute;
+    right: 1.5rem;
+    bottom: 1.5rem;
+    left: 1.5rem;
+    z-index: 3;
+  }
+
+  .jci-story-hero-feature-eyebrow {
+    margin-block-end: 0.7rem;
+    color: var(--jci-story-hero-accent);
+  }
+
+  .jci-story-hero-feature-title {
+    max-width: 380px;
+    margin: 0 0 1.2rem;
+    font-family: var(--jci-font-display);
+    font-size: clamp(26px, 3.2vw, 44px);
+    font-weight: 500;
+  }
+
+  .jci-story-hero-feature-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding-block-end: 0.35rem;
+    border-bottom: 1px solid rgb(var(--jci-paper-rgb) / 0.6);
+    color: var(--jci-story-hero-text);
+    font-family: var(--jci-font-label);
+    font-size: 12px;
+    text-transform: uppercase;
+  }
+
+  .jci-story-hero-feature-arrow {
+    width: 13px;
+    height: 13px;
+    transition: transform 0.3s var(--jci-ease);
+  }
+
+  .jci-story-hero-feature:hover .jci-story-hero-feature-arrow,
+  .jci-story-hero-feature:focus-visible .jci-story-hero-feature-arrow {
+    transform: translate(3px, -3px);
+  }
+
+  .jci-story-hero-feature:focus-visible {
+    outline: 2px solid var(--jci-rust);
+    outline-offset: 4px;
+  }
+
+  /* styles.css:@900 (1529-1531) — the columns stack, the scroll note goes. */
+  @media screen and (max-width: 900px) {
+    .jci-story-hero-main {
+      grid-template-columns: 1fr;
+      gap: 2.8rem;
+      min-height: auto;
+    }
+
+    .jci-story-hero-scroll {
+      display: none;
+    }
+
+    .jci-story-hero-feature {
+      width: min(100%, 720px);
+      justify-self: end;
+    }
+  }
+
+  /* styles.css:@680 (1804-1807) */
+  @media screen and (max-width: 680px) {
+    .jci-story-hero-container {
+      padding-block: var(--jci-story-hero-pad-top-mobile) var(--jci-story-hero-pad-bottom-mobile);
+    }
+
+    .jci-story-hero-topline {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.6rem;
+    }
+
+    .jci-story-hero-main {
+      padding-block-start: 3.5rem;
+    }
+
+    .jci-story-hero-feature {
+      aspect-ratio: var(--jci-story-hero-media-ratio-mobile);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .jci-story-hero-feature,
+    .jci-story-hero-media,
+    .jci-story-hero-feature-arrow {
+      transition: none;
+    }
+
+    .jci-story-hero-feature:hover .jci-story-hero-media {
+      transform: none;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Story hero",
+  "tag": "div",
+  "class": "jci-story-hero-section",
+  "settings": [
+    { "type": "header", "content": "Top rule" },
+    { "type": "text", "id": "topline_left", "label": "Top left", "default": "Maison Cavallé · Our story" },
+    { "type": "text", "id": "topline_right", "label": "Top right", "default": "Story / 03 chapters" },
+
+    { "type": "header", "content": "Copy" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "The Maison story" },
+    { "type": "text", "id": "title_line_one", "label": "Title first line", "default": "A life shaped" },
+    { "type": "text", "id": "title_line_two", "label": "Title second line (italic)", "default": "by horses." },
+    { "type": "textarea", "id": "intro", "label": "Intro", "default": "More than fifty years around horses, brought into a modern wardrobe with considered design and a belief in things made well." },
+    { "type": "text", "id": "cta_label", "label": "Link label", "default": "Begin the story" },
+    { "type": "url", "id": "cta_link", "label": "Link", "info": "Link to the first chapter with its anchor, e.g. #story-origin." },
+    { "type": "text", "id": "scroll_label", "label": "Scroll note", "default": "Scroll to explore", "info": "Hidden at tablet width and below." },
+
+    { "type": "header", "content": "Feature film" },
+    { "type": "video", "id": "video", "label": "Video", "info": "An upload here wins over the asset filename below, and has no 20 MB limit." },
+    { "type": "text", "id": "video_asset", "label": "Video asset filename", "default": "jci-story-hero-film.mp4", "info": "A file in assets/. Used only when no video is chosen above." },
+    { "type": "image_picker", "id": "poster", "label": "Poster image", "info": "Shown while the film loads, or on its own when there is no film." },
+    { "type": "text", "id": "poster_asset", "label": "Poster asset filename", "default": "jci-lux-jacket-front-horse.webp", "info": "A file in assets/. Wins over the poster image above." },
+    { "type": "text", "id": "media_label", "label": "Film description", "default": "Maison Cavallé story film" },
+    { "type": "url", "id": "feature_link", "label": "Link", "info": "Falls back to the copy link above." },
+    { "type": "text", "id": "feature_index", "label": "Corner index", "default": "01 / 03" },
+    { "type": "text", "id": "feature_eyebrow", "label": "Eyebrow", "default": "Heritage / present" },
+    { "type": "text", "id": "feature_title", "label": "Title", "default": "A house shaped by horses." },
+    { "type": "text", "id": "feature_link_label", "label": "Link label", "default": "Read the story" },
+
+    { "type": "header", "content": "Media treatment" },
+    { "type": "range", "id": "media_ratio", "label": "Film ratio", "min": 60, "max": 140, "step": 2, "unit": "%", "default": 106, "info": "Width over height — 106 is the prototype's 1.06." },
+    { "type": "range", "id": "media_ratio_mobile", "label": "Film ratio on mobile", "min": 60, "max": 140, "step": 2, "unit": "%", "default": 84 },
+    { "type": "range", "id": "media_saturate", "label": "Saturation", "min": 0, "max": 180, "step": 2, "unit": "%", "default": 72 },
+    { "type": "range", "id": "media_brightness", "label": "Brightness", "min": 20, "max": 150, "step": 2, "unit": "%", "default": 80 },
+    { "type": "range", "id": "watermark_opacity", "label": "Watermark strength", "min": 0, "max": 120, "step": 5, "unit": "%", "default": 35, "info": "Thousandths — 35 is the prototype's 0.035." },
+
+    { "type": "header", "content": "Motion" },
+    { "type": "checkbox", "id": "enable_tilt", "label": "Tilt the feature towards the pointer", "default": true },
+    { "type": "range", "id": "tilt_strength", "label": "Tilt strength", "min": 0, "max": 20, "step": 1, "unit": "deg", "default": 6 },
+
+    { "type": "header", "content": "Colors", "info": "Left empty, each of these follows the theme colour palette." },
+    { "type": "color", "id": "background_color", "label": "Background" },
+    { "type": "color", "id": "text_color", "label": "Text" },
+    { "type": "color", "id": "accent_color", "label": "Accent" },
+    { "type": "color", "id": "body_color", "label": "Body text" },
+    { "type": "color", "id": "meta_color", "label": "Metadata" },
+    { "type": "color", "id": "frame_background", "label": "Film frame" },
+
+    { "type": "header", "content": "Layout" },
+    { "type": "range", "id": "min_height", "label": "Minimum height", "min": 300, "max": 900, "step": 10, "unit": "px", "default": 560 },
+    { "type": "range", "id": "padding_top", "label": "Padding top", "min": 0, "max": 200, "step": 4, "unit": "px", "default": 76 },
+    { "type": "range", "id": "padding_bottom", "label": "Padding bottom", "min": 0, "max": 240, "step": 4, "unit": "px", "default": 112 },
+    { "type": "range", "id": "padding_top_mobile", "label": "Padding top on mobile", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 48 },
+    { "type": "range", "id": "padding_bottom_mobile", "label": "Padding bottom on mobile", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 72 },
+
+    { "type": "header", "content": "Anchor" },
+    { "type": "text", "id": "anchor_id", "label": "Anchor ID", "default": "story-hero" }
+  ],
+  "presets": [{ "name": "Story hero" }]
+}
+{% endschema %}

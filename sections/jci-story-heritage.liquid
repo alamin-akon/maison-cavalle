@@ -1,0 +1,368 @@
+{% comment %}
+  Maison Cavallé — story heritage
+
+  Prototype source: maison-cavalle-main/app.js      → renderStoryPage, section.heritage-grid.story-heritage
+                    maison-cavalle-main/styles.css  → .heritage-grid, .story-heritage (692-710),
+                                                      @900 (1519), @680 (1761-1766), reduced motion (1909-1910)
+  Reference: MAISON-CAVALLE-SPEC.md §0, §1, §3, §5, §7
+
+  Chapter 02: a framed film - vignette, moving grain and a caption rule - beside
+  the copy.
+
+  Three prototype values give way to the shared scale (§0): the section's
+  own thin padding becomes the shared rhythm, the 6rem heading becomes the
+  section title size, and the 18px paragraphs become the body size.
+
+  No letter-spacing or line-height is authored (§0).
+{% endcomment %}
+
+{%- liquid
+  assign s = section.settings
+
+  assign poster_src = blank
+  if s.poster_asset != blank
+    assign poster_src = s.poster_asset | strip | asset_url
+  elsif s.poster != blank
+    assign poster_src = s.poster | image_url: width: 1400
+  elsif s.video != blank
+    assign poster_src = s.video.preview_image | image_url: width: 1400
+  endif
+
+  assign has_film = false
+  if s.video_asset != blank or s.video != blank
+    assign has_film = true
+  endif
+-%}
+
+<section
+  class="jci-story-heritage"
+  {% if s.anchor_id != blank %}id="{{ s.anchor_id | handleize }}"{% endif %}
+  {{ section.shopify_attributes }}
+  style="
+    --jci-story-heritage-bg: {{ s.background_color | default: settings.color_palette.color3 }};
+    --jci-story-heritage-text: {{ s.text_color | default: settings.color_palette.foreground }};
+    --jci-story-heritage-text-rgb: {{ s.text_color.rgb | default: settings.color_palette.foreground.rgb }};
+    --jci-story-heritage-frame: {{ s.frame_background | default: settings.color_palette.color2 }};
+    --jci-story-heritage-ratio: {{ s.media_ratio | divided_by: 100.0 }};
+    --jci-story-heritage-grain: {{ s.grain_opacity | divided_by: 100.0 }};
+    --jci-story-heritage-pad-top: {% render 'jci-fluid-space', max: s.padding_top, min: s.padding_top_mobile %};
+    --jci-story-heritage-pad-bottom: {% render 'jci-fluid-space', max: s.padding_bottom, min: s.padding_bottom_mobile %};
+    --jci-story-heritage-pad-top-mobile: {{ s.padding_top_mobile }}px;
+    --jci-story-heritage-pad-bottom-mobile: {{ s.padding_bottom_mobile }}px;
+  "
+>
+  <div class="jci-story-heritage-container">
+    <div class="jci-story-heritage-media">
+      <div class="jci-story-heritage-frame">
+        {%- if has_film -%}
+          <video
+            class="jci-story-heritage-film"
+            autoplay
+            muted
+            loop
+            playsinline
+            preload="metadata"
+            {% if poster_src != blank %}poster="{{ poster_src }}"{% endif %}
+            aria-label="{{ s.media_label | escape }}"
+          >
+            {%- if s.video != blank -%}
+              {%- for source in s.video.sources -%}
+                {%- if source.format == 'mp4' -%}
+                  <source src="{{ source.url }}" type="{{ source.mime_type }}">
+                {%- endif -%}
+              {%- endfor -%}
+            {%- else -%}
+              <source src="{{ s.video_asset | strip | asset_url }}" type="video/mp4">
+            {%- endif -%}
+          </video>
+        {%- elsif poster_src != blank -%}
+          <img
+            class="jci-story-heritage-film"
+            src="{{ poster_src }}"
+            alt="{{ s.media_label | escape }}"
+            width="1400"
+            height="1520"
+            loading="lazy"
+          >
+        {%- endif -%}
+
+        <span class="jci-story-heritage-vignette" aria-hidden="true"></span>
+        <span class="jci-story-heritage-grain" aria-hidden="true"></span>
+
+        {%- if s.caption_left != blank or s.caption_right != blank -%}
+          <div class="jci-story-heritage-caption">
+            <span class="jci-story-heritage-caption-text">{{ s.caption_left }}</span>
+            <span class="jci-story-heritage-caption-text">{{ s.caption_right }}</span>
+          </div>
+        {%- endif -%}
+      </div>
+    </div>
+
+    <div class="jci-story-heritage-copy">
+      {%- if s.eyebrow != blank -%}
+        <p class="jci-eyebrow jci-story-heritage-eyebrow">{{ s.eyebrow }}</p>
+      {%- endif -%}
+
+      {%- if s.title != blank -%}
+        <h2 class="jci-story-heritage-title">{{ s.title }}</h2>
+      {%- endif -%}
+
+      {%- if s.text != blank -%}
+        <div class="jci-story-heritage-text">{{ s.text }}</div>
+      {%- endif -%}
+
+      {%- if s.link_label != blank -%}
+        <a class="jci-text-link jci-story-heritage-link" href="{{ s.link | default: routes.all_products_collection_url }}">
+          {{- s.link_label }}
+          {%- render 'jci-action-arrow', class: 'jci-story-heritage-link-arrow' -%}
+        </a>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+  /* styles.css:692-693 */
+  .jci-story-heritage {
+    display: block;
+    padding-block: var(--jci-story-heritage-pad-top) var(--jci-story-heritage-pad-bottom);
+    color: var(--jci-story-heritage-text);
+    background: var(--jci-story-heritage-bg);
+  }
+
+  .jci-story-heritage-container {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(440px, 0.74fr);
+    align-items: center;
+    gap: clamp(4rem, 7.5vw, 9.5rem);
+  }
+
+  /* styles.css:694-696 */
+  .jci-story-heritage-media {
+    position: relative;
+    min-width: 0;
+    aspect-ratio: var(--jci-story-heritage-ratio);
+    box-shadow:
+      18px 20px 0 rgb(var(--jci-story-heritage-text-rgb) / 0.08),
+      0 24px 54px rgb(var(--jci-story-heritage-text-rgb) / 0.1);
+  }
+
+  .jci-story-heritage-frame {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    isolation: isolate;
+    background: var(--jci-story-heritage-frame);
+  }
+
+  .jci-story-heritage-frame::before {
+    content: '';
+    position: absolute;
+    inset: 12px;
+    z-index: 4;
+    border: 1px solid rgb(var(--jci-paper-rgb) / 0.38);
+    pointer-events: none;
+  }
+
+  /* styles.css:698-699 */
+  .jci-story-heritage-film {
+    position: relative;
+    z-index: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    filter: sepia(0.16) saturate(0.68) contrast(1.04) brightness(0.9);
+    transform: scale(1.005);
+    transition:
+      transform 1.35s var(--jci-ease),
+      filter 0.8s var(--jci-ease);
+  }
+
+  .jci-story-heritage:hover .jci-story-heritage-film,
+  .jci-story-heritage:focus-within .jci-story-heritage-film {
+    filter: sepia(0.11) saturate(0.78) contrast(1.04) brightness(0.93);
+    transform: scale(1.035);
+  }
+
+  /* styles.css:700-702 */
+  .jci-story-heritage-vignette {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: radial-gradient(circle at 52% 48%, transparent 38%, rgb(17 21 17 / 0.34) 100%);
+    mix-blend-mode: multiply;
+    pointer-events: none;
+  }
+
+  .jci-story-heritage-grain {
+    position: absolute;
+    inset: -50%;
+    z-index: 2;
+    opacity: var(--jci-story-heritage-grain);
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.86' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.6'/%3E%3C/svg%3E");
+    pointer-events: none;
+    animation: jci-story-heritage-grain 0.7s steps(2) infinite;
+  }
+
+  @keyframes jci-story-heritage-grain {
+    0% {
+      transform: translate3d(-2%, -2%, 0);
+    }
+
+    50% {
+      transform: translate3d(2%, 1%, 0);
+    }
+
+    100% {
+      transform: translate3d(-1%, 2%, 0);
+    }
+  }
+
+  /* styles.css:703 */
+  .jci-story-heritage-caption {
+    position: absolute;
+    right: 1.3rem;
+    bottom: 1.2rem;
+    left: 1.3rem;
+    z-index: 5;
+    display: flex;
+    justify-content: space-between;
+    color: rgb(var(--jci-paper-rgb) / 0.82);
+    font-family: var(--jci-font-label);
+    font-size: 12px;
+    text-transform: uppercase;
+    pointer-events: none;
+  }
+
+  /* styles.css:704-710 */
+  .jci-story-heritage-copy {
+    max-width: 480px;
+  }
+
+  .jci-story-heritage-eyebrow {
+    margin: 0;
+    font-size: 12px;
+  }
+
+  .jci-story-heritage-title {
+    margin: 2.2rem 0 2.4rem;
+    font-family: var(--jci-font-display);
+    font-size: var(--jci-section-title-size);
+    font-weight: 500;
+  }
+
+  /* #61665b is ink at 70% on cream. */
+  .jci-story-heritage-text {
+    color: rgb(var(--jci-story-heritage-text-rgb) / 0.7);
+    font-family: var(--jci-font-sans);
+    font-size: var(--jci-subtitle-size);
+  }
+
+  .jci-story-heritage-text p {
+    margin: 0 0 1.5rem;
+  }
+
+  .jci-story-heritage-link {
+    margin-top: 0.5rem;
+  }
+
+  .jci-story-heritage-link-arrow {
+    width: 14px;
+    height: 14px;
+  }
+
+  /* -- Breakpoints (§5 — 900 and 680 only) ------------------------------- */
+
+  /* styles.css:@900 1519 */
+  @media screen and (max-width: 900px) {
+    .jci-story-heritage-container {
+      gap: 3rem;
+    }
+  }
+
+  /* styles.css:@680 1761-1766 */
+  @media screen and (max-width: 680px) {
+    .jci-story-heritage {
+      padding-block: var(--jci-story-heritage-pad-top-mobile) var(--jci-story-heritage-pad-bottom-mobile);
+    }
+
+    .jci-story-heritage-container {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 2.5rem;
+    }
+
+    .jci-story-heritage-media {
+      width: 100%;
+    }
+
+    .jci-story-heritage-title {
+      margin: 0.9rem 0 1.4rem;
+    }
+
+    .jci-story-heritage-text p {
+      margin-bottom: 1rem;
+    }
+  }
+
+  /* styles.css:1909-1910 */
+  @media (prefers-reduced-motion: reduce) {
+    .jci-story-heritage-grain {
+      animation: none;
+    }
+
+    .jci-story-heritage-film,
+    .jci-story-heritage:hover .jci-story-heritage-film {
+      transition: none;
+      transform: none;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Story heritage",
+  "tag": "div",
+  "class": "jci-story-heritage-section",
+  "settings": [
+    { "type": "header", "content": "Film" },
+    { "type": "video", "id": "video", "label": "Video", "info": "An upload here wins over the asset filename below, and has no 20 MB limit." },
+    { "type": "text", "id": "video_asset", "label": "Video asset filename", "default": "jci-story-heritage-film.mp4", "info": "A file in assets/. Used only when no video is chosen above." },
+    { "type": "image_picker", "id": "poster", "label": "Poster image", "info": "Shown while the film loads, or on its own when there is no film." },
+    { "type": "text", "id": "poster_asset", "label": "Poster asset filename", "default": "jci-editorial-field-note.webp", "info": "A file in assets/. Wins over the poster image above." },
+    { "type": "text", "id": "media_label", "label": "Film description", "default": "Horse grazing in an open field" },
+    { "type": "text", "id": "caption_left", "label": "Caption, left", "default": "Maison Cavallé" },
+    { "type": "text", "id": "caption_right", "label": "Caption, right", "default": "02 / 03" },
+
+    { "type": "header", "content": "Copy" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Chapter 02 · The name" },
+    { "type": "text", "id": "title", "label": "Title", "default": "A House of Horse." },
+    { "type": "richtext", "id": "text", "label": "Text", "default": "<p>It is this heritage that inspired Maison Cavallé.</p><p>MC are Miriam Claire’s own initials, while Maison Cavallé evokes the idea of a House of Horse — a home for a collection shaped by equestrian heritage, timeless style and an appreciation for exceptional quality.</p>" },
+    { "type": "text", "id": "link_label", "label": "Link label", "default": "Explore the collection" },
+    { "type": "url", "id": "link", "label": "Link", "info": "Left empty, it goes to all products." },
+
+    { "type": "header", "content": "Media treatment" },
+    { "type": "range", "id": "media_ratio", "label": "Film ratio", "min": 60, "max": 140, "step": 2, "unit": "%", "default": 92, "info": "Width over height — 92 is the prototype's 0.92." },
+    { "type": "range", "id": "grain_opacity", "label": "Film grain", "min": 0, "max": 40, "step": 1, "unit": "%", "default": 12 },
+
+    { "type": "header", "content": "Colors", "info": "Left empty, each of these follows the theme colour palette." },
+    { "type": "color", "id": "background_color", "label": "Background" },
+    { "type": "color", "id": "text_color", "label": "Text" },
+    { "type": "color", "id": "frame_background", "label": "Film frame" },
+
+    { "type": "header", "content": "Layout" },
+    { "type": "range", "id": "padding_top", "label": "Padding top", "min": 0, "max": 240, "step": 4, "unit": "px", "default": 136 },
+    { "type": "range", "id": "padding_bottom", "label": "Padding bottom", "min": 0, "max": 240, "step": 4, "unit": "px", "default": 136 },
+    { "type": "range", "id": "padding_top_mobile", "label": "Padding top on mobile", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 72 },
+    { "type": "range", "id": "padding_bottom_mobile", "label": "Padding bottom on mobile", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 72 },
+
+    { "type": "header", "content": "Anchor" },
+    { "type": "text", "id": "anchor_id", "label": "Anchor ID", "default": "story-name" }
+  ],
+  "presets": [{ "name": "Story heritage" }]
+}
+{% endschema %}

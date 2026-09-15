@@ -190,7 +190,7 @@
         "watermark": "MC",
         "watermark_opacity": 5.5,
         "background_width": "content",
-        "padding_top": 136,
+        "padding_top": 100,
         "padding_bottom": 136,
         "padding_top_mobile": 72,
         "padding_bottom_mobile": 72,
@@ -233,8 +233,8 @@
         "media_background": "",
         "intro_color": "#5f6259",
         "subtitle_color": "#6d7066",
-        "padding_top": 136,
-        "padding_bottom": 136,
+        "padding_top": 100,
+        "padding_bottom": 100,
         "padding_top_mobile": 72,
         "padding_bottom_mobile": 72,
         "header_gap": 40,
@@ -249,20 +249,20 @@
     "jci_editorial_banner": {
       "type": "jci-editorial-banner",
       "blocks": {
-        "slide_stable": {
+        "slide_considered": {
           "type": "slide",
           "name": "Product",
           "settings": {
             "product": "",
             "video_main_asset": "",
-            "image_main_asset": "jci-crest-cap-lifestyle.webp",
-            "image_alt_main": "Maison Cavallé Crest Cap in the stable",
+            "image_main_asset": "jci-msfd007-riding.webp",
+            "image_alt_main": "Maison Cavallé Contrast Collar Riding Polo in motion",
             "index_main": "01 / 02",
             "video_secondary_asset": "",
-            "image_secondary_asset": "jci-crest-cap-front-logo.webp",
-            "image_alt_secondary": "Maison Cavallé Crest Cap with embroidered logo",
+            "image_secondary_asset": "jci-msfd007-front.webp",
+            "image_alt_secondary": "Maison Cavallé Contrast Collar Riding Polo",
             "index_secondary": "02 / 02",
-            "note": "Stable / everyday"
+            "note": "Made / considered"
           }
         },
         "slide_motion": {
@@ -281,27 +281,27 @@
             "note": "Ease / motion"
           }
         },
-        "slide_considered": {
+        "slide_stable": {
           "type": "slide",
           "name": "Product",
           "settings": {
             "product": "",
             "video_main_asset": "",
-            "image_main_asset": "jci-msfd007-riding.webp",
-            "image_alt_main": "Maison Cavallé Contrast Collar Riding Polo in motion",
+            "image_main_asset": "jci-crest-cap-lifestyle.webp",
+            "image_alt_main": "Maison Cavallé Crest Cap in the stable",
             "index_main": "01 / 02",
             "video_secondary_asset": "",
-            "image_secondary_asset": "jci-msfd007-front.webp",
-            "image_alt_secondary": "Maison Cavallé Contrast Collar Riding Polo",
+            "image_secondary_asset": "jci-crest-cap-front-logo.webp",
+            "image_alt_secondary": "Maison Cavallé Crest Cap with embroidered logo",
             "index_secondary": "02 / 02",
-            "note": "Made / considered"
+            "note": "Stable / everyday"
           }
         }
       },
       "block_order": [
-        "slide_stable",
+        "slide_considered",
         "slide_motion",
-        "slide_considered"
+        "slide_stable"
       ],
       "settings": {
         "eyebrow": "The Maison philosophy",
@@ -343,14 +343,6 @@
     "jci_best_sellers": {
       "type": "jci-best-sellers",
       "blocks": {
-        "piece_1": {
-          "type": "piece",
-          "settings": {
-            "product": "crest-cap",
-            "category": "",
-            "badge": "The Maison edit"
-          }
-        },
         "piece_2": {
           "type": "piece",
           "settings": {
@@ -367,19 +359,27 @@
             "badge": "The Maison edit"
           }
         },
+        "piece_1": {
+          "type": "piece",
+          "settings": {
+            "product": "crest-cap",
+            "category": "",
+            "badge": "The Maison edit"
+          }
+        },
         "piece_4": {
           "type": "piece",
           "settings": {
-            "product": "pro-skin-performance-tights",
+            "product": "msfd003-womens-short-sleeve",
             "category": "",
             "badge": "The Maison edit"
           }
         }
       },
       "block_order": [
-        "piece_1",
         "piece_2",
         "piece_3",
+        "piece_1",
         "piece_4"
       ],
       "settings": {
@@ -413,8 +413,8 @@
         "card_eyebrow_color": "",
         "card_subtitle_color": "#70756a",
         "scroll_length": 260,
-        "padding_top": 112,
-        "padding_bottom": 112,
+        "padding_top": 100,
+        "padding_bottom": 100,
         "column_gap": 144,
         "watermark_opacity": 3.5,
         "stage_label": "Best selling Maison Cavallé products",
@@ -424,7 +424,6 @@
     },
     "jci_testimonials_zGWERm": {
       "type": "jci-testimonials",
-      "disabled": true,
       "blocks": {
         "quote_QwaChj": {
           "type": "quote",
@@ -507,6 +506,7 @@
         "quote_iTJ4AU",
         "quote_FekkA4"
       ],
+      "disabled": true,
       "name": "Testimonials",
       "settings": {
         "eyebrow": "The Maison / In good company",
@@ -583,8 +583,8 @@
         "featured_text_color": "",
         "card_gap": 24,
         "card_min_height": 430,
-        "padding_top": 136,
-        "padding_bottom": 136,
+        "padding_top": 132,
+        "padding_bottom": 0,
         "padding_top_mobile": 72,
         "padding_bottom_mobile": 72,
         "anchor_id": "reviews"
@@ -651,8 +651,8 @@
         "side_text_color": "",
         "side_eyebrow_color": "#e0e4d0",
         "side_body_color": "#edf0e8",
-        "padding_top": 136,
-        "padding_bottom": 136,
+        "padding_top": 100,
+        "padding_bottom": 100,
         "padding_top_mobile": 72,
         "padding_bottom_mobile": 72,
         "head_gap": 128,
@@ -807,8 +807,8 @@
         "card_gap": 9,
         "fade_width": 130,
         "intro_gap": 144,
-        "padding_top": 128,
-        "padding_bottom": 96,
+        "padding_top": 100,
+        "padding_bottom": 100,
         "padding_top_mobile": 56,
         "padding_bottom_mobile": 56,
         "anchor_id": ""
