@@ -53,6 +53,12 @@
 
   --jci-subtitle-size: 14px;
 
+  /* Product title, price and option label. One source for the product page
+     and Horizon's quick-add modal, so both read the same (§3). */
+  --jci-product-title-size: clamp(36px, 4vw, 56px);
+  --jci-product-price-size: 35px;
+  --jci-product-label-size: 14px;
+
   /* ------------------------------------------------------------------------
      Buttons (§4)
      The button font dropdown only offers body/accent, but the prototype's

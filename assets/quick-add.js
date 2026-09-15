@@ -10,6 +10,10 @@ export class QuickAddComponent extends Component {
   #abortController = null;
   /** @type {Map<string, Element>} */
   #cachedContent = new Map();
+  /** @type {Map<string, Promise<Document | null>>} */
+  #pendingPages = new Map();
+  /** @type {string | null} */
+  #pendingUrl = null;
   /** @type {AbortController} */
   #cartUpdateAbortController = new AbortController();
 
@@ -95,6 +99,7 @@ export class QuickAddComponent extends Component {
    */
   #handleCartUpdate = () => {
     this.#cachedContent.clear();
+    this.#pendingPages.clear();
   };
 
   /**
@@ -195,12 +200,33 @@ export class QuickAddComponent extends Component {
    * @param {string} productPageUrl - The URL of the product page to fetch
    * @returns {Promise<Document | null>}
    */
-  async fetchProductPage(productPageUrl) {
-    if (!productPageUrl) return null;
+  fetchProductPage(productPageUrl) {
+    if (!productPageUrl) return Promise.resolve(null);
 
+    // The card prefetches on hover; a click on the same URL reuses that
+    // request, finished or still on its way, instead of starting it over.
+    const pending = this.#pendingPages.get(productPageUrl);
+    if (pending) return pending;
+
+    const request = this.#requestProductPage(productPageUrl);
+    this.#pendingPages.set(productPageUrl, request);
+    request.then((html) => {
+      if (!html) this.#pendingPages.delete(productPageUrl);
+    }, () => this.#pendingPages.delete(productPageUrl));
+
+    return request;
+  }
+
+  /**
+   * @param {string} productPageUrl
+   * @returns {Promise<Document | null>}
+   */
+  async #requestProductPage(productPageUrl) {
     // We use this to abort the previous fetch request if it's still pending.
+    if (this.#pendingUrl) this.#pendingPages.delete(this.#pendingUrl);
     this.#abortController?.abort();
     this.#abortController = new AbortController();
+    this.#pendingUrl = productPageUrl;
 
     // The default product template renders jci-product, which has no
     // [data-product-grid-content]; templates/product.quick-add.json carries
@@ -228,7 +254,10 @@ export class QuickAddComponent extends Component {
         throw error;
       }
     } finally {
-      this.#abortController = null;
+      if (this.#pendingUrl === productPageUrl) {
+        this.#abortController = null;
+        this.#pendingUrl = null;
+      }
     }
   }
 
