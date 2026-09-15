@@ -81,16 +81,31 @@
         {% endif %}
       "
     >
-      <button
-        class="button close-button menu-drawer__close-button focus-inset"
-        type="button"
-        aria-label="{{ 'actions.close' | t }}"
-        on:click="/close"
-      >
-        <span class="svg-wrapper header-drawer-icon header-drawer-icon--close">
-          {{- 'icon-close-menu.svg' | inline_asset_content -}}
+      {%- comment -%}
+        Maison Cavalle: the prototype's mobile menu head (index.html:106-107,
+        styles.css @680 1840-1846) - a back link that closes the drawer, the
+        wordmark, and an intro row counting the top-level links. Horizon's
+        close button and its /close handler are kept; only its content changed.
+      {%- endcomment -%}
+      <div class="menu-drawer__head">
+        <button
+          class="button close-button menu-drawer__close-button focus-inset"
+          type="button"
+          aria-label="{{ 'actions.close' | t }}"
+          on:click="/close"
+        >
+          <span class="menu-drawer__close-arrow" aria-hidden="true">&larr;</span>
+          <span class="menu-drawer__close-label">{{ block_settings.drawer_back_label }}</span>
+        </button>
+        <span class="menu-drawer__brand">{{ block_settings.drawer_brand }}</span>
+      </div>
+      {%- comment -%} Empty copy settings hide their element in CSS (:empty), keeping this snippet under the Liquid complexity limit. {%- endcomment -%}
+      <div class="menu-drawer__intro">
+        <span class="menu-drawer__intro-label">{{ block_settings.drawer_intro }}</span>
+        <span class="menu-drawer__intro-count">
+          {{- linklist.links.size | prepend: '0' | slice: -2, 2 }} {{ block_settings.drawer_count_label -}}
         </span>
-      </button>
+      </div>
       <nav
         class="menu-drawer__navigation"
         style="
@@ -776,6 +791,10 @@
           </ul>
         </div>
       {% endif %}
+      <div class="menu-drawer__footer">
+        <span class="menu-drawer__footer-text">{{ block_settings.drawer_footer_start }}</span>
+        <span class="menu-drawer__footer-text">{{ block_settings.drawer_footer_end }}</span>
+      </div>
     </div>
     <div
       class="menu-drawer__backdrop"
@@ -847,12 +866,12 @@
     margin-inline-end: var(--margin-xl);
   }
 
+  /* Maison Cavalle: the head and intro now sit above the links, so the
+     desktop drawer's top offset is gone. styles.css @680 1847. */
   .menu-drawer__navigation {
-    padding: 0;
-
-    @media screen and (min-width: 750px) {
-      margin-top: var(--drawer-header-desktop-top);
-    }
+    position: relative;
+    z-index: 1;
+    padding: 0.35rem 0 0;
   }
 
   details:not(.menu-open) .header__icon--menu .header-drawer-icon--close {
@@ -873,31 +892,142 @@
     }
   }
 
-  .menu-drawer {
+  /* Maison Cavalle: the prototype's mobile menu panel - styles.css 1388-1389,
+     and @680 1746, 1838-1839. Cream ground, page gutter, 420px (full width
+     at 680px), and an "MC" watermark set behind the links. Scoped through
+     header-drawer so the cream wins over the menu block's .color-custom
+     background. */
+  header-drawer .menu-drawer {
     position: fixed;
-    transform: translateX(-100%);
+    transform: translateX(-105%);
     visibility: hidden;
     height: var(--drawer-height);
-    width: var(--drawer-width);
-    max-width: var(--drawer-max-width);
+    width: min(420px, 91vw);
+    max-width: none;
     z-index: var(--layer-menu-drawer);
     left: 0;
     top: 0;
+    isolation: isolate;
 
     /* Left-anchored drawer spans the full physical viewport (viewport-fit=cover); keep its
-       content clear of the status bar, left-side notch, and home indicator. Subtract the
-       designed menu gutter so link text aligns with the page / hamburger, not inset twice. */
-    padding: var(--safe-area-inset-top) 0 var(--safe-area-inset-bottom)
-      max(0px, calc(var(--safe-area-inset-left) - var(--drawer-padding)));
-    background-color: var(--color-background);
-    overflow: auto;
+       content clear of the status bar, left-side notch, and home indicator. */
+    padding: calc(1.5rem + var(--safe-area-inset-top)) var(--jci-page-pad)
+      calc(1.5rem + var(--safe-area-inset-bottom)) max(var(--jci-page-pad), var(--safe-area-inset-left));
+    color: var(--jci-ink);
+    background-color: var(--jci-cream);
+    box-shadow: 0 0 40px rgb(var(--jci-ink-rgb) / 0.14);
+    overflow: hidden;
     display: flex;
     border-right: var(--style-border-drawer);
     flex-direction: column;
 
-    @media screen and (min-width: 750px) {
-      width: 25rem;
+    @media screen and (max-width: 680px) {
+      width: 100%;
     }
+  }
+
+  .menu-drawer::before {
+    content: 'MC';
+    position: absolute;
+    right: -0.08em;
+    bottom: -0.08em;
+    z-index: -1;
+    color: rgb(var(--jci-olive-rgb) / 0.13);
+    font-family: var(--jci-font-display);
+    font-size: clamp(14rem, 53vw, 25rem);
+    font-weight: 600;
+    line-height: 0.72;
+    pointer-events: none;
+  }
+
+  /* styles.css @680 1840-1844 */
+  .menu-drawer__head {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--jci-line);
+  }
+
+  .menu-drawer__head .menu-drawer__close-button.menu-drawer__close-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    width: auto;
+    height: auto;
+    padding: 0.35rem 0;
+    border: 0;
+    box-shadow: none;
+    color: var(--jci-ink);
+    background: transparent;
+    font-family: var(--jci-font-label);
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+    outline-offset: 4px;
+  }
+
+  .menu-drawer__close-arrow {
+    font-size: 16px;
+    transition: transform 0.3s var(--jci-ease);
+  }
+
+  .menu-drawer__close-button:hover .menu-drawer__close-arrow,
+  .menu-drawer__close-button:focus-visible .menu-drawer__close-arrow {
+    transform: translateX(-3px);
+  }
+
+  .menu-drawer__brand,
+  .menu-drawer__intro-label {
+    color: var(--jci-olive);
+    font-family: var(--jci-font-label);
+    font-size: 14px;
+    font-weight: 500;
+    text-transform: uppercase;
+  }
+
+  /* styles.css @680 1845-1846 */
+  .menu-drawer__intro {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: clamp(2.3rem, 10vw, 4rem);
+    padding-bottom: 0.85rem;
+    border-bottom: 1px solid var(--jci-line);
+    color: rgb(var(--jci-ink-rgb) / 0.6);
+    font-family: var(--jci-font-label);
+    font-size: 12px;
+    text-transform: uppercase;
+  }
+
+  .menu-drawer__footer:not(:has(.menu-drawer__footer-text:not(:empty))),
+  .menu-drawer__close-label:empty,
+  .menu-drawer__brand:empty {
+    display: none;
+  }
+
+  /* styles.css @680 1864 */
+  .menu-drawer__footer {
+    position: absolute;
+    right: var(--jci-page-pad);
+    bottom: calc(1.5rem + var(--safe-area-inset-bottom));
+    left: var(--jci-page-pad);
+    z-index: 1;
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-top: 0.85rem;
+    border-top: 1px solid var(--jci-line);
+    color: rgb(var(--jci-ink-rgb) / 0.58);
+    font-family: var(--jci-font-label);
+    font-size: 12px;
+    text-transform: uppercase;
   }
 
   /* When opening a submenu we don't want the first-level menu to be scrollable, so we reset the overflow  */
@@ -905,16 +1035,17 @@
     overflow: initial;
   }
 
+  /* Maison Cavalle: styles.css 1386 - an ink wash that fades over .4s. */
   .menu-drawer__backdrop {
     position: fixed;
     top: 0;
     left: 0;
     width: 100vw;
     height: 100dvh;
-    backdrop-filter: brightness(0.75);
+    background: rgb(var(--jci-ink-rgb) / 0.48);
     z-index: var(--layer-overlay);
     opacity: 0;
-    transition: opacity var(--drawer-animation-speed) ease;
+    transition: opacity 0.4s var(--jci-ease);
 
     .menu-open & {
       opacity: 1;
@@ -925,6 +1056,11 @@
   details[open] > .menu-drawer__submenu {
     transition: transform var(--drawer-animation-speed) ease, visibility var(--drawer-animation-speed) ease,
       opacity var(--drawer-animation-speed) ease;
+  }
+
+  /* Maison Cavalle: styles.css 1388 - the panel slides over .45s. */
+  .menu-drawer {
+    transition: transform 0.45s var(--jci-ease), visibility 0.45s var(--jci-ease), opacity 0.45s var(--jci-ease);
   }
 
   .menu-open > .menu-drawer,
@@ -987,7 +1123,8 @@
     --menu-drawer-inline-padding: calc(var(--padding-sm) + 7px);
 
     list-style: none;
-    padding-inline: var(--drawer-padding);
+    counter-reset: menu-drawer-link;
+    padding-inline: 0;
     margin-inline: 0;
     margin-block-start: 0;
   }
@@ -1044,7 +1181,7 @@
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    margin-block-end: var(--margin-md);
+    margin-block-end: 0;
   }
 
   .menu-drawer__menu--childlist .menu-drawer__list-item--flat {
@@ -1088,19 +1225,42 @@
     min-height: calc(2 * var(--padding-lg) + var(--icon-size-xs));
   }
 
-  .menu-drawer__menu-item--mainlist {
-    min-height: calc(2 * var(--padding-lg) + var(--icon-size-xs));
-    font-family: var(--menu-top-level-font-family);
-    font-style: var(--menu-top-level-font-style);
-    font-weight: var(--menu-top-level-font-weight);
-    font-size: var(--menu-top-level-font-size);
-    line-height: var(--menu-top-level-font-line-height);
-    text-transform: var(--menu-top-level-font-case);
-    color: var(--menu-top-level-font-color);
+  /* Maison Cavalle: styles.css @680 1848-1854 - each top-level link is a
+     numbered row in the display face. The number is a counter, as in the
+     prototype. Doubled up to outrank .menu-drawer__menu-item's centred row,
+     which is declared further down. */
+  .menu-drawer__menu-item.menu-drawer__menu-item--mainlist {
+    flex-direction: column;
+    align-items: flex-start;
     justify-content: space-between;
+    gap: 0.5rem;
+    min-height: clamp(88px, 19vw, 124px);
+    padding: 1.1rem 0.8rem 1rem 0;
+    border-bottom: 1px solid var(--jci-line);
+    counter-increment: menu-drawer-link;
+    color: var(--jci-ink);
+    font-family: var(--jci-font-display);
+    font-size: clamp(1.6rem, 6.4vw, 2.8rem);
+    font-weight: 500;
+    text-transform: none;
+    transition:
+      color 0.3s var(--jci-ease),
+      background 0.3s var(--jci-ease),
+      padding 0.3s var(--jci-ease);
 
-    &:hover {
-      color: var(--menu-top-level-font-color);
+    &::before {
+      content: counter(menu-drawer-link, decimal-leading-zero);
+      color: var(--jci-olive);
+      font-family: var(--jci-font-label);
+      font-size: 12px;
+      font-weight: 400;
+    }
+
+    &:hover,
+    &:focus-visible {
+      padding-left: 0.4rem;
+      color: var(--jci-olive);
+      background: rgb(var(--jci-olive-rgb) / 0.08);
     }
   }
 

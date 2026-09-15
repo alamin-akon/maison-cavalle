@@ -725,11 +725,17 @@
       font-size: 25px;
     }
 
+    /* Mobile keeps a minimum, not a fixed height. A phone's svh is short once
+       the browser bars are counted, and the fit card sits in the flow here,
+       so a fixed height pushed the copy up across the top line on iPhone. */
     .jci-hero {
-      height: var(--jci-hero-height-mobile);
+      height: auto;
+      min-height: var(--jci-hero-height-mobile);
     }
 
     .jci-hero-container {
+      height: auto;
+      min-height: var(--jci-hero-height-mobile);
       padding-block: 1rem 1.3rem;
     }
 

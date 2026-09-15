@@ -37,9 +37,25 @@ html {
   }
 }
 
-html[scroll-lock],
-html[scroll-lock] .page-wrapper {
+html[scroll-lock] {
   overflow: hidden;
+}
+
+/* Maison Cavalle: below 990px the page scrolls on the root, not the wrapper.
+   `overflow: hidden` here made .page-wrapper a scroll container, so the
+   sticky header stuck to the wrapper instead of the viewport and jumped back
+   to the top of the page whenever a drawer locked scrolling - taking the
+   menu drawer, which is positioned inside the header, off screen with it.
+   `clip` hides the same overflow without becoming a scroll container. */
+html[scroll-lock] .page-wrapper {
+  overflow: clip;
+}
+
+/* From 990px the wrapper is the scroller; `hidden` keeps its scroll offset. */
+@media (min-width: 990px) {
+  html[scroll-lock] .page-wrapper {
+    overflow: hidden;
+  }
 }
 
 .page-wrapper {

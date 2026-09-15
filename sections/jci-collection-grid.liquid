@@ -130,7 +130,7 @@
                 data-jci-dropdown-trigger
               >
                 <span class="jci-collection-grid-trigger-text">{{ active_label }}</span>
-                <span class="jci-collection-grid-chevron" aria-hidden="true">&#8964;</span>
+                {% render 'jci-chevron', class: 'jci-collection-grid-chevron' %}
               </button>
               <div class="jci-collection-grid-menu" id="{{ filter_menu_id }}" hidden data-jci-dropdown-menu>
                 {%- for block in filters -%}
@@ -173,7 +173,7 @@
                 data-jci-dropdown-trigger
               >
                 <span class="jci-collection-grid-trigger-text">{{ sort_label }}</span>
-                <span class="jci-collection-grid-chevron" aria-hidden="true">&#8964;</span>
+                {% render 'jci-chevron', class: 'jci-collection-grid-chevron' %}
               </button>
               <div class="jci-collection-grid-menu" id="{{ sort_menu_id }}" hidden data-jci-dropdown-menu>
                 {%- liquid
@@ -369,8 +369,20 @@
     cursor: pointer;
   }
 
+  /* One line, whatever the label: a long collection name is cut with an
+     ellipsis rather than wrapping, so the filter and sort triggers always
+     share a height. The full name is in the open menu. */
+  .jci-collection-grid-trigger-text {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
   .jci-collection-grid-chevron {
-    font-size: 16px;
+    flex: 0 0 14px;
+    width: 14px;
+    height: 14px;
     transition: transform 0.25s var(--jci-ease);
   }
 

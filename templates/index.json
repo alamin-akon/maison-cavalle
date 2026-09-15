@@ -73,7 +73,7 @@
         "fit_card_link": "",
         "content_width": 1600,
         "height": 90,
-        "height_mobile": 70,
+        "height_mobile": 100,
         "title_size_min": 4,
         "title_size_max": 9,
         "title_size_fluid": 65,
