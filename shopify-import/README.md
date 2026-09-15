@@ -1,21 +1,46 @@
-# Maison Cavallé — demo product import
+# Maison Cavallé — product import
 
-Demo catalogue for the Shopify store, built from the prototype catalogue in
-`maison-cavalle-main/app.js` so the storefront matches the mockup exactly.
+The store's product file, built from the client's packing list
+(`Packing Listing 2026.8.26.pdf`) and dressed with the mockup's product details.
 
-- **17 products** — the 15 in the mockup collection grid, plus Deluxe Grooming
-  Kit and The Groomi Horse Shedder, which the grid's category filter hides.
-- **144 variants** — `Color` × `Size`, using each colourway's own size run.
-- **93 images** — the theme's `jci-*.webp` files, collected in `images/`.
+- **7 products, 518 units** — exactly what the packing list ships, across 5
+  cartons. Colours and sizes are the packing list's; a colour packed in two
+  cartons is summed into one set of variants.
+- **Name, price, description, subtitle and photos come from the mockup**
+  (`maison-cavalle-main/app.js`), matched by comparing each packing-list photo
+  with the mockup's product photos.
+- **36 images** — the mockup photos already uploaded to Content → Files.
+
+The mockup's other products (Active Turtleneck Top, Lux Jacket, Pro-Skin and
+Kids tights, Kids / Elite / AirFlex base layers, gloves, Crest Cap, Deluxe
+Grooming Kit, Groomi Horse Shedder) are not in the packing list, so they are no
+longer in the file. Importing does not delete them from the store.
 
 ## Files
 
 | File | What it is |
 |---|---|
 | `maison-cavalle-products.csv` | The Shopify product import file. |
-| `images/` | Every image the CSV references, ready to bulk-upload. |
-| `make-products-csv.js` | Regenerates the CSV. |
+| `packing-list-data.js` | The packing list: products, colours, sizes, stock, and which mockup photo shows each colour. |
 | `catalog-data.js` | Product data lifted from the prototype's `app.js`. |
+| `make-products-csv.js` | Regenerates the CSV from the two data files. |
+
+## Missing from the mockup
+
+| Packed item | What is missing |
+|---|---|
+| **MSFD008 colour-block short sleeve** (carton 4 — white shoulders and sleeves, contrast chest panel; Navy, Light Blue, Black, White; 41 units) | The whole product. The packing list uses MSFD008 for two different shirts; the solid one matches the mockup's MSFD008, this one has no mockup product or photos. It is imported as its own product, **Colour Block Short Sleeve Show Shirt**, with written details, a $129 price and no images, as a **draft** so it stays off the storefront until photos are added. SKUs are `MSFD008-CB-…`. |
+
+These colours have no photo of their own in the mockup, so their variant image
+is the studio flat-lay that shows every colourway:
+
+| Product | Colours shown only in the studio flat-lay |
+|---|---|
+| MSFC003 Classic Long Sleeve Base Layer | Navy, Black |
+| MSFWX008 Sleeveless High Neck Riding Shirt | White, Burgundy |
+| MSFD003 Soft Collar Riding Polo | Navy Blue, White, Black |
+| MSFD008 Contour Short Sleeve Riding Top | Black, White |
+| MSFC009 Bib Front Long Sleeve Riding Top | Light Blue, Black, White |
 
 ## How to import
 
@@ -26,7 +51,7 @@ The images are already uploaded to **Content → Files** on
 https://maison-cavalle-2.myshopify.com/cdn/shop/files/jci-msfc003-front.webp
 ```
 
-All 93 URLs were checked and return `200`, so the file is ready as it is.
+All 36 URLs were checked and return `200`, so the file is ready as it is.
 
 ### 1. Create the two metafield definitions first
 
@@ -88,15 +113,14 @@ Upload `images/` to that store's Files first, so every filename resolves.
   as a fallback.
 - **Badge.** The mockup's "New" badge is a section setting, not product data —
   set *Show badge* to `always` with badge text `New`.
-- **Collections.** Products are tagged (`Base Layers`, `Tights`, `Kids`,
-  `Accessories`, `Women`, `New` …) so automated collections can be built from
+- **Collections.** Products are tagged (`Tops`, `Base Layers`, `Women`,
+  `Short Sleeve`, `Long Sleeve`, `New` …) so automated collections can be built from
   tags without touching the products again.
 
 ## Invented data
 
-The prototype supplied names, prices, subtitles, descriptions, colourways,
-size runs, images and — where the packing list existed — real stock counts.
-Everything else is written for the demo: fabric composition, feature bullets,
-care instructions, SKUs, weights, Google Shopping category, SEO title and
-description, and a flat 25-unit stock level for variants with no packing-list
-figure.
+The packing list supplied item numbers, colours, sizes and stock. The mockup
+supplied names, prices, subtitles, descriptions and photos. Everything else is
+written for the store: fabric composition, feature bullets, care instructions,
+SKUs, weights, Google Shopping category, SEO title and description — and, for
+the MSFD008 colour-block shirt, its name, price, subtitle and description too.

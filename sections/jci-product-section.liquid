@@ -35,6 +35,7 @@
     --jci-product-card-ratio: {{ s.image_ratio | divided_by: 100.0 }};
     --jci-product-card-zoom: {{ s.image_zoom | divided_by: 1000.0 | plus: 1 }};
     --jci-product-grid-columns: {{ s.columns }};
+    --jci-product-grid-columns-tablet: {{ s.columns_tablet }};
     --jci-product-section-pad-top: {{ s.padding_top }}px;
     --jci-product-section-pad-bottom: {{ s.padding_bottom }}px;
     --jci-product-section-pad-top-mobile: {{ s.padding_top_mobile }}px;
@@ -385,7 +386,16 @@
     margin-top: 3.7rem;
   }
 
-  /* -- Breakpoints (§5 — 900 and 680 only) ------------------------------- */
+  /* -- Breakpoints (§5 — 900 and 680, plus 1200 for the grid by developer
+     instruction) ------------------------------------------------------- */
+
+  /* Four cards are too narrow below 1200px, so the grid drops to the tablet
+     count until the 680px mobile count takes over. */
+  @media screen and (max-width: 1200px) {
+    .jci-product-grid {
+      grid-template-columns: repeat(var(--jci-product-grid-columns-tablet), 1fr);
+    }
+  }
 
   @media screen and (max-width: 900px) {
     .jci-product-section-header {
@@ -424,7 +434,10 @@
       transform: none;
     }
 
-    .jci-product-card-quick-add-button {
+    /* Scoped through .jci-product-card-quick-add: Horizon's
+       `.add-to-cart-button` and `.add-to-cart-text:not([hidden])` would
+       otherwise keep the button flex and the label showing (§1). */
+    .jci-product-card-quick-add .jci-product-card-quick-add-button {
       display: grid;
       place-items: center;
       width: 44px;
@@ -435,7 +448,7 @@
       background: rgb(var(--jci-product-section-bg-rgb) / 0.96);
     }
 
-    .jci-product-card-quick-add-text {
+    .jci-product-card-quick-add .jci-product-card-quick-add-button .jci-product-card-quick-add-text {
       display: none;
     }
 
@@ -492,6 +505,7 @@
     { "type": "collection", "id": "collection", "label": "Collection" },
     { "type": "range", "id": "products_to_show", "label": "Products to show", "min": 2, "max": 12, "step": 1, "default": 4 },
     { "type": "range", "id": "columns", "label": "Columns on desktop", "min": 2, "max": 5, "step": 1, "default": 4 },
+    { "type": "range", "id": "columns_tablet", "label": "Columns below 1200px", "min": 1, "max": 4, "step": 1, "default": 2 },
     { "type": "range", "id": "columns_mobile", "label": "Columns on mobile", "min": 1, "max": 3, "step": 1, "default": 2 },
     { "type": "range", "id": "image_index", "label": "Image to show", "min": 0, "max": 5, "step": 1, "default": 0, "info": "0 is the first product image." },
 

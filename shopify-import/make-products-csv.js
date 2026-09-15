@@ -1,31 +1,16 @@
 const fs = require('fs');
 const path = require('path');
 const { products } = require('./catalog-data.js');
+const { packingList } = require('./packing-list-data.js');
 
 const IMAGE_BASE = (process.argv[2] || '__IMAGE_BASE__').replace(/\/+$/, '');
 const VENDOR = 'Maison Cavallé';
 
-// Order the mockup collection grid renders them in, then the two catalogue
-// products the grid filter leaves out.
-const ORDER = [
-  'msfc003-womens-long-sleeve',
-  'msfwx008-sleeveless-shirt',
-  'msfd003-womens-short-sleeve',
-  'msfd007-womens-short-sleeve',
-  'msfd008-womens-short-sleeve',
-  'msfc009-womens-long-sleeve',
-  'active-turtleneck-top',
-  'lux-jacket',
-  'pro-skin-performance-tights',
-  'kids-performance-tights',
-  'kids-baselayer-short-sleeve',
-  'elite-baselayer-short-sleeve',
-  'airflex-baselayer-dusty-rose',
-  'girls-reinfeel-pro-gloves',
-  'crest-cap',
-  'deluxe-grooming-kit',
-  'groomi-horse-shedder',
-];
+// The packing list decides which products are imported, in its order, with
+// its colours, sizes and stock (packing-list-data.js). Everything else about a
+// product comes from the mockup (catalog-data.js) or, for the one packed item
+// the mockup does not have, from NEW_PRODUCTS below.
+const ORDER = packingList.map((entry) => entry.id);
 
 const TOPS_CAT = 'Apparel & Accessories > Clothing > Shirts & Tops';
 const DETAILS = {
@@ -59,89 +44,33 @@ const DETAILS = {
     fabric: '84% recycled polyamide, 16% elastane technical jersey.',
     features: ['Low-profile collar with a short concealed zip', 'Subtle seam lines that follow the body', 'Smooth, layer-friendly finish under a jacket', 'Four-way stretch with a dry, cool hand feel'],
   },
+  'msfd008-colour-block-short-sleeve': {
+    skuBase: 'MSFD008-CB', type: 'Short-sleeve colour-block jersey · Navy / Light Blue / Black / White',
+    gCategory: TOPS_CAT, grams: 200, tags: ['Tops', 'Women', 'Short Sleeve', 'Show Shirt', 'New'],
+    fabric: '84% recycled polyamide, 16% elastane technical jersey.',
+    features: ['White stand collar with a concealed front zip', 'Contrast chest panel framed by clean white shoulders and sleeves', 'Traditional show lines in a four-way stretch jersey', 'Breathable, quick-drying and easy to care for'],
+    status: 'draft',
+  },
   'msfc009-womens-long-sleeve': {
     skuBase: 'MSFC009', type: 'Long-sleeve contrast-panel jersey · Four colourways',
     gCategory: TOPS_CAT, grams: 240, tags: ['Base Layers', 'Women', 'Long Sleeve', 'New'],
     fabric: '82% recycled polyamide, 18% elastane jersey with a woven bib front.',
     features: ['Clean white body with a curved contrast bib front', 'High collar with a concealed snap closure', 'Traditional show lines in a modern stretch fabric', 'Set-in sleeves cut for full rein movement'],
   },
-  'active-turtleneck-top': {
-    skuBase: 'MC-ATT', type: 'Performance stretch jersey · Cocoa',
-    gCategory: TOPS_CAT, grams: 230, tags: ['Tops', 'Women', 'Long Sleeve', 'New'],
-    fabric: '85% recycled polyamide, 15% elastane stretch jersey.',
-    features: ['Softly gathered high neck', 'Close-fitting cut made for movement', 'Maison Cavallé crest embroidered at the chest', 'Smooth flat seams with no rub points'],
-  },
-  'lux-jacket': {
-    skuBase: 'MC-LXJ', type: 'Performance softshell · Powder blue',
-    gCategory: 'Apparel & Accessories > Clothing > Outerwear > Coats & Jackets', grams: 620,
-    tags: ['Jackets', 'Women', 'Outerwear', 'New'],
-    fabric: 'Bonded three-layer softshell: 92% recycled polyester, 8% elastane with a brushed inner face.',
-    features: ['High collar with a soft chin guard', 'Articulated seams shaped through the body', 'Two secure zipped hand pockets', 'Water-repellent finish and wind-resistant membrane', 'Signature Maison Cavallé branding at the chest and sleeve'],
-    care: 'Machine wash cold on a gentle cycle. Do not tumble dry, iron or dry clean. Reproof as required.',
-  },
-  'pro-skin-performance-tights': {
-    skuBase: 'MC-PST', type: 'Full-seat technical stretch · Ink',
-    gCategory: 'Apparel & Accessories > Clothing > Pants', grams: 320,
-    tags: ['Tights', 'Women', 'Full Seat', 'New'],
-    fabric: '78% recycled polyamide, 22% elastane compression stretch with a silicone full seat.',
-    features: ['Smooth high-rise waistband that stays put in the saddle', 'Full-seat silicone grip for a confident position', 'Secure side pocket sized for a phone', 'Flat, chafe-free seams and a clean ankle cuff'],
-  },
-  'kids-performance-tights': {
-    skuBase: 'MC-KPT', type: 'Full-seat technical stretch · Navy',
-    gCategory: 'Apparel & Accessories > Clothing > Pants', grams: 250,
-    tags: ['Tights', 'Kids', 'Full Seat', 'New'],
-    fabric: '78% recycled polyamide, 22% elastane stretch with a silicone full seat.',
-    features: ['Soft high-rise waistband for growing riders', 'Full-seat grip that builds a secure position', 'Practical side pocket', 'Hard-wearing fabric made for everyday lessons'],
-  },
-  'kids-baselayer-short-sleeve': {
-    skuBase: 'MC-KBL', type: 'Lightweight performance jersey · Stone',
-    gCategory: TOPS_CAT, grams: 150, tags: ['Base Layers', 'Kids', 'Short Sleeve', 'New'],
-    fabric: '86% recycled polyester, 14% elastane lightweight jersey.',
-    features: ['Neat stand collar with a short zip', 'Easy movement through the shoulders', 'Light, breathable and quick-drying', 'Soft flat seams for sensitive skin'],
-  },
-  'elite-baselayer-short-sleeve': {
-    skuBase: 'MC-EBL', type: 'Technical performance jersey · Ink',
-    gCategory: TOPS_CAT, grams: 190, tags: ['Base Layers', 'Women', 'Short Sleeve', 'New'],
-    fabric: '84% recycled polyamide, 16% elastane technical jersey.',
-    features: ['Discreet half zip with an inner storm flap', 'Close competition fit with flat seams', 'Moisture-wicking and fast-drying', 'Holds its shape wash after wash'],
-  },
-  'airflex-baselayer-dusty-rose': {
-    skuBase: 'MC-ABL', type: 'Breathable stretch jersey · Dusty Rose Pink',
-    gCategory: TOPS_CAT, grams: 185, tags: ['Base Layers', 'Women', 'Short Sleeve', 'New'],
-    fabric: '86% recycled polyamide, 14% elastane airflow-knit jersey.',
-    features: ['Neat half zip with a soft inner facing', 'Open airflow knit through the back panel', 'Smooth flat seams and a clean hem', 'Light enough for warm-up, polished enough for the day'],
-  },
-  'girls-reinfeel-pro-gloves': {
-    skuBase: 'MC-GRG', type: 'Technical mesh & rein grip · Black',
-    gCategory: 'Apparel & Accessories > Clothing Accessories > Gloves & Mittens', grams: 90,
-    tags: ['Accessories', 'Kids', 'Gloves', 'New'],
-    fabric: 'Breathable technical mesh with synthetic grip palm and silicone rein panels.',
-    features: ['Reinforced grip panels for steady rein contact', 'Breathable mesh back with four-way stretch', 'Secure hook-and-loop wrist closure', 'Touchscreen-friendly index finger'],
-    care: 'Hand wash cold and air dry flat. Do not tumble dry or iron.',
-  },
-  'crest-cap': {
-    skuBase: 'MC-CAP', type: 'Cotton twill · Ink',
-    gCategory: 'Apparel & Accessories > Clothing Accessories > Hats', grams: 140,
-    tags: ['Accessories', 'Unisex', 'Caps', 'New'],
-    fabric: '100% cotton twill with a cotton sweatband.',
-    features: ['Classic six-panel crown with brass eyelets', 'Maison Cavallé crest embroidered at the front', 'Pre-curved peak', 'Adjustable metal clasp at the back'],
-    care: 'Spot clean only. Do not machine wash, tumble dry or bleach.',
-  },
-  'deluxe-grooming-kit': {
-    skuBase: 'MC-DGK', type: 'Handcrafted brushes & accessories · Chestnut',
-    gCategory: 'Animals & Pet Supplies > Pet Supplies > Pet Grooming Supplies', grams: 2400,
-    tags: ['Accessories', 'Grooming', 'Gifting', 'New'],
-    fabric: 'Beechwood brush bodies, natural and synthetic bristle, chestnut coated-canvas bag.',
-    features: ['Body brush, dandy brush and face brush', 'Mane and tail comb with a hoof pick', 'Rubber curry comb for everyday use', 'Presented in a structured chestnut grooming bag'],
-    care: 'Rinse bristles in cool water and dry flat. Wipe the bag clean with a damp cloth.',
-  },
-  'groomi-horse-shedder': {
-    skuBase: 'MC-GHS', type: 'Textured grooming tool · Pink / Blue / Black',
-    gCategory: 'Animals & Pet Supplies > Pet Supplies > Pet Grooming Supplies', grams: 180,
-    tags: ['Grooming', 'Stable', 'New'],
-    fabric: 'Moulded polymer body with a textured shedding face.',
-    features: ['Textured face lifts loose coat in a few passes', 'Easy-grip shape for wet or gloved hands', 'Safe on the body, shoulder and hindquarter', 'Rinses clean in seconds'],
-    care: 'Rinse under running water after use and air dry.',
+};
+
+// Packed items with no mockup product. Written for the store, priced beside
+// their nearest mockup pieces (MSFD007 polo 129, MSFC009 long sleeve 159).
+const NEW_PRODUCTS = {
+  'msfd008-colour-block-short-sleeve': {
+    id: 'msfd008-colour-block-short-sleeve',
+    name: 'Colour Block Short Sleeve Show Shirt',
+    audience: 'adult',
+    price: 129,
+    subtitle: 'Short-sleeve colour-block jersey · Four colourways',
+    description: 'A crisp short-sleeve show shirt with a white stand collar, clean white shoulders and a contrast chest panel. The warm-weather companion to our bib front long sleeve, it brings a polished competition look to training days and show season alike.',
+    colours: products.find((x) => x.id === 'msfd008-womens-short-sleeve').colours,
+    images: [],
   },
 };
 
@@ -155,21 +84,6 @@ const sizeCode = (size) => (size.toLowerCase() === 'one size' ? 'OS' : size.toUp
 // Prototype PNG path -> theme asset filename, e.g.
 // assets/products/msfc003-.../msfc003-front.png -> jci-msfc003-front.webp
 const assetUrl = (protoPath) => `${IMAGE_BASE}/jci-${path.basename(protoPath, '.png')}.webp`;
-
-// "Pink · S 5 / M 5 / L 5 / XL 4" -> { Pink: { S: 5, M: 5, L: 5, XL: 4 } }
-function parseStock(lines) {
-  const map = {};
-  (lines || []).forEach((line) => {
-    const [colour, rest] = line.split('·').map((s) => s.trim());
-    if (!rest) return;
-    map[colour] = {};
-    rest.split('/').forEach((pair) => {
-      const m = pair.trim().match(/^(.+?)\s+(\d+)$/);
-      if (m) map[colour][m[1].trim()] = Number(m[2]);
-    });
-  });
-  return map;
-}
 
 function bodyHtml(product, d) {
   const features = (d.features || []).map((f) => `<li>${f}</li>`).join('');
@@ -207,34 +121,51 @@ const AGE = { adult: 'adult', kids: 'kids', all: 'adult' };
 
 const lines = [HEADERS.join(',')];
 
-ORDER.forEach((id) => {
-  const p = products.find((x) => x.id === id);
+packingList.forEach((entry) => {
+  const { id } = entry;
+  const p = NEW_PRODUCTS[id] || products.find((x) => x.id === id);
   if (!p) throw new Error(`missing product ${id}`);
   const d = DETAILS[id];
   if (!d) throw new Error(`missing details for ${id}`);
 
-  const stock = parseStock(p.stockBreakdown);
   const gallery = [...new Set(p.images.map(assetUrl))];
   const audience = p.audience || 'adult';
   const tags = [...d.tags, VENDOR].join(', ');
-  const swatches = p.colours.map((c) => `${c.name}:${c.hex}`).join(' | ');
+
+  // "front" -> the gallery photo named msfc003-front.png
+  const photo = (name) => {
+    if (!name) return '';
+    const match = p.images.find((src) => path.basename(src, '.png').endsWith(`-${name}`));
+    if (!match) throw new Error(`${id}: no mockup photo "${name}"`);
+    return assetUrl(match);
+  };
+
+  const hexOf = (colour) => {
+    const found = p.colours.find((c) => c.name === colour.mockupColour);
+    if (!found) throw new Error(`${id}: no mockup colour "${colour.mockupColour}"`);
+    return found.hex;
+  };
+  const swatches = entry.colours.map((c) => `${c.name}:${hexOf(c)}`).join(' | ');
 
   const variants = [];
-  p.colours.forEach((colour) => {
-    const sizes = colour.sizes || p.sizes;
-    sizes.forEach((size) => {
-      const qty = (stock[colour.name] && stock[colour.name][size]) ?? 25;
+  entry.colours.forEach((colour) => {
+    Object.entries(colour.stock).forEach(([size, qty]) => {
       variants.push({
         colour: colour.name,
         size,
         qty,
-        sku: sizeCode(size) === 'OS' && p.colours.length === 1
-          ? d.skuBase
-          : `${d.skuBase}-${colourCode(colour.name)}-${sizeCode(size)}`,
-        image: assetUrl(colour.image),
+        sku: `${d.skuBase}-${colourCode(colour.name)}-${sizeCode(size)}`,
+        image: photo(colour.image),
       });
     });
   });
+
+  // Shopify orders option values by first appearance in the file. Rows go
+  // size first, so the size picker always reads XS S M L XL even when the
+  // first colour is not packed in every size.
+  const SIZE_RANK = ['XS', 'S', 'M', 'L', 'XL'];
+  const colourRank = (name) => entry.colours.findIndex((c) => c.name === name);
+  variants.sort((a, b) => SIZE_RANK.indexOf(a.size) - SIZE_RANK.indexOf(b.size) || colourRank(a.colour) - colourRank(b.colour));
 
   variants.forEach((v, i) => {
     const first = i === 0;
@@ -274,7 +205,7 @@ ORDER.forEach((id) => {
       'Google Shopping / Custom Product': first ? 'FALSE' : '',
       'Variant Image': v.image,
       'Variant Weight Unit': 'g',
-      Status: first ? 'active' : '',
+      Status: first ? (d.status || 'active') : '',
       'Subtitle (product.metafields.custom.subtitle)': first ? p.subtitle : '',
       'Colour swatches (product.metafields.custom.colour_swatches)': first ? swatches : '',
     }));
@@ -292,4 +223,5 @@ ORDER.forEach((id) => {
 
 const out = process.argv[3] || 'maison-cavalle-products.csv';
 fs.writeFileSync(out, lines.join('\n') + '\n');
-console.log(`${out}: ${lines.length - 1} rows, ${ORDER.length} products`);
+const units = packingList.reduce((sum, e) => sum + e.colours.reduce((s, c) => s + Object.values(c.stock).reduce((a, b) => a + b, 0), 0), 0);
+console.log(`${out}: ${lines.length - 1} rows, ${ORDER.length} products, ${units} units`);
