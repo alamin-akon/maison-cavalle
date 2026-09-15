@@ -424,6 +424,7 @@
     },
     "jci_testimonials_zGWERm": {
       "type": "jci-testimonials",
+      "disabled": true,
       "blocks": {
         "quote_QwaChj": {
           "type": "quote",

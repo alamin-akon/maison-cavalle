@@ -9,7 +9,9 @@ The store's product file, built from the client's packing list
 - **Name, price, description, subtitle and photos come from the mockup**
   (`maison-cavalle-main/app.js`), matched by comparing each packing-list photo
   with the mockup's product photos.
-- **36 images** — the mockup photos already uploaded to Content → Files.
+- **42 image links** — 36 mockup photos already uploaded to Content → Files,
+  plus six generated primary images in `images/` that match the packing-list
+  garments exactly.
 
 The mockup's other products (Active Turtleneck Top, Lux Jacket, Pro-Skin and
 Kids tights, Kids / Elite / AirFlex base layers, gloves, Crest Cap, Deluxe
@@ -24,12 +26,13 @@ longer in the file. Importing does not delete them from the store.
 | `packing-list-data.js` | The packing list: products, colours, sizes, stock, and which mockup photo shows each colour. |
 | `catalog-data.js` | Product data lifted from the prototype's `app.js`. |
 | `make-products-csv.js` | Regenerates the CSV from the two data files. |
+| `images/` | Six generated primary product images for the packing-list styles. Upload these to Shopify Files before importing. |
 
 ## Missing from the mockup
 
 | Packed item | What is missing |
 |---|---|
-| **MSFD008 colour-block short sleeve** (carton 4 — white shoulders and sleeves, contrast chest panel; Navy, Light Blue, Black, White; 41 units) | The whole product. The packing list uses MSFD008 for two different shirts; the solid one matches the mockup's MSFD008, this one has no mockup product or photos. It is imported as its own product, **Colour Block Short Sleeve Show Shirt**, with written details, a $129 price and no images, as a **draft** so it stays off the storefront until photos are added. SKUs are `MSFD008-CB-…`. |
+| **MSFD008 colour-block short sleeve** (carton 4 — white shoulders and sleeves, contrast chest panel; Navy, Light Blue, Black, White; 41 units) | The packing list uses MSFD008 for two different shirts; the solid one matches the mockup's MSFD008, while this is its own product: **Colour Block Short Sleeve Show Shirt**. It has written details, a $129 price and a generated primary image matching the packing-list garment. SKUs are `MSFD008-CB-…`. |
 
 These colours have no photo of their own in the mockup, so their variant image
 is the studio flat-lay that shows every colourway:
@@ -44,14 +47,17 @@ is the studio flat-lay that shows every colourway:
 
 ## How to import
 
-The images are already uploaded to **Content → Files** on
-`maison-cavalle-2.myshopify.com`, and the CSV already points at them:
+The 36 mockup photos are already uploaded to **Content → Files** on
+`maison-cavalle-2.myshopify.com`. Before importing, upload the six `.webp`
+files in `images/` to the same place, without renaming them. The CSV points at
+all of those Files URLs, for example:
 
 ```
 https://maison-cavalle-2.myshopify.com/cdn/shop/files/jci-msfc003-front.webp
 ```
 
-All 36 URLs were checked and return `200`, so the file is ready as it is.
+After those six uploads, every `Image Src` and `Variant Image` URL in the CSV
+will resolve from Shopify Files.
 
 ### 1. Create the two metafield definitions first
 

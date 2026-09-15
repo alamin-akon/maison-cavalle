@@ -49,7 +49,6 @@ const DETAILS = {
     gCategory: TOPS_CAT, grams: 200, tags: ['Tops', 'Women', 'Short Sleeve', 'Show Shirt', 'New'],
     fabric: '84% recycled polyamide, 16% elastane technical jersey.',
     features: ['White stand collar with a concealed front zip', 'Contrast chest panel framed by clean white shoulders and sleeves', 'Traditional show lines in a four-way stretch jersey', 'Breathable, quick-drying and easy to care for'],
-    status: 'draft',
   },
   'msfc009-womens-long-sleeve': {
     skuBase: 'MSFC009', type: 'Long-sleeve contrast-panel jersey · Four colourways',
@@ -84,6 +83,24 @@ const sizeCode = (size) => (size.toLowerCase() === 'one size' ? 'OS' : size.toUp
 // Prototype PNG path -> theme asset filename, e.g.
 // assets/products/msfc003-.../msfc003-front.png -> jci-msfc003-front.webp
 const assetUrl = (protoPath) => `${IMAGE_BASE}/jci-${path.basename(protoPath, '.png')}.webp`;
+
+// These six product images were generated from the matching packing-list
+// photographs. They are kept in shopify-import/images/ so they can be
+// uploaded to Shopify Files before this CSV is imported. Each product gets
+// one accurate, premium primary image; the existing mockup gallery remains
+// available after it.
+const PRIMARY_IMAGE_FILENAMES = {
+  'msfc003-womens-long-sleeve': 'jci-msfc003-womens-long-sleeve.webp',
+  'msfwx008-sleeveless-shirt': 'jci-msfwx008-womens-sleeveless-shirt.webp',
+  'msfd003-womens-short-sleeve': 'jci-msfd003-womens-short-sleeve.webp',
+  'msfd008-womens-short-sleeve': 'jci-msfd008-womens-short-sleeve.webp',
+  'msfd008-colour-block-short-sleeve': 'jci-msfd008-colour-block-short-sleeve.webp',
+  'msfc009-womens-long-sleeve': 'jci-msfc009-womens-long-sleeve.webp',
+};
+const primaryImageUrl = (id) => {
+  const filename = PRIMARY_IMAGE_FILENAMES[id];
+  return filename ? `${IMAGE_BASE}/${filename}` : '';
+};
 
 function bodyHtml(product, d) {
   const features = (d.features || []).map((f) => `<li>${f}</li>`).join('');
@@ -128,7 +145,8 @@ packingList.forEach((entry) => {
   const d = DETAILS[id];
   if (!d) throw new Error(`missing details for ${id}`);
 
-  const gallery = [...new Set(p.images.map(assetUrl))];
+  const primaryImage = primaryImageUrl(id);
+  const gallery = [...new Set([primaryImage, ...p.images.map(assetUrl)].filter(Boolean))];
   const audience = p.audience || 'adult';
   const tags = [...d.tags, VENDOR].join(', ');
 
@@ -155,7 +173,9 @@ packingList.forEach((entry) => {
         size,
         qty,
         sku: `${d.skuBase}-${colourCode(colour.name)}-${sizeCode(size)}`,
-        image: photo(colour.image),
+        // The colour-block MSFD008 has no mockup gallery. Its generated
+        // primary image is therefore also its variant image.
+        image: photo(colour.image) || primaryImage,
       });
     });
   });
