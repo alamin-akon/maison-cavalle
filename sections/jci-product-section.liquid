@@ -58,7 +58,7 @@
           {%- if s.title_line_one != blank or s.title_line_two != blank -%}
             <h2 class="jci-product-section-title">
               {{- s.title_line_one -}}
-              {%- if s.title_line_one != blank and s.title_line_two != blank -%}<br>{%- endif -%}
+              {%- if s.title_line_one != blank and s.title_line_two != blank -%}{{ ' ' }}{%- endif -%}
               {%- if s.title_line_two != blank -%}
                 <em class="jci-product-section-title-accent">{{ s.title_line_two }}</em>
               {%- endif -%}
@@ -176,8 +176,8 @@
     color: var(--jci-product-section-accent);
   }
 
+  /* One line on desktop; it wraps on its own when the row runs out of room. */
   .jci-product-section-title {
-    max-width: 530px;
     margin: 0;
     color: var(--jci-product-section-heading);
     font-family: var(--jci-font-display);
@@ -525,8 +525,8 @@
   "settings": [
     { "type": "header", "content": "Header" },
     { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "The opening collection" },
-    { "type": "text", "id": "title_line_one", "label": "Title first line", "default": "Pieces to come" },
-    { "type": "text", "id": "title_line_two", "label": "Title second line (italic)", "default": "back to." },
+    { "type": "text", "id": "title_line_one", "label": "Title", "default": "Pieces to come" },
+    { "type": "text", "id": "title_line_two", "label": "Title accent (italic)", "default": "back to." },
     { "type": "textarea", "id": "intro", "label": "Intro", "default": "Fewer, better pieces — made to be worn season after season." },
 
     { "type": "header", "content": "Products" },

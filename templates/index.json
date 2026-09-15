@@ -160,7 +160,7 @@
         "signoff_name": "Maison Cavallé",
         "signoff_tagline": "Equestrian by heritage. Refined by design.",
         "link_label": "Read our story",
-        "link_url": "",
+        "link_url": "shopify://pages/our-story",
         "scroll_note": "Scroll to discover",
         "video_asset": "jci-story-film.mp4",
         "poster_asset": "jci-lux-jacket-front-horse.webp",
@@ -309,7 +309,7 @@
         "title_line_two": "moments between.",
         "body": "At the stable, at an event, or simply as part of everyday life. Quiet confidence, wherever the day takes you.",
         "cta_label": "Shop the edit",
-        "cta_url": "",
+        "cta_url": "shopify://collections/all",
         "background_color": "",
         "wash_color": "",
         "wash_opacity": 20,
@@ -392,7 +392,7 @@
         "of_label": "of",
         "progress_hint": "Scroll to browse",
         "cta_label": "Explore all pieces",
-        "cta_url": "",
+        "cta_url": "shopify://collections",
         "subtitle_metafield": "custom.subtitle",
         "card_link_label": "View the piece",
         "placeholder_title": "Choose a product",
@@ -512,7 +512,7 @@
         "heading": "Good things,",
         "heading_accent": "said well.",
         "intro": "Pieces made for the ride, the stable and every quiet moment around it.",
-        "link_label": "Read more",
+        "link_label": "",
         "link_url": "",
         "background_color": "",
         "text_color": "",
@@ -542,6 +542,56 @@
         "padding_bottom_mobile": 64,
         "anchor_id": "",
         "rating_out_of": "out of"
+      }
+    },
+    "1789463205d0bf4b3a": {
+      "type": "_blocks",
+      "blocks": {
+        "junip_junip_review_carousel_4JGEH7": {
+          "type": "shopify://apps/junip/blocks/junip-review-carousel/dc14f5a8-ed15-41b1-ad08-cfba23f9789b",
+          "settings": {
+            "reviewsType": "product_reviews",
+            "sortOrder": "mostRecent",
+            "product": "",
+            "reviewTag": "",
+            "showSummary": true,
+            "title": "Reviews",
+            "paddingTop": 48,
+            "paddingBottom": 48,
+            "containerClass": ""
+          }
+        }
+      },
+      "block_order": [
+        "junip_junip_review_carousel_4JGEH7"
+      ],
+      "settings": {
+        "content_direction": "column",
+        "vertical_on_mobile": true,
+        "horizontal_alignment": "flex-start",
+        "vertical_alignment": "center",
+        "align_baseline": false,
+        "horizontal_alignment_flex_direction_column": "flex-start",
+        "vertical_alignment_flex_direction_column": "center",
+        "gap": 12,
+        "section_width": "page-width",
+        "section_height": "",
+        "section_height_custom": 50,
+        "background_media": "none",
+        "background_color": "",
+        "video_position": "cover",
+        "background_image_position": "cover",
+        "toggle_overlay": false,
+        "overlay_color": "#00000026",
+        "overlay_style": "solid",
+        "gradient_direction": "to top",
+        "border": "none",
+        "border_width": 1,
+        "border_opacity": 100,
+        "border_color": "",
+        "border_radius": 0,
+        "padding-block-start": 0,
+        "padding-block-end": 0
       }
     },
     "jci_home_faq": {
@@ -592,7 +642,7 @@
         "side_title": "Ask the Maison.",
         "side_text": "Find thoughtful answers about fit, care, delivery and returns.",
         "side_link_label": "Visit all FAQs",
-        "side_link_url": "",
+        "side_link_url": "shopify://pages/faq",
         "side_min_height": 250,
         "side_padding": 140,
         "mark_size": 100,
@@ -815,6 +865,7 @@
     "jci_editorial_banner",
     "jci_best_sellers",
     "jci_testimonials_zGWERm",
+    "1789463205d0bf4b3a",
     "jci_home_faq",
     "jci_social_media_Pj7UYJ",
     "jci_newsletter"
