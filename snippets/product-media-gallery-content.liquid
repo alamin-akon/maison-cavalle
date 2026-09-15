@@ -1366,6 +1366,11 @@
     .product-information .media-gallery--grid .media-gallery__rail > .product-media-container {
       flex: 0 0 clamp(165px, 54vw, 220px);
       scroll-snap-align: start;
+      /* The tilt is pointer-only, but its perspective transform still makes a
+         3D layer, and iOS Safari drops 3D layers inside a scrolling rail —
+         the images went blank after a swipe. Flat inside the rail. */
+      transform: none;
+      transform-style: flat;
     }
 
     .product-information .media-gallery__rail-controls {

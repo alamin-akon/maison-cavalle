@@ -73,8 +73,8 @@
     "button_text_case_secondary": "uppercase",
     "pills_border_radius": 0,
     "cart_type": "drawer",
-    "auto_open_cart_drawer": true,
     "cart_price_font": "subheading",
+    "auto_open_cart_drawer": true,
     "show_cart_note": false,
     "show_add_discount_code": true,
     "cart_thumbnail_border_radius": 0,
@@ -116,6 +116,15 @@
     "variant_button_radius": 0,
     "variant_button_width": "equal-width-buttons",
     "content_for_index": [],
+    "blocks": {
+      "16017602894386113438": {
+        "type": "shopify://apps/junip/blocks/junip-store-key/dc14f5a8-ed15-41b1-ad08-cfba23f9789b",
+        "disabled": false,
+        "settings": {
+          "enablePreviewMode": true
+        }
+      }
+    },
     "color_palette": {
       "background": "#fbfaf7",
       "foreground": "#1e211d",
