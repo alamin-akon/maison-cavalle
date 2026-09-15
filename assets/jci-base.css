@@ -43,7 +43,7 @@
   /* Exact prototype sizes. Horizon derives its own clamp minimum from the
      next smaller configured size, and 144px is not a dropdown option, so
      both headline sizes are pinned here instead. */
-  --jci-hero-title-size: clamp(4rem, 8vw, 9rem); /* 64 → 144px */
+  --jci-hero-title-size: clamp(4rem, 6.5vw, 9rem); /* 64 → 144px */
   --jci-section-title-size: clamp(2.4rem, 5vw, 4.5rem); /* 38.4 → 72px */
   --font-size--h1: var(--jci-hero-title-size);
   --font-size--h2: var(--jci-section-title-size);

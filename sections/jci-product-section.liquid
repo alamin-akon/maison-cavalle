@@ -41,6 +41,7 @@
     --jci-product-section-pad-top-mobile: {{ s.padding_top_mobile }}px;
     --jci-product-section-pad-bottom-mobile: {{ s.padding_bottom_mobile }}px;
     --jci-product-grid-columns-mobile: {{ s.columns_mobile }};
+    --jci-product-grid-columns-small: {{ s.columns_small }};
     --jci-product-grid-gap: {{ s.grid_gap }}px;
     --jci-product-grid-row-gap-mobile: {{ s.grid_row_gap_mobile }}px;
     --jci-product-section-header-gap: {{ s.header_gap }}px;
@@ -71,8 +72,20 @@
       </div>
     {%- endif -%}
 
+    {%- liquid
+      assign grid_class = 'jci-product-grid'
+      if s.layout == 'slider'
+        assign grid_class = 'jci-product-grid jci-product-grid-slider'
+      endif
+    -%}
+
     {%- if products.size > 0 -%}
-      <div class="jci-product-grid">
+      <div
+        class="{{ grid_class }}"
+        {% if s.layout == 'slider' %}
+          role="region" aria-label="{{ s.title_line_one | append: ' ' | append: s.title_line_two | strip | default: s.eyebrow | escape }}" tabindex="0"
+        {% endif %}
+      >
         {%- assign shown = 0 -%}
         {%- for product in products -%}
           {%- liquid
@@ -109,7 +122,7 @@
         No collection chosen yet. Placeholder cards keep the grid judgeable in
         the Theme Editor rather than collapsing the section to nothing.
       {%- endcomment -%}
-      <div class="jci-product-grid">
+      <div class="{{ grid_class }}">
         {%- for i in (1..s.columns) -%}
           <article class="jci-product-card">
             <div class="jci-product-card-media">
@@ -156,9 +169,10 @@
     margin-bottom: var(--jci-product-section-header-gap);
   }
 
-  /* The prototype resets h1–h3 and p to margin 0 and adds no gap here. */
+  /* The prototype leans on its tight leading for this gap; with normal leading
+     (§0) it needs a margin, matching the other home section headers. */
   .jci-product-section-eyebrow {
-    margin-bottom: 0;
+    margin-bottom: 1rem;
     color: var(--jci-product-section-accent);
   }
 
@@ -186,10 +200,35 @@
 
   /* -- Grid -------------------------------------------------------------- */
 
+  /* The breakpoints below change only the count and the column gap, so the
+     grid and the slider layout both follow them. */
   .jci-product-grid {
+    --jci-product-grid-count: var(--jci-product-grid-columns);
+    --jci-product-grid-column-gap: var(--jci-product-grid-gap);
     display: grid;
-    grid-template-columns: repeat(var(--jci-product-grid-columns), 1fr);
-    gap: var(--jci-product-grid-gap);
+    grid-template-columns: repeat(var(--jci-product-grid-count), minmax(0, 1fr));
+    gap: var(--jci-product-grid-gap) var(--jci-product-grid-column-gap);
+  }
+
+  /* Slider layout: one row, the same number of cards in view as the grid
+     shows per row, swiped or scrolled sideways and snapping card by card. */
+  .jci-product-grid-slider {
+    grid-template-columns: none;
+    grid-auto-flow: column;
+    grid-auto-columns: calc(
+      (100% - (var(--jci-product-grid-count) - 1) * var(--jci-product-grid-column-gap)) /
+        var(--jci-product-grid-count)
+    );
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    padding-bottom: 1rem;
+    scrollbar-width: thin;
+    scrollbar-color: rgb(var(--jci-product-section-heading-rgb) / 0.3) transparent;
+  }
+
+  .jci-product-grid-slider .jci-product-card {
+    scroll-snap-align: start;
   }
 
   .jci-product-card {
@@ -393,7 +432,7 @@
      count until the 680px mobile count takes over. */
   @media screen and (max-width: 1200px) {
     .jci-product-grid {
-      grid-template-columns: repeat(var(--jci-product-grid-columns-tablet), 1fr);
+      --jci-product-grid-count: var(--jci-product-grid-columns-tablet);
     }
   }
 
@@ -403,12 +442,11 @@
       margin-bottom: 1.8rem;
     }
 
-    .jci-product-section-title {
-      margin-bottom: 1rem;
-    }
-
+    /* On the intro rather than under the title: Horizon's base.css zeroes the
+       bottom margin of a heading that is its parent's last child. */
     .jci-product-section-intro {
       max-width: none;
+      margin-top: 1rem;
     }
   }
 
@@ -418,57 +456,47 @@
     }
 
     .jci-product-grid {
-      grid-template-columns: repeat(var(--jci-product-grid-columns-mobile), 1fr);
+      --jci-product-grid-count: var(--jci-product-grid-columns-mobile);
       /* styles.css:@680 — `gap: 2.3rem .7rem`. The column gap tightens on
          mobile rather than carrying the desktop grid gap across. */
-      gap: var(--jci-product-grid-row-gap-mobile) 0.7rem;
+      --jci-product-grid-column-gap: 0.7rem;
+      row-gap: var(--jci-product-grid-row-gap-mobile);
     }
 
-    /* Hover cannot reveal the button on touch, so it sits out as a square. */
+    /* Hover cannot reveal the button on touch, so the desktop "Quick add" bar
+       stays on show at the foot of the image. No icon-only square on mobile
+       (developer instruction). */
     .jci-product-card-quick-add {
-      top: 0.6rem;
-      right: 0.6rem;
-      bottom: auto;
-      left: auto;
       opacity: 1;
       transform: none;
-    }
-
-    /* Scoped through .jci-product-card-quick-add: Horizon's
-       `.add-to-cart-button` and `.add-to-cart-text:not([hidden])` would
-       otherwise keep the button flex and the label showing (§1). */
-    .jci-product-card-quick-add .jci-product-card-quick-add-button {
-      display: grid;
-      place-items: center;
-      width: 44px;
-      height: 44px;
-      min-height: 44px;
-      padding: 0;
-      border: 1px solid var(--jci-product-section-heading);
-      background: rgb(var(--jci-product-section-bg-rgb) / 0.96);
-    }
-
-    .jci-product-card-quick-add .jci-product-card-quick-add-button .jci-product-card-quick-add-text {
-      display: none;
-    }
-
-    .jci-product-card-quick-add-icon {
-      display: block;
-      width: 19px;
-      height: 19px;
     }
 
     .jci-product-card-info {
       display: block;
     }
 
+    /* The reserved heights only line up the title and price row across a
+       desktop row. Stacked, they read as empty gaps under a one-line title
+       or subtitle. */
     .jci-product-card-title {
+      min-height: 0;
       font-size: 15px;
+    }
+
+    .jci-product-card-subtitle {
+      min-height: 0;
     }
 
     .jci-product-card-price {
       display: block;
       margin-top: 0.5rem;
+    }
+  }
+
+  /* Developer instruction: one card per row on the smallest phones. */
+  @media screen and (max-width: 430px) {
+    .jci-product-grid {
+      --jci-product-grid-count: var(--jci-product-grid-columns-small);
     }
   }
 
@@ -503,10 +531,12 @@
 
     { "type": "header", "content": "Products" },
     { "type": "collection", "id": "collection", "label": "Collection" },
+    { "type": "select", "id": "layout", "label": "Layout", "options": [{ "value": "grid", "label": "Grid" }, { "value": "slider", "label": "Slider" }], "default": "grid", "info": "Slider keeps every product on one row, with the column counts below in view." },
     { "type": "range", "id": "products_to_show", "label": "Products to show", "min": 2, "max": 12, "step": 1, "default": 4 },
     { "type": "range", "id": "columns", "label": "Columns on desktop", "min": 2, "max": 5, "step": 1, "default": 4 },
     { "type": "range", "id": "columns_tablet", "label": "Columns below 1200px", "min": 1, "max": 4, "step": 1, "default": 2 },
     { "type": "range", "id": "columns_mobile", "label": "Columns on mobile", "min": 1, "max": 3, "step": 1, "default": 2 },
+    { "type": "range", "id": "columns_small", "label": "Columns below 430px", "min": 1, "max": 3, "step": 1, "default": 1 },
     { "type": "range", "id": "image_index", "label": "Image to show", "min": 0, "max": 5, "step": 1, "default": 0, "info": "0 is the first product image." },
 
     { "type": "header", "content": "Card details" },

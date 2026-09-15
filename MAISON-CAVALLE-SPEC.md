@@ -240,7 +240,7 @@ transfers one-to-one:
 | JS hooks | Behaviour targets `data-jci-*` attributes, never a `jci-` class. Classes are for styling only. |
 | Modified Horizon sections | When a Horizon section is modified rather than replaced (e.g. `header.liquid`), add `jci-{name}` to its root and reach its internal classes only through that scope: `.jci-header .menu-list__link`. Never restyle `.menu-list__link` on its own. |
 | Dynamic values | `{% stylesheet %}` blocks do not run Liquid. Every setting-driven value passes through an inline `style="--jci-*: …"` on the section root. |
-| Ranges | Four server rules, only the first of which `theme check` catches: `step` divisible by `0.1`; `unit` at most **3 characters**; at most **101 steps** (`(max - min) / step + 1`); `default` on the step grid. For fractional values use whole numbers with a `%` unit and divide by 100 in Liquid. |
+| Ranges | Five server rules, only the first of which `theme check` catches: `step` divisible by `0.1`; `unit` at most **3 characters**; at most **101 steps** (`(max - min) / step + 1`); at least **3 steps**; `default` on the step grid. For fractional values use whole numbers with a `%` unit and divide by 100 in Liquid. |
 | Validate before pushing | `theme check` does not enforce the schema rules above — the server rejects the upload instead, and a section that fails to upload makes `header-group.json` fail too ("does not refer to an existing section file"). Run the schema validator as well as `theme check`. |
 | Pushing JSON | `shopify theme dev` does **not** re-sync `sections/*-group.json`, `templates/*.json` or `config/settings_data.json` after it starts — it protects Theme Editor edits. Changes to those files need `shopify theme push`, or a restart of `theme dev`. Liquid and assets hot-sync normally. |
 | Translations | Only use locale keys that already exist. A new key must be added to all 33 locale files or theme check fails. |
@@ -414,7 +414,7 @@ Every size below is taken verbatim from `styles.css`. These are the target.
 | Role | Prototype value | Resolves to | Horizon setting |
 |---|---|---|---|
 | Body / `p` | `14px` / `1.55` | 14px | `14` — **exact** |
-| Page hero `h1` | `clamp(4rem, 8vw, 9rem)` | 64 → **144px** | `152` — nearest, CSS override |
+| Page hero `h1` | `clamp(4rem, 6.5vw, 9rem)` | 64 → **144px** | `152` — nearest, CSS override |
 | Section title `h2` | `clamp(2.4rem, 5vw, 4.5rem)` | 38.4 → **72px** | `72` — **exact** |
 | Product title | `clamp(36px, 4vw, 56px)` | 36 → 56px | own class, not global h1 |
 | `h3` | `32px` | 32px | `32` — exact |
@@ -445,7 +445,7 @@ Both are pinned exactly in `assets/jci-base.css`:
 
 ```css
 :root {
-  --jci-hero-title-size:    clamp(4rem, 8vw, 9rem);      /* 64 → 144 */
+  --jci-hero-title-size:    clamp(4rem, 6.5vw, 9rem);      /* 64 → 144 */
   --jci-section-title-size: clamp(2.4rem, 5vw, 4.5rem);  /* 38.4 → 72 */
   --font-h1--size: var(--jci-hero-title-size);
   --font-h2--size: var(--jci-section-title-size);
