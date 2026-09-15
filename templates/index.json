@@ -544,8 +544,8 @@
         "rating_out_of": "out of"
       }
     },
-    "1789463205d0bf4b3a": {
-      "type": "_blocks",
+    "jci_review_carousel": {
+      "type": "jci-review-carousel",
       "blocks": {
         "junip_junip_review_carousel_4JGEH7": {
           "type": "shopify://apps/junip/blocks/junip-review-carousel/dc14f5a8-ed15-41b1-ad08-cfba23f9789b",
@@ -555,9 +555,9 @@
             "product": "",
             "reviewTag": "",
             "showSummary": true,
-            "title": "Reviews",
-            "paddingTop": 48,
-            "paddingBottom": 48,
+            "title": "",
+            "paddingTop": 0,
+            "paddingBottom": 0,
             "containerClass": ""
           }
         }
@@ -566,32 +566,27 @@
         "junip_junip_review_carousel_4JGEH7"
       ],
       "settings": {
-        "content_direction": "column",
-        "vertical_on_mobile": true,
-        "horizontal_alignment": "flex-start",
-        "vertical_alignment": "center",
-        "align_baseline": false,
-        "horizontal_alignment_flex_direction_column": "flex-start",
-        "vertical_alignment_flex_direction_column": "center",
-        "gap": 12,
-        "section_width": "page-width",
-        "section_height": "",
-        "section_height_custom": 50,
-        "background_media": "none",
+        "eyebrow": "Verified reviews",
+        "heading": "In their",
+        "heading_accent": "own words.",
+        "intro": "Notes from riders who wear the Maison at the stable and beyond.",
         "background_color": "",
-        "video_position": "cover",
-        "background_image_position": "cover",
-        "toggle_overlay": false,
-        "overlay_color": "#00000026",
-        "overlay_style": "solid",
-        "gradient_direction": "to top",
-        "border": "none",
-        "border_width": 1,
-        "border_opacity": 100,
-        "border_color": "",
-        "border_radius": 0,
-        "padding-block-start": 0,
-        "padding-block-end": 0
+        "text_color": "",
+        "eyebrow_color": "",
+        "accent_color": "",
+        "intro_color": "",
+        "card_background": "",
+        "soft_background": "",
+        "stars_color": "",
+        "featured_background": "",
+        "featured_text_color": "",
+        "card_gap": 24,
+        "card_min_height": 430,
+        "padding_top": 136,
+        "padding_bottom": 136,
+        "padding_top_mobile": 72,
+        "padding_bottom_mobile": 72,
+        "anchor_id": "reviews"
       }
     },
     "jci_home_faq": {
@@ -865,7 +860,7 @@
     "jci_editorial_banner",
     "jci_best_sellers",
     "jci_testimonials_zGWERm",
-    "1789463205d0bf4b3a",
+    "jci_review_carousel",
     "jci_home_faq",
     "jci_social_media_Pj7UYJ",
     "jci_newsletter"
