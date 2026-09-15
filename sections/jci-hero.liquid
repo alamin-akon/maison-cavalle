@@ -240,7 +240,9 @@
     --jci-hero-title-size: var(--jci-hero-title-size-desktop);
     position: relative;
     display: block;
-    min-height: var(--jci-hero-height);
+    /* A fixed height, not a minimum: a larger title or a longer moment must
+       not stretch the hero. The copy row gives way instead (below). */
+    height: var(--jci-hero-height);
     overflow: hidden;
     isolation: isolate;
     color: var(--jci-hero-text);
@@ -311,7 +313,7 @@
     z-index: 1;
     display: flex;
     flex-direction: column;
-    min-height: var(--jci-hero-height);
+    height: 100%;
     padding-block: clamp(1.4rem, 3vw, 3rem) clamp(1.3rem, 2.8vw, 2.7rem);
   }
 
@@ -346,8 +348,13 @@
   /* --- Copy --- */
   .jci-hero-grid {
     flex: 1;
+    /* Lets the row shrink below its content, so the hero keeps its height.
+       The single row is pinned to the space left over, so copy taller than
+       that grows upwards from the bottom line, never down across it. */
+    min-height: 0;
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(180px, 0.34fr);
+    grid-template-rows: minmax(0, 1fr);
     gap: clamp(2rem, 8vw, 9rem);
     align-items: end;
     padding-block: clamp(4.5rem, 8vw, 8rem) clamp(3rem, 5vw, 5rem);
@@ -718,9 +725,8 @@
       font-size: 25px;
     }
 
-    .jci-hero,
-    .jci-hero-container {
-      min-height: var(--jci-hero-height-mobile);
+    .jci-hero {
+      height: var(--jci-hero-height-mobile);
     }
 
     .jci-hero-container {

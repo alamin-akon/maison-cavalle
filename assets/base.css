@@ -52,6 +52,9 @@ html[scroll-lock] .page-wrapper {
   .page-wrapper {
     height: 100dvh;
     overflow-y: auto;
+    /* Maison Cavalle: keeps the scrollbar's room when a drawer or modal locks
+       scrolling, so the page does not shift sideways as it opens and closes. */
+    scrollbar-gutter: stable;
     scroll-behavior: smooth;
     scrollbar-width: thin;
     scrollbar-color: rgb(var(--color-foreground-rgb) / var(--opacity-40)) var(--color-background);

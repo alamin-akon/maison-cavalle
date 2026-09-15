@@ -73,6 +73,7 @@
     "button_text_case_secondary": "uppercase",
     "pills_border_radius": 0,
     "cart_type": "drawer",
+    "auto_open_cart_drawer": true,
     "cart_price_font": "subheading",
     "show_cart_note": false,
     "show_add_discount_code": true,

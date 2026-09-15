@@ -15,8 +15,16 @@
     display: contents;
   }
 
+  /* Maison Cavalle: the drawer slides and its backdrop fades the way the
+     prototype's cart drawer does (styles.css:1386-1391) - transform over .45s
+     and opacity over .4s on --jci-ease. Horizon animated `right` in .125s,
+     which reflows every frame and read as a jump. */
   .theme-drawer__dialog {
     --theme-drawer-padding: var(--padding-xl);
+    --theme-drawer-slide-speed: 0.45s;
+    --theme-drawer-fade-speed: 0.4s;
+    --backdrop-color-rgb: var(--color-foreground-rgb);
+    --backdrop-opacity: 0.48;
 
     z-index: calc(var(--layer-sticky) + var(--drawer-stack-order, 0));
     position: fixed;
@@ -44,15 +52,15 @@
   }
 
   .theme-drawer__dialog--opening {
-    animation: drawer-slide-in var(--animation-speed) var(--animation-timing-fade-in);
+    animation: drawer-slide-in var(--theme-drawer-slide-speed) var(--jci-ease);
   }
 
   .theme-drawer__dialog--opening-inline-start {
-    animation: drawer-slide-in-inline-start var(--animation-speed) var(--animation-timing-fade-in);
+    animation: drawer-slide-in-inline-start var(--theme-drawer-slide-speed) var(--jci-ease);
   }
 
   .theme-drawer__dialog--closing {
-    animation: drawer-slide-out var(--animation-speed) var(--animation-timing-fade-out) forwards;
+    animation: drawer-slide-out var(--theme-drawer-slide-speed) var(--jci-ease) forwards;
   }
 
   .theme-drawer__dialog-instant {
@@ -61,24 +69,58 @@
 
   @keyframes drawer-slide-in {
     from {
-      right: calc(-1 * var(--theme-drawer-width, var(--sidebar-width)));
+      transform: translateX(105%);
     }
   }
 
   @keyframes drawer-slide-in-inline-start {
     from {
-      right: calc(var(--theme-drawer-width, var(--sidebar-width)) / 2);
+      transform: translateX(-50%);
     }
   }
 
   @keyframes drawer-slide-out {
     to {
-      right: calc(-1 * var(--theme-drawer-width, var(--sidebar-width)));
+      transform: translateX(105%);
     }
   }
 
   .theme-drawer__dialog::backdrop {
     background: rgb(var(--backdrop-color-rgb) / var(--backdrop-opacity));
+  }
+
+  /* The fade-out is shorter than the slide, so it has finished by the time
+     the dialog closes and takes the backdrop with it. */
+  .theme-drawer__dialog--opening::backdrop,
+  .theme-drawer__dialog--opening-inline-start::backdrop {
+    animation: drawer-backdrop-in var(--theme-drawer-fade-speed) var(--jci-ease);
+  }
+
+  .theme-drawer__dialog--closing::backdrop {
+    animation: drawer-backdrop-out var(--theme-drawer-fade-speed) var(--jci-ease) forwards;
+  }
+
+  @keyframes drawer-backdrop-in {
+    from {
+      opacity: 0;
+    }
+  }
+
+  @keyframes drawer-backdrop-out {
+    to {
+      opacity: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .theme-drawer__dialog--opening,
+    .theme-drawer__dialog--opening-inline-start,
+    .theme-drawer__dialog--closing,
+    .theme-drawer__dialog--opening::backdrop,
+    .theme-drawer__dialog--opening-inline-start::backdrop,
+    .theme-drawer__dialog--closing::backdrop {
+      animation: none;
+    }
   }
 
   /* Exclude open drawers from the page navigation cross-fade so they
