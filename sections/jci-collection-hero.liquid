@@ -92,7 +92,7 @@
       {%- if title_block != blank -%}
         <h1 class="jci-collection-hero-title" {{ title_block.shopify_attributes }}>
           {{- title_block.settings.title_line_one -}}
-          {%- if title_block.settings.title_line_one != blank and title_block.settings.title_line_two != blank -%}<br>{%- endif -%}
+          {%- if title_block.settings.title_line_one != blank and title_block.settings.title_line_two != blank -%}{{ ' ' }}{%- endif -%}
           {%- if title_block.settings.title_line_two != blank -%}
             <em class="jci-collection-hero-title-accent">{{ title_block.settings.title_line_two }}</em>
           {%- endif -%}
@@ -102,7 +102,7 @@
       {%- elsif s.title_line_one != blank or s.title_line_two != blank -%}
         <h1 class="jci-collection-hero-title">
           {{- s.title_line_one -}}
-          {%- if s.title_line_one != blank and s.title_line_two != blank -%}<br>{%- endif -%}
+          {%- if s.title_line_one != blank and s.title_line_two != blank -%}{{ ' ' }}{%- endif -%}
           {%- if s.title_line_two != blank -%}
             <em class="jci-collection-hero-title-accent">{{ s.title_line_two }}</em>
           {%- endif -%}
@@ -497,8 +497,8 @@
       "name": "Collection title",
       "settings": [
         { "type": "collection", "id": "collection", "label": "Collection", "info": "The title shows while this collection is being viewed." },
-        { "type": "text", "id": "title_line_one", "label": "Title first line", "default": "The" },
-        { "type": "text", "id": "title_line_two", "label": "Title second line (italic)", "default": "edit." }
+        { "type": "text", "id": "title_line_one", "label": "Title", "default": "The" },
+        { "type": "text", "id": "title_line_two", "label": "Title accent (italic)", "default": "edit." }
       ]
     },
     {
@@ -530,8 +530,8 @@
       "default": "section"
     },
     { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Maison Cavallé · 2026" },
-    { "type": "text", "id": "title_line_one", "label": "Title first line", "default": "The opening" },
-    { "type": "text", "id": "title_line_two", "label": "Title second line (italic)", "default": "collection." },
+    { "type": "text", "id": "title_line_one", "label": "Title", "default": "The opening" },
+    { "type": "text", "id": "title_line_two", "label": "Title accent (italic)", "default": "collection." },
     { "type": "textarea", "id": "intro", "label": "Intro", "default": "Timeless equestrian influence, considered fabrics and pieces made to live beyond the ride." },
 
     { "type": "header", "content": "Visual" },

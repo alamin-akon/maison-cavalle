@@ -3,21 +3,24 @@ import { trapFocus, removeTrapFocus } from '@theme/focus';
 import { isClickedOutside, lockScroll, onAnimationEnd, unlockScroll } from '@theme/utilities';
 import { getScrollTop, scrollTo } from '@theme/scroll-container';
 
-/** Viewport width below which the drawer opens as a modal overlay (no squeeze). */
-const MODAL_BREAKPOINT = 990;
+/**
+ * When the drawer opens as a modal overlay. Maison Cavalle: at every width.
+ * Horizon squeezed the page beside a non-modal drawer from 990px up; the page
+ * no longer squeezes (base.css), and a non-modal drawer sat under the header
+ * with no backdrop to click away on. The prototype overlays at all widths.
+ */
+const MODAL_MEDIA_QUERY = 'all';
 
 /**
  * A drawer that opens from the right side.
  *
- * On wide viewports (≥ 990px) the drawer squeezes page content alongside it.
- * The panel is a non-modal dialog (`show()`); we install a focus trap via
- * `trapFocus()` so Tab cycles within the drawer, mirroring the modal-mode
- * a11y contract. Focus moves to the close button on open and returns to
- * the trigger on close.
+ * The drawer overlays with a backdrop. The panel is a modal dialog
+ * (`showModal()`) — top layer above the header, native focus trap,
+ * scroll-lock, and ARIA semantics. Focus moves to the close button on open
+ * and returns to the trigger on close; a click on the backdrop closes it.
  *
- * On narrow viewports (< 990px) the drawer overlays with a backdrop. The
- * panel is a modal dialog (`showModal()`) — native focus trap, scroll-lock,
- * and ARIA semantics. Same focus-on-close-button + restore-on-close UX.
+ * The non-modal (`show()`) branches below stay in place, unused while
+ * MODAL_MEDIA_QUERY matches every viewport.
  *
  * Dispatches {@link DrawerOpenEvent} and {@link DrawerCloseEvent}.
  *
@@ -44,7 +47,7 @@ export class ThemeDrawer extends Component {
   #previouslyFocused = null;
 
   /** @type {MediaQueryList} */
-  #modalQuery = window.matchMedia(`(max-width: ${MODAL_BREAKPOINT - 1}px)`);
+  #modalQuery = window.matchMedia(MODAL_MEDIA_QUERY);
 
   /**
    * @returns {boolean} Whether the drawer is currently open.

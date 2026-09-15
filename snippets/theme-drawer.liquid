@@ -27,10 +27,11 @@
     var drawerIds = (sessionStorage.getItem('theme-drawer-open') || '').split(',').filter(Boolean);
     if (!drawerIds.length) return;
 
-    // Only restore on wide viewports (squeeze mode). On narrow viewports the
-    // drawer is a modal overlay — let it start closed after navigation rather
-    // than re-opening a fullscreen dialog the user may have left behind.
-    if (!window.matchMedia('(min-width: 990px)').matches) return;
+    // Maison Cavalle: the drawer is a modal overlay at every width
+    // (theme-drawer.js), so it starts closed after navigation, as Horizon does
+    // below 990px. Restoring sets [open] without showModal(), which would put
+    // the drawer back under the header with no backdrop.
+    return;
 
     var dialogs = [];
     for (var i = 0; i < drawerIds.length; i++) {
