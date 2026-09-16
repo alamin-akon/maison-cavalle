@@ -234,6 +234,13 @@
 <script src="{{ 'jci-hero.js' | asset_url }}" type="module"></script>
 
 {% stylesheet %}
+  /* styles.css:125 — the hero and the marquee under it are the only page
+     sections that break out of the page column and run the full viewport. */
+  .jci-hero {
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+  }
+
   .jci-hero {
     /* Seeded from the section settings inline. Kept out of the inline style
        itself so the 900px / 680px overrides below can win the cascade. */

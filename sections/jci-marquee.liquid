@@ -53,6 +53,13 @@
 {% endif %}
 
 {% stylesheet %}
+  /* styles.css:125 — the hero and the marquee under it are the only page
+     sections that break out of the page column and run the full viewport. */
+  .jci-marquee {
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+  }
+
   .jci-marquee {
     display: flex;
     overflow: hidden;
