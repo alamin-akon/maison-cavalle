@@ -346,6 +346,12 @@
     min-width: 0;
   }
 
+  /* Match the home FAQ: this reserve is measured from every answer at the
+     current width, so opening one does not move the section that follows. */
+  .jci-faq-groups {
+    min-height: var(--jci-faq-groups-reserve, auto);
+  }
+
   /* styles.css:1014-1020 */
   .jci-faq-nav {
     position: sticky;

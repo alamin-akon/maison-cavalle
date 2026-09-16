@@ -31,12 +31,15 @@ const EASING = 'cubic-bezier(0.22, 0.61, 0.36, 1)';
 class JciFaq {
   #animations = new WeakMap();
   #entries = [];
+  #widthObserver;
+  #lastWidth = 0;
 
   constructor(section) {
     this.section = section;
     this.input = section.querySelector('[data-jci-faq-search]');
     this.clear = section.querySelector('[data-jci-faq-clear]');
     this.groups = [...section.querySelectorAll('[data-jci-faq-group]')];
+    this.groupsContainer = section.querySelector('.jci-faq-groups');
     this.empty = section.querySelector('[data-jci-faq-empty]');
     this.items = [...section.querySelectorAll('[data-jci-faq-item]')];
 
@@ -50,6 +53,13 @@ class JciFaq {
       item,
       text: item.textContent.toLowerCase().replace(/\s+/g, ' '),
     }));
+
+    // Just like the home FAQ, hold enough space for the tallest possible
+    // single answer before anything is clicked. That keeps the section below
+    // this FAQ stationary while its answers open and close.
+    this.#reserveHeight();
+    this.#observeWidth();
+    document.fonts?.ready.then(() => this.#reserveHeight());
 
     this.input?.addEventListener('input', this.#handleInput);
     this.clear?.addEventListener('click', this.#handleClear);
@@ -70,6 +80,7 @@ class JciFaq {
     this.input?.removeEventListener('input', this.#handleInput);
     this.clear?.removeEventListener('click', this.#handleClear);
     this.section.removeEventListener('toggle', this.#handleToggle, true);
+    this.#widthObserver?.disconnect();
 
     for (const item of this.items) {
       item.querySelector('.jci-faq-item-summary')?.removeEventListener('click', this.#handleClick);
@@ -77,6 +88,57 @@ class JciFaq {
   }
 
   /* -- Open and close ------------------------------------------------- */
+
+  /**
+   * The FAQ page has several topic groups, so the reserve belongs to their
+   * shared wrapper rather than an individual list. One open answer consumes
+   * that reserved space, leaving the following section in the same place.
+   */
+  #reserveHeight() {
+    if (!this.groupsContainer || this.items.length === 0) return;
+    if (this.input?.value) return;
+
+    this.section.style.removeProperty('--jci-faq-groups-reserve');
+
+    const wasOpen = this.items.map((item) => item.open);
+    const heights = this.items.map((item) => {
+      const answer = this.#answer(item);
+      if (!answer) return 0;
+
+      const animation = this.#animations.get(answer);
+      animation?.cancel();
+      this.#animations.delete(answer);
+
+      item.open = true;
+      const height = answer.scrollHeight;
+      item.open = false;
+      return height;
+    });
+
+    const closed = this.groupsContainer.getBoundingClientRect().height;
+
+    this.items.forEach((item, index) => {
+      item.open = wasOpen[index];
+    });
+
+    const answers = this.singleOpen ? Math.max(...heights, 0) : heights.reduce((total, height) => total + height, 0);
+    const reserve = Math.ceil(closed + answers);
+    if (reserve > 0) this.section.style.setProperty('--jci-faq-groups-reserve', `${reserve}px`);
+  }
+
+  #observeWidth() {
+    if (typeof ResizeObserver === 'undefined' || !this.groupsContainer) return;
+
+    this.#lastWidth = this.groupsContainer.getBoundingClientRect().width;
+    this.#widthObserver = new ResizeObserver(() => {
+      const width = this.groupsContainer.getBoundingClientRect().width;
+      if (Math.abs(width - this.#lastWidth) < 1) return;
+
+      this.#lastWidth = width;
+      this.#reserveHeight();
+    });
+    this.#widthObserver.observe(this.groupsContainer);
+  }
 
   #handleToggle = (event) => {
     const item = event.target;
@@ -201,6 +263,10 @@ class JciFaq {
     const query = value.trim().toLowerCase();
     let matches = 0;
 
+    // Search deliberately shows only matching rows, so its result should
+    // remain compact rather than keeping the normal accordion reserve.
+    if (query !== '') this.section.style.removeProperty('--jci-faq-groups-reserve');
+
     for (const { item, text } of this.#entries) {
       const hit = query === '' || text.includes(query);
 
@@ -230,6 +296,8 @@ class JciFaq {
     const template = this.empty.dataset.jciFaqEmptyTemplate ?? '';
     this.empty.hidden = matches > 0 || query === '';
     this.empty.textContent = query === '' ? '' : template.replace(QUERY_TOKEN, value.trim());
+
+    if (query === '') this.#reserveHeight();
   }
 }
 
