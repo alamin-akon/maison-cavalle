@@ -52,10 +52,52 @@
         "background_color": "{{ settings.color_palette.background }}",
         "padding-block-start": 40,
         "padding-block-end": 80
+      },
+      "disabled": true
+    },
+    "jci_journal_hero": {
+      "type": "jci-journal-hero",
+      "settings": {
+        "topline_left": "Maison Cavallé · 2026",
+        "topline_right": "Journal / 03 notes",
+        "eyebrow": "The Maison journal",
+        "title_line_one": "Notes from",
+        "title_line_two": "the stable.",
+        "intro": "Stories of horses, craft and the everyday rituals that make a life feel well lived.",
+        "cta_label": "Begin reading",
+        "cta_link": "#journal-notes",
+        "image_asset": "jci-journal-opening-note.webp",
+        "image": "",
+        "image_alt": "Woman with a horse in the Maison opening note",
+        "feature_link": "#journal-notes",
+        "feature_index": "01 / 03",
+        "feature_eyebrow": "The opening note",
+        "feature_title": "A life shaped by horses.",
+        "feature_link_label": "Read the story",
+        "image_ratio": 106,
+        "image_ratio_mobile": 88,
+        "image_saturate": 72,
+        "image_brightness": 80,
+        "watermark_opacity": 35,
+        "enable_tilt": true,
+        "tilt_strength": 6,
+        "background_color": "",
+        "text_color": "",
+        "accent_color": "",
+        "body_color": "",
+        "meta_color": "",
+        "frame_background": "",
+        "min_height": 560,
+        "padding_top": 76,
+        "padding_bottom": 100,
+        "padding_top_mobile": 48,
+        "padding_bottom_mobile": 52,
+        "anchor_id": "journal-hero"
       }
     }
   },
   "order": [
+    "jci_journal_hero",
     "main"
   ]
 }

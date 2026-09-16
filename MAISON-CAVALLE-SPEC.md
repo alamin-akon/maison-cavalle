@@ -147,6 +147,40 @@ When a section genuinely needs a different width, it sets
 `--jci-container-width` on its root (§1) rather than restyling its container —
 but it starts from the shared value, not from whatever the mockup had.
 
+**The prototype's own per-section caps are not cloned.** It narrows four places
+below the shared measure — story chapter 03 and both size-guide sections to
+1180px (`styles.css:687, 781, 797`), the contact section to 1180px, and the FAQ
+head to 1280px (`:1004`) — while chapter 01 right beside it runs the full
+measure (`:1293`). Those are inconsistencies in the prototype, not a system.
+Standing developer instruction: **every section takes the shared container**,
+and the prototype's narrower caps are dropped.
+
+This is the one place the container rule is deliberately not 1:1, so it needs
+no per-instance report under §0.
+
+### Uploads beat filenames
+
+Standing developer instruction: **whatever the merchant chooses in the Theme
+Editor wins.** A `*_asset` text setting naming a file in `assets/` is the
+*fallback*, used only when the picker is empty — never the other way round.
+
+Every media pair follows this: check the `image_picker` / `video` setting
+first, fall back to the asset filename. The setting's `info` says so too
+("Used only when no image is chosen"), because a merchant who uploads an image
+and sees nothing change has no way to work out why.
+
+### One component per job
+
+Four page heroes (`jci-story-hero`, `jci-contact-hero`, `jci-size-guide-hero`,
+`jci-journal-hero`) are near-duplicates of the prototype's single
+`.journal-hero` base, which it varies with a per-page modifier class. Each of
+ours carries the same settings and differs only in a handful of tuned values.
+
+They stay separate for now — consolidating them touches four live pages — but
+**no fifth page hero gets added**. A new page reuses one of these four, and the
+four should be folded into a single `jci-page-hero` when there is room to test
+all four pages together.
+
 ### Structure is not design
 
 The clone rule applies to the **visual output only**. The prototype's
@@ -463,7 +497,7 @@ all — `--line-height--display-tight`, `--letter-spacing--heading-tight` and
 `--line-height--body-loose` keep their Horizon defaults, and no section
 re-declares them.
 
-The prototype's `.84` / `.92` leading and `-.07em` / `-.055em` tracking are
+The prototype's `.84` / `.92` leading and `-.04em` / `-.055em` tracking are
 recorded in the size table above for reference only. They are not implemented.
 
 ### Eyebrow / label utility
@@ -564,6 +598,32 @@ Keep `"page_width": "narrow"` and retune the token:
 }
 ```
 
+### The page column
+
+The prototype wraps the whole page in `#app` (`styles.css:32`):
+
+```css
+#app { width: min(100%, var(--content-max)); margin-inline: auto; }
+```
+
+That is not just a content measure — it caps **every section's background too**.
+Past 1600px the dark hero, the cream chapter and the olive quote all stop at
+1600px with paper down both sides. A theme that only caps the inner container
+looks identical up to 1600px and wrong on every screen wider than that.
+
+Reproduced on `main` and the footer:
+
+```css
+.jci-page {
+  width: min(100%, var(--jci-content-max));
+  margin-inline: auto;
+}
+```
+
+`layout/theme.liquid` puts `jci-page` on `<main class="content-for-layout">`
+and on `<footer>`. The announcement bar and header sit outside it and stay
+full-bleed, as they do in the prototype.
+
 ### Page padding
 
 ```css
@@ -594,7 +654,9 @@ starting point; the setting is what ships.
 
 ### Full-bleed breakout
 
-For sections that must ignore the container (hero, marquee, editorial banner):
+**Exactly three sections break out of the page column**, and the prototype
+names them: `.home-hero` and the `.marquee-band` under it (`styles.css:125`),
+and `.newsletter-section` (`:413`). Nothing else on any page is full-bleed.
 
 ```css
 .jci-hero {
@@ -602,6 +664,24 @@ For sections that must ignore the container (hero, marquee, editorial banner):
   margin-left: calc(50% - 50vw);
 }
 ```
+
+So: `jci-hero`, `jci-marquee`, `jci-newsletter` — and no others. A fourth
+section wanting to "go full width" is a design change, not a clone.
+
+A section that only needs to fill the column edge to edge uses the column, not
+the viewport — past 1600px `100vw` escapes the page:
+
+```css
+--jci-container-width:  var(--jci-page-column);
+--jci-container-offset: calc(50% - var(--jci-page-column) / 2);
+```
+
+`jci-product`'s mobile gallery also uses `100vw`, matching `.product-gallery`
+at `:1701`, which is likewise inside a media query.
+
+> The prototype clips the horizontal axis on `html, body` (`:30-31`). That clip
+> is **not** copied — it cuts the product gallery's captions. See the note in
+> `sections/jci-product.liquid`.
 
 ### Breakpoints
 
@@ -721,7 +801,7 @@ Other border widths:
 | 10a | FAQ page — `jci-faq-hero`, `jci-faq`, `jci-faq-assurance` | done |
 | 10b | Contact page — `jci-contact-hero`, `jci-contact` | done |
 | 10c | Story page | not started |
-| 10d | Journal page | not started |
+| 10d | Journal page — `jci-journal-hero` done; note index and cards still to build | in progress |
 | 10e | Shipping & returns page | not started |
 | 10f | Size guide page | not started |
 | 11 | `sections/header.liquid` — Horizon's header carrying the prototype's design | done |
