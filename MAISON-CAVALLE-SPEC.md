@@ -827,7 +827,7 @@ Other border widths:
 | 10c | Story page | not started |
 | 10d | Journal page — `jci-journal-hero`, `jci-journal-index` (+ `jci-journal-note` snippet) | done |
 | 10e | Policy pages — `templates/policy.json` + `jci-policy`, covering shipping, refund, privacy, terms and contact info | done |
-| 10f | Shipping & returns as a custom page (the prototype's `#shipping`: hero, three cards, six accordions, four policy columns) | not started |
+| 10f | Shipping & returns page — `templates/page.shipping.json`: `jci-size-guide-hero` reused, plus `jci-shipping-overview`, `jci-shipping-info`, `jci-shipping-policy` | done |
 | 10f | Size guide page | not started |
 | 11 | `sections/header.liquid` — Horizon's header carrying the prototype's design | done |
 
