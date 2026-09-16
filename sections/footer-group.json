@@ -222,7 +222,7 @@
         "column_explore": {
           "type": "column",
           "settings": {
-            "menu": "jci-footer-menu-copy",
+            "menu": "jci-footer-menu-1",
             "heading": "Explore"
           }
         },
