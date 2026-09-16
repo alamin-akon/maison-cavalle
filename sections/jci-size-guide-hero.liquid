@@ -447,7 +447,9 @@
 
     .jci-size-guide-hero-feature {
       width: min(100%, 720px);
-      justify-self: end;
+      /* The columns have stacked, so the frame centres under the copy
+         rather than hanging off the right edge. */
+      justify-self: center;
     }
   }
 
