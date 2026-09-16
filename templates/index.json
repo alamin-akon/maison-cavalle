@@ -246,83 +246,6 @@
         "anchor_id": "collection"
       }
     },
-    "jci_home_faq": {
-      "type": "jci-home-faq",
-      "blocks": {
-        "item_size": {
-          "type": "item",
-          "settings": {
-            "index": "",
-            "question": "How do I find my usual size?",
-            "answer": "<p>Use our <a href=\"/pages/size-guide\">size guide</a> to compare your bust, waist and hip measurements. If you are between sizes, choose the larger size.</p>",
-            "open_by_default": false
-          }
-        },
-        "item_delivery": {
-          "type": "item",
-          "settings": {
-            "index": "",
-            "question": "How quickly will my order arrive?",
-            "answer": "<p>Australian orders are dispatched from the Maison with delivery updates provided once your parcel is on its way.</p>",
-            "open_by_default": false
-          }
-        },
-        "item_returns": {
-          "type": "item",
-          "settings": {
-            "index": "",
-            "question": "Can I return or exchange a piece?",
-            "answer": "<p>Yes. We offer easy 14-day returns on eligible unworn pieces. Visit <a href=\"/pages/shipping\">shipping &amp; returns</a> for the full details.</p>",
-            "open_by_default": false
-          }
-        }
-      },
-      "block_order": [
-        "item_size",
-        "item_delivery",
-        "item_returns"
-      ],
-      "name": "FAQ",
-      "settings": {
-        "eyebrow": "The Maison help desk",
-        "title_line_one": "Good to know.",
-        "title_line_two": "Easy to find.",
-        "intro": "Clear answers for the moments before the ride, after checkout and everywhere in between.",
-        "show_side_card": true,
-        "side_mark": "?",
-        "side_eyebrow": "Need a little more?",
-        "side_title": "Ask the Maison.",
-        "side_text": "Find thoughtful answers about fit, care, delivery and returns.",
-        "side_link_label": "Visit all FAQs",
-        "side_link_url": "shopify://pages/faq",
-        "side_min_height": 250,
-        "side_padding": 140,
-        "mark_size": 100,
-        "background_color": "",
-        "heading_color": "",
-        "accent_color": "",
-        "focus_color": "",
-        "body_color": "#65695f",
-        "side_background": "",
-        "side_text_color": "",
-        "side_eyebrow_color": "#e0e4d0",
-        "side_body_color": "#edf0e8",
-        "padding_top": 100,
-        "padding_bottom": 100,
-        "padding_top_mobile": 52,
-        "padding_bottom_mobile": 52,
-        "head_gap": 128,
-        "head_space": 48,
-        "grid_gap": 128,
-        "row_padding": 20,
-        "answer_indent": 48,
-        "question_size_min": 22,
-        "question_size_max": 31,
-        "toggle_duration": 320,
-        "single_open": true,
-        "anchor_id": "home-faq"
-      }
-    },
     "jci_editorial_banner": {
       "type": "jci-editorial-banner",
       "blocks": {
@@ -415,6 +338,83 @@
         "carousel_label": "The Maison philosophy image story",
         "controls_label": "Philosophy image controls",
         "anchor_id": "journal"
+      }
+    },
+    "jci_home_faq": {
+      "type": "jci-home-faq",
+      "blocks": {
+        "item_size": {
+          "type": "item",
+          "settings": {
+            "index": "",
+            "question": "How do I find my usual size?",
+            "answer": "<p>Use our <a href=\"/pages/size-guide\">size guide</a> to compare your bust, waist and hip measurements. If you are between sizes, choose the larger size.</p>",
+            "open_by_default": false
+          }
+        },
+        "item_delivery": {
+          "type": "item",
+          "settings": {
+            "index": "",
+            "question": "How quickly will my order arrive?",
+            "answer": "<p>Australian orders are dispatched from the Maison with delivery updates provided once your parcel is on its way.</p>",
+            "open_by_default": false
+          }
+        },
+        "item_returns": {
+          "type": "item",
+          "settings": {
+            "index": "",
+            "question": "Can I return or exchange a piece?",
+            "answer": "<p>Yes. We offer easy 14-day returns on eligible unworn pieces. Visit <a href=\"/pages/shipping\">shipping &amp; returns</a> for the full details.</p>",
+            "open_by_default": false
+          }
+        }
+      },
+      "block_order": [
+        "item_size",
+        "item_delivery",
+        "item_returns"
+      ],
+      "name": "FAQ",
+      "settings": {
+        "eyebrow": "The Maison help desk",
+        "title_line_one": "Good to know.",
+        "title_line_two": "Easy to find.",
+        "intro": "Clear answers for the moments before the ride, after checkout and everywhere in between.",
+        "show_side_card": true,
+        "side_mark": "?",
+        "side_eyebrow": "Need a little more?",
+        "side_title": "Ask the Maison.",
+        "side_text": "Find thoughtful answers about fit, care, delivery and returns.",
+        "side_link_label": "Visit all FAQs",
+        "side_link_url": "shopify://pages/faq",
+        "side_min_height": 250,
+        "side_padding": 140,
+        "mark_size": 100,
+        "background_color": "",
+        "heading_color": "",
+        "accent_color": "",
+        "focus_color": "",
+        "body_color": "#65695f",
+        "side_background": "",
+        "side_text_color": "",
+        "side_eyebrow_color": "#e0e4d0",
+        "side_body_color": "#edf0e8",
+        "padding_top": 100,
+        "padding_bottom": 100,
+        "padding_top_mobile": 52,
+        "padding_bottom_mobile": 52,
+        "head_gap": 128,
+        "head_space": 48,
+        "grid_gap": 128,
+        "row_padding": 20,
+        "answer_indent": 48,
+        "question_size_min": 22,
+        "question_size_max": 31,
+        "toggle_duration": 320,
+        "single_open": true,
+        "anchor_id": "home-faq"
       }
     },
     "jci_best_sellers": {
@@ -661,7 +661,7 @@
         "card_gap": 24,
         "card_min_height": 430,
         "padding_top": 100,
-        "padding_bottom": 0,
+        "padding_bottom": 52,
         "padding_top_mobile": 52,
         "padding_bottom_mobile": 52,
         "anchor_id": "reviews"
