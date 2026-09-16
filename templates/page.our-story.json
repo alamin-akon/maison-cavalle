@@ -9,52 +9,6 @@
  */
 {
   "sections": {
-    "main": {
-      "type": "main-page",
-      "blocks": {
-        "heading": {
-          "type": "text",
-          "name": "t:names.title",
-          "settings": {
-            "text": "<h1>{{ closest.page.title }}</h1>",
-            "width": "100%",
-            "max_width": "normal",
-            "alignment": "left",
-            "type_preset": "h2",
-            "font": "var(--font-body--family)",
-            "line_height": "normal",
-            "letter_spacing": "normal",
-            "case": "none",
-            "wrap": "pretty",
-            "background": false,
-            "background_color": "#00000026",
-            "corner_radius": 0,
-            "padding-block-start": 0,
-            "padding-block-end": 0,
-            "padding-inline-start": 0,
-            "padding-inline-end": 0
-          },
-          "blocks": {}
-        },
-        "page-content": {
-          "type": "page-content",
-          "settings": {},
-          "blocks": {}
-        }
-      },
-      "block_order": [
-        "heading",
-        "page-content"
-      ],
-      "settings": {
-        "content_direction": "column",
-        "gap": 32,
-        "background_color": "{{ settings.color_palette.background }}",
-        "padding-block-start": 40,
-        "padding-block-end": 80
-      },
-      "disabled": true
-    },
     "jci_story_hero": {
       "type": "jci-story-hero",
       "settings": {
@@ -82,6 +36,12 @@
         "watermark_opacity": 35,
         "enable_tilt": true,
         "tilt_strength": 6,
+        "background_color": "",
+        "text_color": "",
+        "accent_color": "",
+        "body_color": "",
+        "meta_color": "",
+        "frame_background": "",
         "min_height": 560,
         "padding_top": 76,
         "padding_bottom": 112,
@@ -96,28 +56,28 @@
         "paragraph_1": {
           "type": "paragraph",
           "settings": {
-            "text": "She began competing herself as a child, and the equestrian world became not simply an interest, but a way of life.",
-            "tone": "body",
             "number": "01",
-            "label": "Childhood"
+            "label": "Childhood",
+            "text": "She began competing herself as a child, and the equestrian world became not simply an interest, but a way of life.",
+            "tone": "body"
           }
         },
         "paragraph_2": {
           "type": "paragraph",
           "settings": {
-            "text": "That connection continued through adulthood. Miriam married a National Hunt jockey before eventually making a new home in Australia, where horses remained an enduring part of family life.",
-            "tone": "body",
             "number": "02",
-            "label": "Adulthood"
+            "label": "Adulthood",
+            "text": "That connection continued through adulthood. Miriam married a National Hunt jockey before eventually making a new home in Australia, where horses remained an enduring part of family life.",
+            "tone": "body"
           }
         },
         "paragraph_3": {
           "type": "paragraph",
           "settings": {
-            "text": "Today, more than fifty years after that journey began, Miriam still owns horses and remains immersed in the equestrian world. Now another generation continues the story, with her granddaughter competing successfully in Equestrian Australia show jumping at national level.",
-            "tone": "body",
             "number": "03",
-            "label": "Legacy"
+            "label": "Legacy",
+            "text": "Today, more than fifty years after that journey began, Miriam still owns horses and remains immersed in the equestrian world. Now another generation continues the story, with her granddaughter competing successfully in Equestrian Australia show jumping at national level.",
+            "tone": "body"
           }
         }
       },
@@ -133,16 +93,23 @@
         "title_line_one": "More than an aesthetic.",
         "title_line_two": "A way of life.",
         "intro": "For founder Miriam Claire, horses have been part of life for as long as she can remember. Growing up in the United Kingdom as the daughter of a racehorse trainer, Miriam's childhood was spent surrounded by horses, racing and competition.",
+        "signoff": "A story shaped by horses, heritage and generations.",
+        "signoff_mark": "Maison Cavallé",
+        "image_asset": "",
+        "image_alt": "A horse standing in an open field",
+        "overlay_text": "Horses\nPeople\nA brighter\ntomorrow",
         "background_color": "",
         "text_color": "",
         "accent_color": "",
+        "overlay_color": "",
+        "media_width": 57,
+        "media_min_height": 520,
+        "overlay_scrim": 25,
         "padding_top": 136,
         "padding_bottom": 136,
         "padding_top_mobile": 72,
         "padding_bottom_mobile": 72,
-        "anchor_id": "story-origin",
-        "signoff": "A story shaped by horses, heritage and generations.",
-        "signoff_mark": "Maison Cavallé"
+        "anchor_id": "story-origin"
       }
     },
     "jci_story_heritage": {
@@ -173,18 +140,22 @@
     "jci_story_continuing": {
       "type": "jci-story-chapter",
       "blocks": {
-        "paragraph_1": {
-          "type": "paragraph",
-          "settings": {
-            "text": "From British racing yards to Australian stables, from one generation to the next, horses have always been there.",
-            "tone": "body"
-          }
-        },
         "paragraph_2": {
           "type": "paragraph",
           "settings": {
+            "number": "",
+            "label": "",
             "text": "Maison Cavallé is the next chapter of that story.",
             "tone": "statement"
+          }
+        },
+        "paragraph_1": {
+          "type": "paragraph",
+          "settings": {
+            "number": "",
+            "label": "",
+            "text": "From British racing yards to Australian stables, from one generation to the next, horses have always been there.",
+            "tone": "body"
           }
         },
         "step_1": {
@@ -226,21 +197,24 @@
         "title_line_one": "From one generation",
         "title_line_two": "to the next.",
         "intro": "",
+        "signoff": "",
+        "signoff_mark": "",
+        "image_asset": "",
+        "image": "shopify://shop_images/horse.png",
+        "image_alt": "A horse standing in an open field at dusk",
+        "overlay_text": "Horses\nPeople\nA brighter\ntomorrow",
         "background_color": "{{ settings.color_palette.background }}",
         "text_color": "",
         "accent_color": "",
+        "overlay_color": "",
+        "media_width": 57,
+        "media_min_height": 520,
+        "overlay_scrim": 25,
         "padding_top": 136,
         "padding_bottom": 136,
         "padding_top_mobile": 72,
         "padding_bottom_mobile": 72,
-        "anchor_id": "story-continuing",
-        "image_asset": "jci-editorial-field-note.webp",
-        "image_alt": "A horse standing in an open field at dusk",
-        "overlay_text": "Horses\nPeople\nA brighter\ntomorrow",
-        "overlay_color": "",
-        "media_width": 57,
-        "media_min_height": 520,
-        "overlay_scrim": 25
+        "anchor_id": "story-continuing"
       }
     },
     "jci_story_quote": {
@@ -257,6 +231,56 @@
         "padding_top_mobile": 72,
         "padding_bottom_mobile": 72,
         "anchor_id": "story-quote"
+      }
+    },
+    "main": {
+      "type": "main-page",
+      "blocks": {
+        "heading": {
+          "type": "text",
+          "name": "t:names.title",
+          "settings": {
+            "text": "<h1>{{ closest.page.title }}</h1>",
+            "width": "100%",
+            "max_width": "normal",
+            "alignment": "left",
+            "type_preset": "h2",
+            "font": "var(--font-body--family)",
+            "font_size": "1rem",
+            "line_height": "normal",
+            "letter_spacing": "normal",
+            "case": "none",
+            "wrap": "pretty",
+            "text_color": "",
+            "background": false,
+            "background_color": "#00000026",
+            "corner_radius": 0,
+            "padding-block-start": 0,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {}
+        },
+        "page-content": {
+          "type": "page-content",
+          "settings": {
+            "text_color": ""
+          },
+          "blocks": {}
+        }
+      },
+      "block_order": [
+        "heading",
+        "page-content"
+      ],
+      "disabled": true,
+      "settings": {
+        "content_direction": "column",
+        "gap": 32,
+        "background_color": "{{ settings.color_palette.background }}",
+        "padding-block-start": 40,
+        "padding-block-end": 80
       }
     }
   },
