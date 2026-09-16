@@ -88,9 +88,7 @@
             endcomment
 
             assign film_main = blank
-            if b.video_main_asset != blank
-              assign film_main = b.video_main_asset | strip | asset_url
-            elsif b.video_main != blank
+            if b.video_main != blank
               for source in b.video_main.sources
                 if source.format == 'mp4'
                   assign film_main = source.url
@@ -98,17 +96,21 @@
                 endif
               endfor
             endif
+            if film_main == blank and b.video_main_asset != blank
+              assign film_main = b.video_main_asset | strip | asset_url
+            endif
 
             assign film_secondary = blank
-            if b.video_secondary_asset != blank
-              assign film_secondary = b.video_secondary_asset | strip | asset_url
-            elsif b.video_secondary != blank
+            if b.video_secondary != blank
               for source in b.video_secondary.sources
                 if source.format == 'mp4'
                   assign film_secondary = source.url
                   break
                 endif
               endfor
+            endif
+            if film_secondary == blank and b.video_secondary_asset != blank
+              assign film_secondary = b.video_secondary_asset | strip | asset_url
             endif
 
             comment
@@ -118,10 +120,10 @@
             endcomment
             assign main_image = blank
             assign main_src = blank
-            if b.image_main_asset != blank
-              assign main_src = b.image_main_asset | strip | asset_url
-            elsif b.image_main != blank
+            if b.image_main != blank
               assign main_image = b.image_main
+            elsif b.image_main_asset != blank
+              assign main_src = b.image_main_asset | strip | asset_url
             elsif product != blank
               comment
                 The product's first image, literally — a merchant can set a
@@ -136,10 +138,10 @@
 
             assign secondary_image = blank
             assign secondary_src = blank
-            if b.image_secondary_asset != blank
-              assign secondary_src = b.image_secondary_asset | strip | asset_url
-            elsif b.image_secondary != blank
+            if b.image_secondary != blank
               assign secondary_image = b.image_secondary
+            elsif b.image_secondary_asset != blank
+              assign secondary_src = b.image_secondary_asset | strip | asset_url
             elsif product != blank
               comment
                 The second image, so the pair reads as two views of one piece.
@@ -790,17 +792,17 @@
 
         { "type": "header", "content": "Large frame" },
         { "type": "video", "id": "video_main", "label": "Video", "info": "Replaces the product image. No 20 MB limit." },
-        { "type": "text", "id": "video_main_asset", "label": "Video asset filename", "info": "A file in assets/. Wins over the video above." },
+        { "type": "text", "id": "video_main_asset", "label": "Video asset filename", "info": "A file in assets/. Used only when no video is chosen." },
         { "type": "image_picker", "id": "image_main", "label": "Image", "info": "Replaces the product image, and is the video poster." },
-        { "type": "text", "id": "image_main_asset", "label": "Image asset filename", "info": "A file in assets/. Wins over the image above." },
+        { "type": "text", "id": "image_main_asset", "label": "Image asset filename", "info": "A file in assets/. Used only when no image is chosen." },
         { "type": "text", "id": "image_alt_main", "label": "Alt text", "info": "Left empty, the product title is used." },
         { "type": "text", "id": "index_main", "label": "Index label", "default": "01 / 02" },
 
         { "type": "header", "content": "Small frame" },
         { "type": "video", "id": "video_secondary", "label": "Video" },
-        { "type": "text", "id": "video_secondary_asset", "label": "Video asset filename", "info": "A file in assets/. Wins over the video above." },
+        { "type": "text", "id": "video_secondary_asset", "label": "Video asset filename", "info": "A file in assets/. Used only when no video is chosen." },
         { "type": "image_picker", "id": "image_secondary", "label": "Image", "info": "Replaces the product's second image, and is the video poster." },
-        { "type": "text", "id": "image_secondary_asset", "label": "Image asset filename", "info": "A file in assets/. Wins over the image above." },
+        { "type": "text", "id": "image_secondary_asset", "label": "Image asset filename", "info": "A file in assets/. Used only when no image is chosen." },
         { "type": "text", "id": "image_alt_secondary", "label": "Alt text", "info": "Left empty, the product title is used." },
         { "type": "text", "id": "index_secondary", "label": "Index label", "default": "02 / 02" },
 

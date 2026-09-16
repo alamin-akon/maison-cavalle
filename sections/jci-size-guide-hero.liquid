@@ -111,17 +111,7 @@
         {% if s.enable_tilt %}data-jci-tilt{% endif %}
         data-jci-tilt-strength="{{ s.tilt_strength }}"
       >
-        {%- if image_asset != blank -%}
-          <img
-            class="jci-size-guide-hero-image"
-            src="{{ image_asset | asset_url }}"
-            alt="{{ s.image_alt | escape }}"
-            width="640"
-            height="696"
-            loading="eager"
-            fetchpriority="high"
-          >
-        {%- elsif feature_image != blank -%}
+        {%- if feature_image != blank -%}
           <img
             class="jci-size-guide-hero-image"
             src="{{ feature_image | image_url: width: 1000 }}"
@@ -134,6 +124,16 @@
             alt="{{ feature_image.alt | escape | default: s.image_alt | escape }}"
             width="{{ feature_image.width }}"
             height="{{ feature_image.height }}"
+            loading="eager"
+            fetchpriority="high"
+          >
+        {%- elsif image_asset != blank -%}
+          <img
+            class="jci-size-guide-hero-image"
+            src="{{ image_asset | asset_url }}"
+            alt="{{ s.image_alt | escape }}"
+            width="640"
+            height="696"
             loading="eager"
             fetchpriority="high"
           >
@@ -524,7 +524,7 @@
     { "type": "url", "id": "cta_link", "label": "Link" },
 
     { "type": "header", "content": "Feature" },
-    { "type": "text", "id": "image_asset", "label": "Image file in theme assets", "info": "Filename only. Takes priority over the picker below." },
+    { "type": "text", "id": "image_asset", "label": "Image file in theme assets", "info": "A file in assets/. Used only when no image is chosen." },
     { "type": "image_picker", "id": "image", "label": "Image" },
     { "type": "text", "id": "image_alt", "label": "Image description", "default": "Maison Cavallé rider wearing the Active Turtleneck Top" },
     { "type": "url", "id": "feature_link", "label": "Link", "info": "Falls back to the copy link above." },

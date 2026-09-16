@@ -138,16 +138,7 @@
 
       {%- if has_media -%}
         <div class="jci-story-chapter-media">
-          {%- if image_asset != blank -%}
-            <img
-              class="jci-story-chapter-image"
-              src="{{ image_asset | asset_url }}"
-              alt="{{ s.image_alt | escape }}"
-              width="1200"
-              height="800"
-              loading="lazy"
-            >
-          {%- else -%}
+          {%- if picked_image != blank -%}
             <img
               class="jci-story-chapter-image"
               src="{{ picked_image | image_url: width: 1400 }}"
@@ -161,6 +152,15 @@
               alt="{{ picked_image.alt | escape | default: s.image_alt | escape }}"
               width="{{ picked_image.width }}"
               height="{{ picked_image.height }}"
+              loading="lazy"
+            >
+          {%- else -%}
+            <img
+              class="jci-story-chapter-image"
+              src="{{ image_asset | asset_url }}"
+              alt="{{ s.image_alt | escape }}"
+              width="1200"
+              height="800"
               loading="lazy"
             >
           {%- endif -%}
@@ -897,7 +897,7 @@
     { "type": "text", "id": "signoff_mark", "label": "Sign-off mark" },
 
     { "type": "header", "content": "Image", "info": "The Continuing layout only. Set an image here and the chapter takes its two-column composition, with the film on the right." },
-    { "type": "text", "id": "image_asset", "label": "Image file in theme assets", "info": "Filename only, e.g. jci-editorial-field-note.webp. Takes priority over the picker below." },
+    { "type": "text", "id": "image_asset", "label": "Image file in theme assets", "info": "A file in assets/, e.g. jci-editorial-field-note.webp. Used only when no image is chosen." },
     { "type": "image_picker", "id": "image", "label": "Image", "info": "Drag the focal point in the image editor to choose the crop." },
     { "type": "text", "id": "image_alt", "label": "Image description", "default": "A horse standing in an open field" },
     { "type": "textarea", "id": "overlay_text", "label": "Image overlay", "info": "One line per line of text.", "default": "Horses\nPeople\nA brighter\ntomorrow" },

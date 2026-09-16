@@ -54,10 +54,10 @@
       {%- assign video_asset = block.settings.video_asset | strip -%}
       {%- assign poster = block.settings.poster | default: video.preview_image -%}
       {%- assign poster_asset = block.settings.poster_asset | strip -%}
-      {%- if poster_asset != blank -%}
-        {%- assign poster_src = poster_asset | asset_url -%}
-      {%- elsif poster != blank -%}
+      {%- if poster != blank -%}
         {%- assign poster_src = poster | image_url: width: 1800 -%}
+      {%- elsif poster_asset != blank -%}
+        {%- assign poster_src = poster_asset | asset_url -%}
       {%- else -%}
         {%- assign poster_src = blank -%}
       {%- endif -%}
@@ -78,17 +78,17 @@
           {% if poster_src != blank %}poster="{{ poster_src }}"{% endif %}
         >
           {%- comment -%}
-            A filename in the theme's assets folder wins, so the clip travels
-            with the theme code. An upload in Files is the fallback.
+            An upload in Files wins, so whatever the merchant chooses in the
+            Theme Editor is what plays. The assets/ filename is the fallback.
           {%- endcomment -%}
-          {%- if video_asset != blank -%}
-            <source src="{{ video_asset | asset_url }}" type="video/mp4">
-          {%- else -%}
+          {%- if video != blank -%}
             {%- for source in video.sources -%}
               {%- if source.format == 'mp4' -%}
                 <source src="{{ source.url }}" type="{{ source.mime_type }}">
               {%- endif -%}
             {%- endfor -%}
+          {%- else -%}
+            <source src="{{ video_asset | asset_url }}" type="video/mp4">
           {%- endif -%}
         </video>
       {%- elsif poster_src != blank -%}
@@ -834,9 +834,9 @@
       "name": "Moment",
       "settings": [
         { "type": "text", "id": "label", "label": "Tab label", "default": "The ride" },
-        { "type": "text", "id": "video_asset", "label": "Video file in theme assets", "info": "Filename only, e.g. jci-hero-ride.mp4. Takes priority over the Files upload below." },
-        { "type": "video", "id": "video", "label": "Video from Files", "info": "Used only when no asset filename is set above." },
-        { "type": "text", "id": "poster_asset", "label": "Poster file in theme assets", "info": "Filename only, e.g. jci-hero-ride-poster.webp. Takes priority over the picker below." },
+        { "type": "text", "id": "video_asset", "label": "Video file in theme assets", "info": "A file in assets/, e.g. jci-hero-ride.mp4. Used only when no video is chosen." },
+        { "type": "video", "id": "video", "label": "Video from Files", "info": "An upload here wins over the asset filename above." },
+        { "type": "text", "id": "poster_asset", "label": "Poster file in theme assets", "info": "A file in assets/, e.g. jci-hero-ride-poster.webp. Used only when no poster is chosen." },
         { "type": "image_picker", "id": "poster", "label": "Poster image", "info": "Shown before the video plays, and on its own if no video is set." },
         { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "The first collection · 2026" },
         { "type": "text", "id": "title", "label": "Headline", "default": "Elevated equestrian, for a life well lived." },

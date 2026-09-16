@@ -21,10 +21,10 @@
   assign s = section.settings
 
   assign poster_src = blank
-  if s.poster_asset != blank
-    assign poster_src = s.poster_asset | strip | asset_url
-  elsif s.poster != blank
+  if s.poster != blank
     assign poster_src = s.poster | image_url: width: 1400
+  elsif s.poster_asset != blank
+    assign poster_src = s.poster_asset | strip | asset_url
   elsif s.video != blank
     assign poster_src = s.video.preview_image | image_url: width: 1400
   endif
@@ -501,9 +501,9 @@
 
     { "type": "header", "content": "Feature film" },
     { "type": "video", "id": "video", "label": "Video", "info": "An upload here wins over the asset filename below, and has no 20 MB limit." },
-    { "type": "text", "id": "video_asset", "label": "Video asset filename", "default": "jci-story-hero-film.mp4", "info": "A file in assets/. Used only when no video is chosen above." },
+    { "type": "text", "id": "video_asset", "label": "Video asset filename", "default": "jci-story-hero-film.mp4", "info": "A file in assets/. Used only when no video is chosen." },
     { "type": "image_picker", "id": "poster", "label": "Poster image", "info": "Shown while the film loads, or on its own when there is no film." },
-    { "type": "text", "id": "poster_asset", "label": "Poster asset filename", "default": "jci-lux-jacket-front-horse.webp", "info": "A file in assets/. Wins over the poster image above." },
+    { "type": "text", "id": "poster_asset", "label": "Poster asset filename", "default": "jci-lux-jacket-front-horse.webp", "info": "A file in assets/. Used only when no poster image is chosen." },
     { "type": "text", "id": "media_label", "label": "Film description", "default": "Maison Cavallé story film" },
     { "type": "url", "id": "feature_link", "label": "Link", "info": "Falls back to the copy link above." },
     { "type": "text", "id": "feature_index", "label": "Corner index", "default": "01 / 03" },

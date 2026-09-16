@@ -21,10 +21,10 @@
   assign columns = section.blocks | where: 'type', 'column'
 
   assign logo_src = blank
-  if s.logo_asset != blank
-    assign logo_src = s.logo_asset | strip | asset_url
-  elsif s.logo != blank
+  if s.logo != blank
     assign logo_src = s.logo | image_url: width: 420
+  elsif s.logo_asset != blank
+    assign logo_src = s.logo_asset | strip | asset_url
   endif
 %}
 
@@ -359,7 +359,7 @@
   "settings": [
     { "type": "header", "content": "Brand" },
     { "type": "image_picker", "id": "logo", "label": "Logo" },
-    { "type": "text", "id": "logo_asset", "label": "Logo asset filename", "default": "jci-logo-inverse.svg", "info": "A file in assets/. Wins over the logo above." },
+    { "type": "text", "id": "logo_asset", "label": "Logo asset filename", "default": "jci-logo-inverse.svg", "info": "A file in assets/. Used only when no logo is chosen." },
     { "type": "range", "id": "logo_width", "label": "Logo width", "min": 100, "max": 360, "step": 5, "unit": "px", "default": 210 },
     { "type": "textarea", "id": "tagline", "label": "Tagline", "default": "Fewer, better pieces.\nBorn from a life with horses." },
 

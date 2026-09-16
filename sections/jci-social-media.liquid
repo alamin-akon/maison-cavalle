@@ -131,15 +131,16 @@
                   assign b = block.settings
 
                   assign film = blank
-                  if b.video_asset != blank
-                    assign film = b.video_asset | strip | asset_url
-                  elsif b.video != blank
+                  if b.video != blank
                     for source in b.video.sources
                       if source.format == 'mp4'
                         assign film = source.url
                         break
                       endif
                     endfor
+                  endif
+                  if film == blank and b.video_asset != blank
+                    assign film = b.video_asset | strip | asset_url
                   endif
 
                   comment
@@ -575,7 +576,7 @@
       "name": "Card",
       "settings": [
         { "type": "video", "id": "video", "label": "Video", "info": "No 20 MB limit." },
-        { "type": "text", "id": "video_asset", "label": "Video asset filename", "info": "A file in assets/. Wins over the video above." },
+        { "type": "text", "id": "video_asset", "label": "Video asset filename", "info": "A file in assets/. Used only when no video is chosen." },
         { "type": "image_picker", "id": "image", "label": "Image", "info": "The video poster, or the card itself when there is no video." },
         { "type": "text", "id": "poster_asset", "label": "Poster asset filename", "info": "A file in assets/, shown while the video loads. The image above wins when one is chosen." },
         { "type": "text", "id": "label", "label": "Label", "default": "Instagram / 01 · Film" },
