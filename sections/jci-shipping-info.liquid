@@ -328,6 +328,14 @@
     transform: none;
   }
 
+  /* With JavaScript, the FAQ-style animation owns the answer height. Keep
+     the same resting states but remove CSS's max-height hand-off. */
+  [data-jci-shipping-info-enhanced] .jci-shipping-info-row-text,
+  [data-jci-shipping-info-enhanced] .jci-shipping-info-row[open] .jci-shipping-info-row-text {
+    max-height: none;
+    transition: none;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .jci-shipping-info-row,
     .jci-shipping-info-row-text,

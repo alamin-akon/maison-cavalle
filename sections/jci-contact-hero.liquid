@@ -268,20 +268,20 @@
 }
 
   /* styles.css:1071-1102 */
+  /* Each item sits on one line, so the row is a wrapping flex rather than
+     three equal columns that would force the label under its number. */
   .jci-contact-hero-meta {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0.7rem;
-    max-width: 430px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.7rem 2rem;
     padding-block-start: 1.1rem;
     border-top: 1px solid rgb(var(--jci-paper-rgb) / 0.18);
   }
 
   .jci-contact-hero-meta-item {
     display: flex;
-    flex-direction: column;
-    gap: 0.35rem;
-    min-width: 0;
+    align-items: baseline;
+    gap: 0.55rem;
     color: var(--jci-contact-hero-meta);
   }
 
@@ -468,9 +468,6 @@
       margin-block-end: 2rem;
     }
 
-    .jci-contact-hero-meta {
-      max-width: none;
-    }
 
     .jci-contact-hero-feature {
       width: calc(100% - 0.75rem);
