@@ -176,10 +176,11 @@
     text-transform: uppercase;
   }
 
-  .jci-review-carousel .junip-review-carousel-summary-rating,
-  .jci-review-carousel .junip-review-carousel-summary-review-count {
-    font-size: 12px;
-  }
+.jci-review-carousel .junip-review-carousel-summary-rating, .jci-review-carousel .junip-review-carousel-summary-review-count {
+    font-size: clamp(1.2rem,1.7vw,1.65rem);
+    font-weight: 500;
+    font-style: italic;
+}
 
   /* The rail: cards start flush left and leave room for their offset shadow. */
   .jci-review-carousel .junip-review-carousel-container {

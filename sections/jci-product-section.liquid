@@ -298,8 +298,12 @@
       transform 0.3s var(--jci-ease);
   }
 
+  /* `:focus-within` would also match a mouse click, and the quick-add button
+     keeps focus after the modal closes — so its card stayed revealed with the
+     pointer nowhere near it, and hovering another showed two at once.
+     `:has(:focus-visible)` reveals it for keyboard focus only. */
   .jci-product-card:hover .jci-product-card-quick-add,
-  .jci-product-card:focus-within .jci-product-card-quick-add {
+  .jci-product-card:has(:focus-visible) .jci-product-card-quick-add {
     opacity: 1;
     transform: translateY(0);
   }

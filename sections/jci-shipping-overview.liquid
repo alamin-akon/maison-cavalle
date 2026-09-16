@@ -79,9 +79,20 @@
             if b.link != blank
               assign tag = 'a'
             endif
+
+            comment
+              At two columns an odd number of cards leaves the last one alone on
+              its row. §1 does not allow :nth-child, so the count decides here
+              and the CSS centres whatever carries `is-orphan`.
+            endcomment
+            assign orphan = ''
+            assign remainder = cards.size | modulo: 2
+            if forloop.last and remainder == 1
+              assign orphan = ' is-orphan'
+            endif
           -%}
           <{{ tag }}
-            class="jci-shipping-overview-card"
+            class="jci-shipping-overview-card{{ orphan }}"
             {% if b.link != blank %}href="{{ b.link }}"{% endif %}
             {{ block.shopify_attributes }}
           >
@@ -264,6 +275,14 @@
     .jci-shipping-overview-cards {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
+
+    /* Alone on the last row, so it sits in the middle rather than hanging off
+       the left with an empty column beside it. */
+    .jci-shipping-overview-card.is-orphan {
+      grid-column: 1 / -1;
+      justify-self: center;
+      width: calc(50% - var(--jci-shipping-overview-card-gap) / 2);
+    }
   }
 
   /* styles.css:@680 251, 260-261, 269-270 */
@@ -287,6 +306,10 @@
 
     .jci-shipping-overview-card {
       min-height: var(--jci-shipping-overview-card-height-mobile);
+    }
+
+    .jci-shipping-overview-card.is-orphan {
+      width: auto;
     }
 
     .jci-shipping-overview-card-eyebrow {
