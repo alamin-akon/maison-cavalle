@@ -59,7 +59,7 @@
             "title": "Made for the moments between.",
             "text": "What we wear is only one part of a life shaped by horses.",
             "link_label": "Read note",
-            "link": "/pages/our-story",
+            "link": "shopify://pages/our-story",
             "image_asset": "jci-editorial-field-note.webp",
             "image_alt": "Rider and horse moving through an open field"
           }
@@ -72,7 +72,7 @@
             "title": "Before the ride.",
             "text": "",
             "link_label": "Explore the edit",
-            "link": "/collections/all",
+            "link": "shopify://collections/all",
             "image_asset": "jci-deluxe-grooming-kit.webp",
             "image_alt": "Deluxe grooming kit accessories"
           }
@@ -85,7 +85,7 @@
             "title": "Fewer, better pieces.",
             "text": "",
             "link_label": "Shop the Maison",
-            "link": "/collections/all",
+            "link": "shopify://collections/all",
             "image_asset": "jci-faq-hero-white-horse.webp",
             "image_alt": "White horse and rider in the Maison edit"
           }
