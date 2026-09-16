@@ -148,26 +148,38 @@
   aria-hidden="true"
   inert
 >
-  <button
-    type="button"
-    class="jci-product-lightbox-close"
-    data-jci-lightbox-close
-    aria-label="{{ 'actions.close' | t }}"
-  >
-    ×
-  </button>
-  <button
-    type="button"
-    class="jci-product-lightbox-control jci-product-lightbox-previous"
-    data-jci-lightbox-control="previous"
-    aria-label="{{ 'accessibility.slideshow_previous' | t }}"
-  >
-    ←
-  </button>
   <div
     class="jci-product-lightbox-stage"
     data-jci-lightbox-stage
   >
+    {%- comment -%}
+      The three controls live inside the stage so they sit on the image itself
+      rather than out at the dialog's edges.
+    {%- endcomment -%}
+    <button
+      type="button"
+      class="jci-product-lightbox-close"
+      data-jci-lightbox-close
+      aria-label="{{ 'actions.close' | t }}"
+    >
+      {%- render 'jci-close', class: 'jci-product-lightbox-icon' -%}
+    </button>
+    <button
+      type="button"
+      class="jci-product-lightbox-control jci-product-lightbox-previous"
+      data-jci-lightbox-control="previous"
+      aria-label="{{ 'accessibility.slideshow_previous' | t }}"
+    >
+      {%- render 'jci-action-arrow', direction: 'left', class: 'jci-product-lightbox-icon' -%}
+    </button>
+    <button
+      type="button"
+      class="jci-product-lightbox-control jci-product-lightbox-next"
+      data-jci-lightbox-control="next"
+      aria-label="{{ 'accessibility.slideshow_next' | t }}"
+    >
+      {%- render 'jci-action-arrow', direction: 'right', class: 'jci-product-lightbox-icon' -%}
+    </button>
     <img
       class="jci-product-lightbox-image"
       data-jci-lightbox-image
@@ -189,12 +201,4 @@
       <p class="jci-product-lightbox-hint">{{ s.lightbox_hint | escape }}</p>
     {%- endif -%}
   </div>
-  <button
-    type="button"
-    class="jci-product-lightbox-control jci-product-lightbox-next"
-    data-jci-lightbox-control="next"
-    aria-label="{{ 'accessibility.slideshow_next' | t }}"
-  >
-    →
-  </button>
 </div>

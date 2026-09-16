@@ -635,8 +635,13 @@
     position: relative;
     display: grid;
     place-items: center;
-    width: min(100%, 1100px);
-    height: var(--jci-product-lightbox-height);
+    /* Shrink to the frame it holds, so the controls, the count and the hint
+       all sit against the image rather than out at a fixed 1100px box the
+       image rarely fills. */
+    width: fit-content;
+    max-width: min(100%, 1100px);
+    height: fit-content;
+    max-height: var(--jci-product-lightbox-height);
     touch-action: pan-y;
     user-select: none;
   }
@@ -651,6 +656,23 @@
     object-fit: contain;
     box-shadow: 0 24px 70px rgb(0 0 0 / 0.34);
     -webkit-user-drag: none;
+    /* 180ms each way — jci-product.js waits exactly this long before it
+       swaps the frame, so the slide never snaps. */
+    transition: opacity 0.18s var(--jci-ease), transform 0.18s var(--jci-ease);
+  }
+
+  /* The old frame leaves towards the travel direction; the new one is placed
+     on the far side with no transition, then released so it slides in. JS sets
+     --jci-product-lightbox-shift per direction. */
+  .jci-product-lightbox-image.is-leaving {
+    opacity: 0;
+    transform: translateX(var(--jci-product-lightbox-shift, 0px));
+  }
+
+  .jci-product-lightbox-image.is-entering {
+    opacity: 0;
+    transform: translateX(calc(var(--jci-product-lightbox-shift, 0px) * -1));
+    transition: none;
   }
 
   .jci-product-lightbox-close,
@@ -685,21 +707,23 @@
   }
 
   .jci-product-lightbox-close {
-    top: clamp(1rem, 2.5vw, 2rem);
-    right: clamp(1rem, 2.5vw, 2rem);
-    width: 46px;
-    height: 46px;
-    font-size: 28px;
-    font-weight: 300;
+    top: clamp(0.75rem, 1.5vw, 1.25rem);
+    right: clamp(0.75rem, 1.5vw, 1.25rem);
+    width: 42px;
+    height: 42px;
   }
 
   .jci-product-lightbox-control {
     top: 50%;
-    width: 52px;
-    height: 52px;
-    font-size: 21px;
+    width: 48px;
+    height: 48px;
     transform: translateY(-50%);
   }
+
+.jci-product-lightbox-icon {
+    width: 20px;
+    height: 15px;
+}
 
   .jci-product-lightbox-control:hover,
   .jci-product-lightbox-control:focus-visible {
@@ -707,11 +731,11 @@
   }
 
   .jci-product-lightbox-previous {
-    left: clamp(1rem, 2.5vw, 2rem);
+    left: clamp(0.75rem, 1.5vw, 1.25rem);
   }
 
   .jci-product-lightbox-next {
-    right: clamp(1rem, 2.5vw, 2rem);
+    right: clamp(0.75rem, 1.5vw, 1.25rem);
   }
 
   .jci-product-lightbox-meta {
@@ -1365,7 +1389,7 @@
     .jci-product-lightbox-stage {
       --jci-product-lightbox-height: calc(100svh - 8.75rem);
 
-      width: 100%;
+      max-width: 100%;
     }
 
     .jci-product-lightbox-close {

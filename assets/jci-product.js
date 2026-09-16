@@ -20,6 +20,10 @@ const ROOT = '[data-jci-product]';
 const SWIPE_THRESHOLD = 45;
 const pad = (value) => String(value).padStart(2, '0');
 const ACCORDION_DURATION = 320;
+// Matches the .jci-product-lightbox-image transition in jci-product.liquid.
+const LIGHTBOX_SLIDE = 180;
+const LIGHTBOX_DECODE_CAP = 400;
+const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const ACCORDION_EASING = 'cubic-bezier(0.22, 0.61, 0.36, 1)';
 
 class JciProduct {
@@ -27,6 +31,8 @@ class JciProduct {
   #returnFocus = null;
   #swipe = null;
   #lightboxIndex = 0;
+  #lightboxRun = null;
+  #preloaded = new Set();
   #accordionAnimations = new WeakMap();
 
   constructor(root) {
@@ -131,7 +137,8 @@ class JciProduct {
 
     const control = target.closest('[data-jci-lightbox-control]');
     if (control) {
-      this.#showLightboxImage(this.#lightboxIndex + (control.getAttribute('data-jci-lightbox-control') === 'next' ? 1 : -1));
+      const step = control.getAttribute('data-jci-lightbox-control') === 'next' ? 1 : -1;
+      this.#showLightboxImage(this.#lightboxIndex + step, step);
     }
   };
 
@@ -357,22 +364,97 @@ class JciProduct {
     this.#openLightbox(Number(figure.getAttribute('data-jci-lightbox-open')), figure);
   };
 
-  #showLightboxImage(index) {
+  /** The full-size source a gallery figure points at. */
+  #lightboxSrc(figure) {
+    const source = figure?.querySelector('img');
+    if (!source) return '';
+    return source.getAttribute('data-jci-lightbox-src') || source.currentSrc || source.src;
+  }
+
+  /**
+   * Warms the frames either side of the current one. Without this every arrow
+   * press starts a fresh download of a 2200px image, which is what made the
+   * change take seconds; decoded ahead of time it is instant.
+   */
+  #preloadNeighbours() {
+    const figures = this.#figures;
+    if (figures.length < 2) return;
+
+    for (const step of [1, -1]) {
+      const src = this.#lightboxSrc(figures[(this.#lightboxIndex + step + figures.length) % figures.length]);
+      if (!src || this.#preloaded.has(src)) continue;
+      this.#preloaded.add(src);
+      const warm = new Image();
+      warm.decoding = 'async';
+      warm.src = src;
+    }
+  }
+
+  async #showLightboxImage(index, direction = 0) {
     const figures = this.#figures;
     if (!figures.length || !this.lightbox) return;
 
     this.#lightboxIndex = (index + figures.length) % figures.length;
 
-    const source = figures[this.#lightboxIndex].querySelector('img');
     const image = this.lightbox.querySelector('[data-jci-lightbox-image]');
     const count = this.lightbox.querySelector('[data-jci-lightbox-count]');
-
-    if (source && image) {
-      image.src = source.getAttribute('data-jci-lightbox-src') || source.currentSrc || source.src;
-      image.alt = source.alt;
-    }
+    const source = figures[this.#lightboxIndex].querySelector('img');
 
     if (count) count.textContent = `${pad(this.#lightboxIndex + 1)} / ${pad(figures.length)}`;
+    if (!source || !image) return;
+
+    const src = this.#lightboxSrc(figures[this.#lightboxIndex]);
+    // Only a deliberate step animates. Opening the lightbox sets its frame
+    // outright, so it never slides in from a neighbour it was never on.
+    const travel = direction;
+
+    // A token, so a fast run of clicks only ever paints the last one.
+    const run = Symbol('lightbox-change');
+    this.#lightboxRun = run;
+
+    if (this.reducedMotion || !travel) {
+      image.src = src;
+      image.alt = source.alt;
+      this.#preloadNeighbours();
+      return;
+    }
+
+    image.style.setProperty('--jci-product-lightbox-shift', travel > 0 ? '-40px' : '40px');
+    image.classList.add('is-leaving');
+
+    const warm = new Image();
+    warm.decoding = 'async';
+    warm.src = src;
+    // `complete` is already true for a preloaded frame, which is the usual
+    // case — #preloadNeighbours warms both sides after every change. Only a
+    // cold frame waits, and never longer than the cap.
+    const ready = warm.complete
+      ? Promise.resolve()
+      : Promise.race([
+          new Promise((resolve) => {
+            warm.addEventListener('load', resolve, { once: true });
+            warm.addEventListener('error', resolve, { once: true });
+          }),
+          wait(LIGHTBOX_DECODE_CAP),
+        ]);
+
+    // Both: the frame has to be ready, and the outgoing slide has to finish,
+    // so a warm image still animates instead of snapping half way through.
+    await Promise.all([ready, wait(LIGHTBOX_SLIDE)]);
+    if (this.#lightboxRun !== run) return;
+
+    image.src = src;
+    image.alt = source.alt;
+    image.classList.remove('is-leaving');
+    image.classList.add('is-entering');
+
+    // Flush the entering position so the browser has something to transition
+    // from. A forced reflow is synchronous; waiting on frames leaves the image
+    // invisible for however long the next frame takes to arrive.
+    void image.offsetWidth;
+    image.classList.remove('is-entering');
+
+    this.#preloadNeighbours();
   }
 
   #openLightbox(index, trigger) {
@@ -405,7 +487,8 @@ class JciProduct {
       this.#closeLightbox();
     } else if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
       event.preventDefault();
-      this.#showLightboxImage(this.#lightboxIndex + (event.key === 'ArrowRight' ? 1 : -1));
+      const step = event.key === 'ArrowRight' ? 1 : -1;
+      this.#showLightboxImage(this.#lightboxIndex + step, step);
     } else if (event.key === 'Tab') {
       const focusable = [...this.lightbox.querySelectorAll('button:not([disabled])')];
       const first = focusable[0];
@@ -435,7 +518,8 @@ class JciProduct {
     const deltaY = event.clientY - swipe.y;
     if (Math.abs(deltaX) < SWIPE_THRESHOLD || Math.abs(deltaX) <= Math.abs(deltaY)) return;
 
-    this.#showLightboxImage(this.#lightboxIndex + (deltaX < 0 ? 1 : -1));
+    const step = deltaX < 0 ? 1 : -1;
+    this.#showLightboxImage(this.#lightboxIndex + step, step);
   };
 
   #clearSwipe = () => {
