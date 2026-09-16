@@ -28,6 +28,7 @@
 
 <section
   class="jci-shipping-info"
+  data-jci-shipping-info
   {% if s.anchor_id != blank %}id="{{ s.anchor_id | handleize }}"{% endif %}
   {{ section.shopify_attributes }}
   style="
@@ -82,7 +83,7 @@
     </div>
 
     {%- if rows.size > 0 -%}
-      <div class="jci-shipping-info-list">
+      <div class="jci-shipping-info-list" data-jci-shipping-info-list>
         {%- for block in rows -%}
           {%- comment -%}
             The shared `name` makes this an exclusive accordion: the browser
@@ -93,6 +94,7 @@
           {%- endcomment -%}
           <details
             class="jci-shipping-info-row"
+            data-jci-shipping-info-row
             name="jci-shipping-info-{{ section.id }}"
             {% if forloop.first and s.open_first %}open{% endif %}
             {{ block.shopify_attributes }}
@@ -103,13 +105,15 @@
               {%- endif -%}
               <h3 class="jci-shipping-info-row-title">{{ block.settings.title }}</h3>
             </summary>
-            <p class="jci-shipping-info-row-text">{{ block.settings.text }}</p>
+            <p class="jci-shipping-info-row-text" data-jci-shipping-info-answer>{{ block.settings.text }}</p>
           </details>
         {%- endfor -%}
       </div>
     {%- endif -%}
   </div>
 </section>
+
+<script src="{{ 'jci-shipping-info.js' | asset_url }}" type="module"></script>
 
 {% stylesheet %}
   .jci-shipping-info {
@@ -197,6 +201,9 @@
   .jci-shipping-info-list {
     display: grid;
     gap: var(--jci-shipping-info-row-gap);
+    /* Measured from the tallest answer by jci-shipping-info.js. The list
+       keeps one height whether a row is open or closed, matching Home FAQ. */
+    min-height: var(--jci-shipping-info-list-reserve, auto);
   }
 
   /* styles.css:890-897 */

@@ -259,7 +259,7 @@
         "bottom_color": "#92998b",
         "rule_opacity": 18,
         "background_width": "content",
-        "space_above": 0,
+        "space_above": 30,
         "padding_top": 96,
         "padding_bottom": 24,
         "top_gap": 48,
