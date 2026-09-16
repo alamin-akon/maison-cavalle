@@ -15,22 +15,22 @@
         "meta_1": {
           "type": "meta",
           "settings": {
-            "index": "01",
-            "label": "Fit & care"
+            "index": "",
+            "label": "01 Fit & care"
           }
         },
         "meta_2": {
           "type": "meta",
           "settings": {
-            "index": "02",
-            "label": "Delivery"
+            "index": "",
+            "label": "02 Delivery"
           }
         },
         "meta_3": {
           "type": "meta",
           "settings": {
-            "index": "03",
-            "label": "Returns"
+            "index": "",
+            "label": "03 Returns"
           }
         }
       },
@@ -50,7 +50,7 @@
         "overlay_title": "Here when you need us.",
         "stamp_mark": "MC",
         "stamp_note": "help / 2026",
-        "stamp_size": 74,
+        "stamp_size": 78,
         "image_ratio": 88,
         "image_ratio_mobile": 86,
         "image_saturate": 62,
@@ -199,7 +199,7 @@
         "index_width": 34,
         "summary_gap": 100,
         "toggle_duration": 320,
-        "single_open": false,
+        "single_open": true,
         "show_search": true,
         "search_label": "Search frequently asked questions",
         "search_placeholder": "Search fit, delivery or returns",
