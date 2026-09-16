@@ -137,73 +137,55 @@
         "anchor_id": "story-name"
       }
     },
-    "jci_story_continuing": {
+    "jci_story_chapter_h7fgV8": {
       "type": "jci-story-chapter",
       "blocks": {
-        "paragraph_2": {
+        "paragraph_rU7w68": {
           "type": "paragraph",
           "settings": {
-            "number": "",
-            "label": "",
-            "text": "Maison Cavallé is the next chapter of that story.",
-            "tone": "statement"
-          }
-        },
-        "paragraph_1": {
-          "type": "paragraph",
-          "settings": {
-            "number": "",
-            "label": "",
-            "text": "From British racing yards to Australian stables, from one generation to the next, horses have always been there.",
+            "number": "01",
+            "label": "Then ·  United Kingdom",
+            "text": "A childhood among racehorses, competition and the rhythm of the stable.",
             "tone": "body"
           }
         },
-        "step_1": {
-          "type": "step",
+        "paragraph_tBywx4": {
+          "type": "paragraph",
           "settings": {
-            "label": "01 · Then",
-            "title": "United Kingdom",
-            "text": "A childhood among racehorses, competition and the rhythm of the stable."
+            "number": "02",
+            "label": "The journey · A new home",
+            "text": "A life in Australia, with horses remaining at the heart of family life.",
+            "tone": "body"
           }
         },
-        "step_2": {
-          "type": "step",
+        "paragraph_hFNkVx": {
+          "type": "paragraph",
           "settings": {
-            "label": "02 · The journey",
-            "title": "A new home",
-            "text": "A life in Australia, with horses remaining at the heart of family life."
-          }
-        },
-        "step_3": {
-          "type": "step",
-          "settings": {
-            "label": "03 · Now",
-            "title": "The Maison",
-            "text": "A modern wardrobe inspired by heritage, made for the moments between."
+            "number": "03",
+            "label": "Now · The Maison",
+            "text": "A modern wardrobe inspired by heritage, made for the moments in between.",
+            "tone": "body"
           }
         }
       },
       "block_order": [
-        "paragraph_2",
-        "paragraph_1",
-        "step_1",
-        "step_2",
-        "step_3"
+        "paragraph_rU7w68",
+        "paragraph_tBywx4",
+        "paragraph_hFNkVx"
       ],
       "settings": {
-        "layout": "continuing",
+        "layout": "origin",
         "number": "03",
         "eyebrow": "Chapter 03 · Continuing",
         "title_line_one": "From one generation",
         "title_line_two": "to the next.",
-        "intro": "",
-        "signoff": "",
-        "signoff_mark": "",
+        "intro": "From British racing yards to Australian stables, from one generation to the next, horses have always been there.",
+        "signoff": "Maison Cavallé is the next chapter of that story.",
+        "signoff_mark": "Maison Cavallé",
         "image_asset": "",
-        "image": "shopify://shop_images/horse.png",
-        "image_alt": "A horse standing in an open field at dusk",
+        "image_alt": "A horse standing in an open field",
         "overlay_text": "Horses\nPeople\nA brighter\ntomorrow",
-        "background_color": "{{ settings.color_palette.background }}",
+        "background_color": "",
         "text_color": "",
         "accent_color": "",
         "overlay_color": "",
@@ -214,7 +196,7 @@
         "padding_bottom": 100,
         "padding_top_mobile": 52,
         "padding_bottom_mobile": 52,
-        "anchor_id": "story-continuing"
+        "anchor_id": "story-origin"
       }
     },
     "jci_story_quote": {
@@ -288,7 +270,7 @@
     "jci_story_hero",
     "jci_story_origin",
     "jci_story_heritage",
-    "jci_story_continuing",
+    "jci_story_chapter_h7fgV8",
     "jci_story_quote",
     "main"
   ]
