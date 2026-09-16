@@ -144,9 +144,9 @@
         "enable_sticky_bar": true,
         "background_color": "",
         "padding_top": 56,
-        "padding_bottom": 136,
+        "padding_bottom": 100,
         "padding_top_mobile": 0,
-        "padding_bottom_mobile": 72
+        "padding_bottom_mobile": 52
       }
     },
     "jci_product_reviews": {
@@ -175,10 +175,10 @@
         "button_text_color": "",
         "accent_color": "",
         "highlight_color": "",
-        "padding_top": 136,
-        "padding_bottom": 136,
-        "padding_top_mobile": 72,
-        "padding_bottom_mobile": 72,
+        "padding_top": 100,
+        "padding_bottom": 100,
+        "padding_top_mobile": 52,
+        "padding_bottom_mobile": 52,
         "anchor_id": "reviews"
       }
     },
@@ -540,10 +540,10 @@
         "media_background": "",
         "intro_color": "#5f6259",
         "subtitle_color": "#6d7066",
-        "padding_top": 136,
-        "padding_bottom": 136,
-        "padding_top_mobile": 72,
-        "padding_bottom_mobile": 72,
+        "padding_top": 100,
+        "padding_bottom": 100,
+        "padding_top_mobile": 52,
+        "padding_bottom_mobile": 52,
         "header_gap": 40,
         "grid_gap": 28,
         "grid_row_gap_mobile": 36,

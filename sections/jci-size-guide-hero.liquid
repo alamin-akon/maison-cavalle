@@ -221,15 +221,15 @@
 .jci-size-guide-hero-main {
     position: relative;
     display: grid;
-    grid-template-columns: minmax(0,.90fr) minmax(0,1.10fr);
-    gap: clamp(1rem,3vw,5rem);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: clamp(2rem, 2vw, 2rem);
     min-height: var(--jci-size-guide-hero-min-height);
     padding-block-start: clamp(4rem,8vw,7.5rem);
 }
 
   /* styles.css:1271-1276, with :737-739 applied. */
 .jci-size-guide-hero-copy {
-    max-width: 690px;
+    max-width: 100%;
 }
 
   .jci-size-guide-hero-eyebrow {
@@ -239,11 +239,13 @@
 
   /* All page heroes share the hero title size (§3). */
   .jci-size-guide-hero-title {
-    max-width: 670px;
-    margin: 0 0 1.8rem;
+    /* max-width: 670px; */
+    /* margin: 0 0 1.8rem; */
     font-family: var(--jci-font-display);
     font-size: var(--jci-hero-title-size);
     font-weight: 500;
+    /* styles.css — the page heroes set their own leading. */
+    line-height: 100%;
   }
 
   .jci-size-guide-hero-title-accent {

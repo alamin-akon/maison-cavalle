@@ -150,8 +150,8 @@
   /* styles.css:982 */
   .jci-faq-hero-container {
     display: grid;
-    grid-template-columns: minmax(0, 0.86fr) minmax(360px, 0.84fr);
-    gap: clamp(2.5rem, 7vw, 8rem);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: clamp(2rem, 2vw, 2rem);
     align-items: center;
     min-height: var(--jci-faq-hero-min-height);
     padding-block: var(--jci-faq-hero-pad-top) var(--jci-faq-hero-pad-bottom);
@@ -161,6 +161,7 @@
   .jci-faq-hero-copy {
     position: relative;
     z-index: 1;
+    max-width: 100%;
   }
 
   /* styles.css:984 */
@@ -171,11 +172,13 @@
 
   /* styles.css:985-986. All page heroes share the hero title size (§3). */
   .jci-faq-hero-title {
-    max-width: 680px;
+    /* max-width: 680px; */
     margin: 0;
     font-family: var(--jci-font-display);
     font-size: var(--jci-hero-title-size);
     font-weight: 500;
+    /* styles.css — the page heroes set their own leading. */
+    line-height: 100%;
   }
 
   .jci-faq-hero-title-accent {

@@ -81,6 +81,30 @@ This is the one place the clone is deliberately not 1:1, so it needs no
 per-instance report under §0. Everything else about the type — family, size,
 weight, case — is still cloned exactly.
 
+#### The one exception: page hero titles
+
+Standing developer instruction, later than the rule above and outranking it:
+**the page hero titles carry `line-height: 100%`.**
+
+At `--jci-hero-title-size` (64 → 144px) normal leading opens the two lines of a
+hero headline far enough apart that they stop reading as one block. These six
+set it, and nothing else does:
+
+| Section | Title class |
+|---|---|
+| `jci-story-hero` | `.jci-story-hero-title` |
+| `jci-contact-hero` | `.jci-contact-hero-title` |
+| `jci-size-guide-hero` | `.jci-size-guide-hero-title` |
+| `jci-journal-hero` | `.jci-journal-hero-title` |
+| `jci-collection-hero` | `.jci-collection-hero-title` |
+| `jci-faq-hero` | `.jci-faq-hero-title` |
+
+**The homepage hero (`jci-hero`) is excluded** and keeps normal leading.
+
+The exception is this list and nothing more: not the feature/overlay titles
+inside those heroes, not section headings, not body copy. `letter-spacing`
+stays banned everywhere, with no exception.
+
 ### A section ships complete, or not at all
 
 Standing developer instruction, and by §0 #1 it outranks everything below:

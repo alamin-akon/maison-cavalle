@@ -217,15 +217,15 @@
   .jci-contact-hero-main {
     position: relative;
     display: grid;
-    grid-template-columns: minmax(0, 0.86fr) minmax(0, 1.14fr);
-    gap: clamp(3rem, 8vw, 9rem);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: clamp(2rem, 2vw, 2rem);
     min-height: var(--jci-contact-hero-min-height);
     padding-block-start: clamp(4rem, 8vw, 7.5rem);
   }
 
   /* styles.css:1271-1276, with :1064-1066 applied. */
   .jci-contact-hero-copy {
-    max-width: 590px;
+    max-width: 100%;
   }
 
   .jci-contact-hero-eyebrow {
@@ -235,11 +235,13 @@
 
   /* All page heroes share the hero title size (§3). */
   .jci-contact-hero-title {
-    max-width: 600px;
-    margin: 0 0 1.8rem;
+    /* max-width: 600px; */
+    /* margin: 0 0 1.8rem; */
     font-family: var(--jci-font-display);
     font-size: var(--jci-hero-title-size);
     font-weight: 500;
+    /* styles.css — the page heroes set their own leading. */
+    line-height: 100%;
   }
 
   .jci-contact-hero-title-accent {
