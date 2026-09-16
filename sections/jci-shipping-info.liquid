@@ -84,8 +84,16 @@
     {%- if rows.size > 0 -%}
       <div class="jci-shipping-info-list">
         {%- for block in rows -%}
+          {%- comment -%}
+            The shared `name` makes this an exclusive accordion: the browser
+            closes whichever row was open the instant another one opens, so the
+            list never stacks six answers and grows down the page. Native, so
+            it needs no JS; a browser without support simply allows more than
+            one open.
+          {%- endcomment -%}
           <details
             class="jci-shipping-info-row"
+            name="jci-shipping-info-{{ section.id }}"
             {% if forloop.first and s.open_first %}open{% endif %}
             {{ block.shopify_attributes }}
           >
@@ -395,7 +403,7 @@
     { "type": "text", "id": "mark", "label": "Sign-off mark", "default": "MC / Care" },
 
     { "type": "header", "content": "Rows" },
-    { "type": "checkbox", "id": "open_first", "label": "Open the first row", "default": true },
+    { "type": "checkbox", "id": "open_first", "label": "Open the first row", "default": true, "info": "Only one row is open at a time either way." },
     { "type": "range", "id": "row_gap", "label": "Row gap", "min": 0, "max": 200, "step": 5, "unit": "%", "default": 70, "info": "Hundredths of a rem — 70 is the prototype's 0.7rem." },
     { "type": "range", "id": "answer_max_height", "label": "Answer height cap", "min": 10, "max": 60, "step": 1, "unit": "rem", "default": 28, "info": "A long answer needs a taller cap to open fully." },
 
