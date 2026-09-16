@@ -56,8 +56,8 @@
     --jci-newsletter-frame-opacity: {{ s.frame_opacity | divided_by: 100.0 }};
     --jci-newsletter-ring-size: {{ s.ring_size | divided_by: 10.0 }}rem;
     {%- if s.background_width == 'full' %}
-      --jci-container-width: 100vw;
-      --jci-container-offset: calc(50% - 50vw);
+      --jci-container-width: var(--jci-page-column);
+      --jci-container-offset: calc(50% - var(--jci-page-column) / 2);
     {%- endif %}
   "
 >

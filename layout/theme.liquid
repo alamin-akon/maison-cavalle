@@ -158,7 +158,7 @@
 
       <main
         id="MainContent"
-        class="content-for-layout"
+        class="content-for-layout jci-page"
         role="main"
         data-page-transition-enabled="{{ settings.page_transition_enabled }}"
         data-product-transition="{{ settings.transition_to_main_product }}"
@@ -167,7 +167,7 @@
         {{ content_for_layout }}
       </main>
 
-      <footer>
+      <footer class="jci-page">
         {% sections 'footer-group' %}
       </footer>
     </div>

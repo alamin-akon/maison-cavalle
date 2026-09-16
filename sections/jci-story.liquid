@@ -59,8 +59,8 @@
     --jci-story-rule-rgb: {{ s.rule_color.rgb | default: settings.color_palette.color6.rgb }};
     --jci-story-media-gap: clamp(2.5rem, 7vw, {{ s.column_gap | divided_by: 10.0 }}rem);
     {%- if s.background_width == 'full' %}
-      --jci-container-width: 100vw;
-      --jci-container-offset: calc(50% - 50vw);
+      --jci-container-width: var(--jci-page-column);
+      --jci-container-offset: calc(50% - var(--jci-page-column) / 2);
     {%- endif %}
     --jci-story-copy-max: {{ s.copy_max_width }}px;
     --jci-story-frame-min: {{ s.frame_min_height }}px;

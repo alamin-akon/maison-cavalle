@@ -20,6 +20,10 @@
   --jci-page-pad: clamp(1.25rem, 4vw, 4.25rem);
   --jci-editorial-gutter: calc(var(--jci-page-pad) + clamp(0rem, 4vw, 4rem));
 
+  /* The width the page column actually occupies. A section that breaks out of
+     its container fills this, not the viewport — past 1600px the two differ. */
+  --jci-page-column: min(100vw, var(--jci-content-max));
+
   /* Section vertical rhythm — three steps only, no ad-hoc clamps */
   --jci-section-pad-sm: clamp(3rem, 6vw, 5.5rem);
   --jci-section-pad: clamp(4.5rem, 9vw, 8.5rem);
@@ -92,6 +96,21 @@
   width: var(--jci-container-width, min(100%, var(--jci-content-max)));
   margin-inline: var(--jci-container-offset, auto) auto;
   padding-inline: var(--jci-container-pad, var(--jci-page-pad));
+}
+
+/* --------------------------------------------------------------------------
+   Page column (§5)
+   The prototype wraps every page in `#app` — `width: min(100%, --content-max)`,
+   centred (styles.css:32) — so a section's BACKGROUND stops at 1600px instead
+   of bleeding to the viewport edge. Past 1600px that leaves paper down both
+   sides, which is the design. Reproduced here on `main` and the footer.
+
+   The announcement bar and header sit outside this and stay full-bleed, as
+   they do in the prototype.
+   -------------------------------------------------------------------------- */
+.jci-page {
+  width: min(100%, var(--jci-content-max));
+  margin-inline: auto;
 }
 
 /* --------------------------------------------------------------------------

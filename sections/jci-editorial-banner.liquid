@@ -56,8 +56,8 @@
     {%- endcomment %}
     --jci-container-pad: 0;
     {%- if s.background_width == 'full' %}
-      --jci-container-width: 100vw;
-      --jci-container-offset: calc(50% - 50vw);
+      --jci-container-width: var(--jci-page-column);
+      --jci-container-offset: calc(50% - var(--jci-page-column) / 2);
     {%- endif %}
   "
 >

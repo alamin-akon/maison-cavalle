@@ -48,8 +48,8 @@
     --jci-footer-heading-size: {{ s.heading_size }}px;
     --jci-footer-link-size: {{ s.link_size }}px;
     {%- if s.background_width == 'full' %}
-      --jci-container-width: 100vw;
-      --jci-container-offset: calc(50% - 50vw);
+      --jci-container-width: var(--jci-page-column);
+      --jci-container-offset: calc(50% - var(--jci-page-column) / 2);
     {%- endif %}
   "
 >
