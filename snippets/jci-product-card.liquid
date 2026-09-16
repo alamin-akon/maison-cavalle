@@ -164,7 +164,7 @@
       {%- endcomment -%}
       {%- capture quick_add_inner -%}
         <span class="jci-product-card-quick-add-text add-to-cart-text">
-          {{- quick_add_label }} <span aria-hidden="true">&#65291;</span>
+          {{- quick_add_label }} <span class="jci-product-card-quick-add-plus" aria-hidden="true">{{- 'icon-plus.svg' | inline_asset_content -}}</span>
         </span>
         {%- render 'jci-product-card-bag-icon' -%}
       {%- endcapture -%}

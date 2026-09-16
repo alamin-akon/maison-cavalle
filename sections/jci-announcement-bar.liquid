@@ -60,7 +60,7 @@
         data-jci-announcement-dismiss
         aria-label="{{ 'actions.close' | t }}"
       >
-        <span aria-hidden="true">&times;</span>
+        {%- render 'jci-close', class: 'jci-announcement-bar-dismiss-icon' -%}
       </button>
     {%- endif -%}
   </jci-announcement-bar>
@@ -117,14 +117,19 @@
     position: absolute;
     inset-inline-end: var(--jci-announcement-dismiss-offset);
     inset-block-start: 50%;
+    display: grid;
+    place-items: center;
     padding: 0.1rem 0.35rem;
     border: 0;
     color: inherit;
     background: transparent;
-    font-size: var(--jci-announcement-dismiss-size);
-    font-weight: 300;
     cursor: pointer;
     transform: translateY(-50%);
+  }
+
+  .jci-announcement-bar-dismiss-icon {
+    width: var(--jci-announcement-dismiss-size);
+    height: var(--jci-announcement-dismiss-size);
   }
 
   .jci-announcement-bar-dismiss:focus-visible {

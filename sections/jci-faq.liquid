@@ -95,7 +95,7 @@
             data-jci-faq-clear
             aria-label="{{ s.search_clear_label | escape }}"
           >
-            &times;
+            {%- render 'jci-close', class: 'jci-faq-search-clear-icon' -%}
           </button>
         </label>
       {%- endif -%}
@@ -204,14 +204,9 @@
                       {{- question.settings.index | default: question_index | prepend: '0' | slice: -2, 2 -}}
                     </span>
                     <h4 class="jci-faq-item-question">{{ question.settings.question }}</h4>
-                    {%- comment -%}
-                      styles.css:1036-1037 swaps the glyph outright, + to -.
-                      Both are rendered and one is shown, so no CSS `content`
-                      is needed and the entities stay in the markup.
-                    {%- endcomment -%}
                     <b class="jci-faq-item-toggle" aria-hidden="true">
-                      <span class="jci-faq-item-toggle-plus">&#65291;</span>
-                      <span class="jci-faq-item-toggle-minus">&#8722;</span>
+                      <span class="jci-faq-item-toggle-plus">{{- 'icon-plus.svg' | inline_asset_content -}}</span>
+                      <span class="jci-faq-item-toggle-minus">{{- 'icon-minus.svg' | inline_asset_content -}}</span>
                     </b>
                   </summary>
                   <div class="jci-faq-item-answer">{{ answer }}</div>
@@ -309,17 +304,23 @@
 
   /* The clear button only appears once there is something to clear. */
   .jci-faq-search-clear {
+    display: grid;
+    place-items: center;
     width: 20px;
     height: 20px;
     padding: 0;
     border: 0;
     color: var(--jci-faq-accent);
     background: transparent;
-    font-size: 20px;
     opacity: 0;
     pointer-events: none;
     cursor: pointer;
     transition: opacity 0.2s;
+  }
+
+  .jci-faq-search-clear-icon {
+    width: 16px;
+    height: 16px;
   }
 
   .jci-faq-search:focus-within .jci-faq-search-clear,
@@ -503,10 +504,18 @@
   }
 
   .jci-faq-item-toggle {
+    display: grid;
+    place-items: center;
+    width: 19px;
+    height: 19px;
     color: var(--jci-faq-accent);
-    font-family: var(--jci-font-sans);
-    font-size: 19px;
-    font-weight: 400;
+    --icon-stroke-width: 1.4px;
+  }
+
+  .jci-faq-item-toggle svg {
+    display: block;
+    width: 19px;
+    height: 19px;
   }
 
   .jci-faq-item-toggle-minus,
@@ -515,7 +524,7 @@
   }
 
   .jci-faq-item[open] .jci-faq-item-toggle-minus {
-    display: inline;
+    display: grid;
   }
 
   /* styles.css:1040-1041. Height is animated by jci-faq.js, so the answer

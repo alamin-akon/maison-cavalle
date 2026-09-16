@@ -202,7 +202,8 @@
   >
     <div class="jci-header-drawer-head">
       <button class="jci-header-drawer-back" type="button" data-jci-drawer-close>
-        <span aria-hidden="true">&larr;</span> {{ 'actions.close' | t }}
+        {%- render 'jci-action-arrow', direction: 'left', class: 'jci-header-drawer-back-icon' -%}
+        {{ 'actions.close' | t }}
       </button>
       <span class="jci-eyebrow">{{ shop.name }}</span>
     </div>
@@ -610,13 +611,14 @@
     cursor: pointer;
   }
 
-  .jci-header-drawer-back span {
-    font-size: 16px;
+  .jci-header-drawer-back-icon {
+    width: 14px;
+    height: 14px;
     transition: transform 0.3s var(--jci-ease);
   }
 
-  .jci-header-drawer-back:hover span,
-  .jci-header-drawer-back:focus-visible span {
+  .jci-header-drawer-back:hover .jci-header-drawer-back-icon,
+  .jci-header-drawer-back:focus-visible .jci-header-drawer-back-icon {
     transform: translateX(-3px);
   }
 

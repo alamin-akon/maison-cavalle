@@ -115,7 +115,7 @@
               data-jci-gallery-control="previous"
               aria-label="{{ 'accessibility.slideshow_previous' | t }}"
             >
-              ←
+              {%- render 'jci-action-arrow', direction: 'left', class: 'jci-product-gallery-control-icon' -%}
             </button>
             <button
               type="button"
@@ -123,7 +123,7 @@
               data-jci-gallery-control="next"
               aria-label="{{ 'accessibility.slideshow_next' | t }}"
             >
-              →
+              {%- render 'jci-action-arrow', direction: 'right', class: 'jci-product-gallery-control-icon' -%}
             </button>
           </div>
         </div>

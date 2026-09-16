@@ -91,7 +91,7 @@
               <summary class="jci-home-faq-summary" data-jci-faq-summary>
                 <span class="jci-home-faq-index">{{ b.index | default: forloop.index | prepend: '0' | slice: -2, 2 }}</span>
                 <h3 class="jci-home-faq-question">{{ b.question }}</h3>
-                <b class="jci-home-faq-toggle" aria-hidden="true">&#65291;</b>
+                <span class="jci-home-faq-toggle" aria-hidden="true">{{- 'icon-plus.svg' | inline_asset_content -}}</span>
               </summary>
               <div class="jci-home-faq-answer" data-jci-faq-answer>{{ answer }}</div>
             </details>
@@ -228,11 +228,19 @@
   }
 
   .jci-home-faq-toggle {
+    display: grid;
+    place-items: center;
+    width: 22px;
+    height: 22px;
     color: var(--jci-home-faq-accent);
-    font-family: var(--jci-font-sans);
-    font-size: 22px;
-    font-weight: 400;
+    --icon-stroke-width: 1.5px;
     transition: transform 0.3s var(--jci-ease);
+  }
+
+  .jci-home-faq-toggle svg {
+    display: block;
+    width: 18px;
+    height: 18px;
   }
 
   .jci-home-faq-item[open] .jci-home-faq-toggle {

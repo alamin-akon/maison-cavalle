@@ -94,7 +94,7 @@
           aria-label="{{ 'actions.close' | t }}"
           on:click="/close"
         >
-          <span class="menu-drawer__close-arrow" aria-hidden="true">&larr;</span>
+          <span class="menu-drawer__close-arrow" aria-hidden="true">{{- 'icon-arrow.svg' | inline_asset_content -}}</span>
           <span class="menu-drawer__close-label">{{ block_settings.drawer_back_label }}</span>
         </button>
         <span class="menu-drawer__brand">{{ block_settings.drawer_brand }}</span>
@@ -971,8 +971,16 @@
   }
 
   .menu-drawer__close-arrow {
-    font-size: 16px;
+    display: grid;
+    width: 16px;
+    height: 16px;
     transition: transform 0.3s var(--jci-ease);
+  }
+
+  .menu-drawer__close-arrow svg {
+    width: 100%;
+    height: 100%;
+    transform: rotate(180deg);
   }
 
   .menu-drawer__close-button:hover .menu-drawer__close-arrow,

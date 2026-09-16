@@ -124,7 +124,9 @@
                   class="jci-testimonial-card-stars"
                   aria-label="{{ rating }} {{ s.rating_out_of }} 5"
                 >
-                  {%- for i in (1..rating) -%}&#9733;{%- endfor -%}
+                  {%- for i in (1..rating) -%}
+                    {%- render 'jci-star', class: 'jci-testimonial-card-star' -%}
+                  {%- endfor -%}
                 </div>
               {%- endif -%}
 
@@ -301,10 +303,15 @@
   .jci-testimonial-card-stars {
     position: relative;
     z-index: 1;
+    display: flex;
+    gap: 2px;
     margin-block: auto 1.25rem;
     color: var(--jci-testimonials-stars);
-    font-family: var(--jci-font-sans);
-    font-size: 13px;
+  }
+
+  .jci-testimonial-card-star {
+    width: 13px;
+    height: 13px;
   }
 
   .jci-testimonial-card--featured .jci-testimonial-card-stars {

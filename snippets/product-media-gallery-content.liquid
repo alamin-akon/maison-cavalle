@@ -554,7 +554,7 @@
                   data-jci-gallery-control="previous"
                   aria-label="{{ 'accessibility.slideshow_previous' | t }}"
                 >
-                  ←
+                  {%- render 'jci-action-arrow', direction: 'left', class: 'media-gallery__rail-control-icon' -%}
                 </button>
                 <button
                   type="button"
@@ -562,7 +562,7 @@
                   data-jci-gallery-control="next"
                   aria-label="{{ 'accessibility.slideshow_next' | t }}"
                 >
-                  →
+                  {%- render 'jci-action-arrow', direction: 'right', class: 'media-gallery__rail-control-icon' -%}
                 </button>
               </div>
             </li>
@@ -1394,9 +1394,12 @@
       border-radius: 0;
       background: rgb(var(--jci-paper-rgb) / 0.7);
       box-shadow: 0 10px 24px rgb(var(--jci-ink-rgb) / 0.16);
-      font-family: var(--jci-font-sans);
-      font-size: 18px;
       pointer-events: auto;
+    }
+
+    .product-information .media-gallery__rail-control-icon {
+      width: 16px;
+      height: 16px;
     }
 
     .product-information .media-gallery__rail-control:focus-visible {

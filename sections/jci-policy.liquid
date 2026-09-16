@@ -1,0 +1,248 @@
+{% comment %}
+  Maison Cavallé — policy page
+
+  Renders the shop policies Shopify keeps in Settings → Policies: shipping,
+  refund, privacy, terms and contact information. All of them share one
+  template, so this section is written against `page.title` and `page.content`
+  and carries no copy of its own beyond the eyebrow.
+
+  Reference: MAISON-CAVALLE-SPEC.md §0, §1, §3, §5, §7
+
+  The prototype has no policy page, so there is nothing to clone. The page
+  borrows the house language instead: the section title token for the heading,
+  the shared container, and a reading measure for the body.
+
+  The heading deliberately uses --jci-section-title-size, not the hero token.
+  jci-base.css points Horizon's --font-size--h1 at the 144px hero size, which
+  is why an unstyled policy page renders "Privacy policy" three lines tall.
+
+  Shopify writes the policy body as plain HTML with no classes, so §1's
+  "no bare tag styling" cannot apply inside it. Every one of those selectors is
+  scoped under .jci-policy-body and appears nowhere else — the same exception
+  jci-story-heritage makes for its richtext setting.
+
+  No letter-spacing or line-height is authored (§0).
+{% endcomment %}
+
+{%- liquid
+  assign s = section.settings
+
+  comment
+    Shopify fills the `page` drop on a policy page — title and body both. There
+    is no `policy` object in this template; theme check rejects it.
+  endcomment
+  assign policy_title = page.title
+  assign policy_body = page.content
+-%}
+
+<section
+  class="jci-policy"
+  {% if s.anchor_id != blank %}id="{{ s.anchor_id | handleize }}"{% endif %}
+  {{ section.shopify_attributes }}
+  style="
+    --jci-policy-bg: {{ s.background_color | default: settings.color_palette.background }};
+    --jci-policy-text: {{ s.text_color | default: settings.color_palette.foreground }};
+    --jci-policy-text-rgb: {{ s.text_color.rgb | default: settings.color_palette.foreground.rgb }};
+    --jci-policy-accent: {{ s.accent_color | default: settings.color_palette.color5 }};
+    --jci-policy-measure: {{ s.measure }}px;
+    --jci-policy-pad-top: {% render 'jci-fluid-space', max: s.padding_top, min: s.padding_top_mobile %};
+    --jci-policy-pad-bottom: {% render 'jci-fluid-space', max: s.padding_bottom, min: s.padding_bottom_mobile %};
+    --jci-policy-pad-top-mobile: {{ s.padding_top_mobile }}px;
+    --jci-policy-pad-bottom-mobile: {{ s.padding_bottom_mobile }}px;
+  "
+>
+  <div class="jci-policy-container">
+    <div class="jci-policy-head">
+      {%- if s.eyebrow != blank -%}
+        <p class="jci-eyebrow jci-policy-eyebrow">{{ s.eyebrow }}</p>
+      {%- endif -%}
+
+      <h1 class="jci-policy-title">{{ policy_title }}</h1>
+
+      {%- if s.intro != blank -%}
+        <p class="jci-policy-intro">{{ s.intro }}</p>
+      {%- endif -%}
+    </div>
+
+    <div class="jci-policy-body">
+      <rte-formatter>
+        {{ policy_body }}
+      </rte-formatter>
+    </div>
+
+    {%- if s.back_label != blank -%}
+      <a class="jci-policy-back jci-text-link" href="{{ s.back_link | default: routes.root_url }}">
+        {{- s.back_label -}}
+        {%- render 'jci-action-arrow', direction: 'left', class: 'jci-policy-back-arrow' -%}
+      </a>
+    {%- endif -%}
+  </div>
+</section>
+
+{% stylesheet %}
+  .jci-policy {
+    display: block;
+    padding-block: var(--jci-policy-pad-top) var(--jci-policy-pad-bottom);
+    color: var(--jci-policy-text);
+    background: var(--jci-policy-bg);
+  }
+
+  .jci-policy-head {
+    max-width: var(--jci-policy-measure);
+    margin-block-end: clamp(2rem, 4vw, 3.25rem);
+    padding-block-end: clamp(1.5rem, 3vw, 2.25rem);
+    border-block-end: 1px solid var(--jci-line);
+  }
+
+  .jci-policy-eyebrow {
+    margin-block-end: 0.9rem;
+    color: var(--jci-policy-accent);
+  }
+
+  /* The section title token, not the hero one — see the note at the top. */
+  .jci-policy-title {
+    margin: 0;
+    font-family: var(--jci-font-display);
+    font-size: var(--jci-section-title-size);
+    font-weight: 500;
+  }
+
+  /* #62665d is ink at 70% on paper. */
+  .jci-policy-intro {
+    max-width: 520px;
+    margin-block-start: 1.1rem;
+    margin-block-end: 0;
+    color: rgb(var(--jci-policy-text-rgb) / 0.7);
+    font-family: var(--jci-font-sans);
+    font-size: var(--jci-subtitle-size);
+  }
+
+  .jci-policy-body {
+    max-width: var(--jci-policy-measure);
+    color: rgb(var(--jci-policy-text-rgb) / 0.78);
+    font-family: var(--jci-font-sans);
+    font-size: var(--jci-subtitle-size);
+  }
+
+  /* -- Shopify's policy HTML ---------------------------------------------
+     Written by the admin editor with no classes of its own, so these are
+     scoped under .jci-policy-body and used nowhere else. */
+
+  .jci-policy-body h1,
+  .jci-policy-body h2 {
+    margin-block: clamp(2.25rem, 4vw, 3rem) 1rem;
+    color: var(--jci-policy-text);
+    font-family: var(--jci-font-display);
+    font-size: clamp(1.5rem, 2.4vw, 2rem);
+    font-weight: 500;
+  }
+
+  .jci-policy-body h3,
+  .jci-policy-body h4 {
+    margin-block: 2rem 0.75rem;
+    color: var(--jci-policy-text);
+    font-family: var(--jci-font-display);
+    font-size: 21px;
+    font-weight: 500;
+  }
+
+  .jci-policy-body p,
+  .jci-policy-body ul,
+  .jci-policy-body ol {
+    margin-block: 0 1.1rem;
+  }
+
+  .jci-policy-body ul,
+  .jci-policy-body ol {
+    padding-inline-start: 1.25rem;
+  }
+
+  .jci-policy-body li {
+    margin-block-end: 0.5rem;
+  }
+
+  .jci-policy-body strong {
+    color: var(--jci-policy-text);
+    font-weight: 500;
+  }
+
+  .jci-policy-body a {
+    color: var(--jci-policy-text);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+    transition: color 0.25s var(--jci-ease);
+  }
+
+  .jci-policy-body a:hover {
+    color: var(--jci-policy-accent);
+  }
+
+  .jci-policy-body table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .jci-policy-body td,
+  .jci-policy-body th {
+    padding: 0.7rem 0.9rem 0.7rem 0;
+    border-block-end: 1px solid var(--jci-line);
+    text-align: start;
+  }
+
+  .jci-policy-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-block-start: clamp(2.5rem, 5vw, 4rem);
+  }
+
+  .jci-policy-back-arrow {
+    width: 13px;
+    height: 13px;
+    transition: transform 0.3s var(--jci-ease);
+  }
+
+  .jci-policy-back:hover .jci-policy-back-arrow {
+    transform: translate(-3px, 3px);
+  }
+
+  /* -- Breakpoints (§5 — 900 and 680 only) ------------------------------- */
+
+  @media screen and (max-width: 680px) {
+    .jci-policy {
+      padding-block: var(--jci-policy-pad-top-mobile) var(--jci-policy-pad-bottom-mobile);
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Policy",
+  "tag": "div",
+  "class": "jci-policy-section",
+  "settings": [
+    { "type": "paragraph", "content": "The title and body come from Shopify → Settings → Policies. Only the framing is set here." },
+
+    { "type": "header", "content": "Copy" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Maison Cavallé · The practical details" },
+    { "type": "textarea", "id": "intro", "label": "Intro", "info": "Optional line under the title. Shown on every policy page." },
+    { "type": "text", "id": "back_label", "label": "Back link label", "default": "Back to the Maison" },
+    { "type": "url", "id": "back_link", "label": "Back link", "info": "Left empty, it points at the home page." },
+
+    { "type": "header", "content": "Colors", "info": "Left empty, each of these follows the theme colour palette." },
+    { "type": "color", "id": "background_color", "label": "Background" },
+    { "type": "color", "id": "text_color", "label": "Text" },
+    { "type": "color", "id": "accent_color", "label": "Accent" },
+
+    { "type": "header", "content": "Layout" },
+    { "type": "range", "id": "measure", "label": "Reading width", "min": 480, "max": 900, "step": 20, "unit": "px", "default": 720, "info": "How wide a line of the policy runs." },
+    { "type": "range", "id": "padding_top", "label": "Padding top", "min": 0, "max": 240, "step": 4, "unit": "px", "default": 100 },
+    { "type": "range", "id": "padding_bottom", "label": "Padding bottom", "min": 0, "max": 240, "step": 4, "unit": "px", "default": 100 },
+    { "type": "range", "id": "padding_top_mobile", "label": "Padding top on mobile", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 52 },
+    { "type": "range", "id": "padding_bottom_mobile", "label": "Padding bottom on mobile", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 52 },
+
+    { "type": "header", "content": "Anchor" },
+    { "type": "text", "id": "anchor_id", "label": "Anchor ID", "default": "policy" }
+  ]
+}
+{% endschema %}

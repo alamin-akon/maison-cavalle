@@ -1,0 +1,18 @@
+{% comment %}
+  Maison Cavallé — solid rating star
+
+  A presentation-only SVG star. The parent provides the accessible rating
+  label; this icon is therefore hidden from assistive technology.
+
+  Accepts:
+    class - optional extra class for size and spacing
+{% endcomment %}
+<svg
+  class="jci-star{% if class != blank %} {{ class }}{% endif %}"
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 24 24"
+  aria-hidden="true"
+  focusable="false"
+>
+  <path d="m12 2.75 2.86 5.8 6.4.93-4.63 4.51 1.09 6.38L12 17.36l-5.72 3.01 1.09-6.38-4.63-4.51 6.4-.93L12 2.75Z" fill="currentColor"></path>
+</svg>
