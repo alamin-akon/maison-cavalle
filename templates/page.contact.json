@@ -71,9 +71,9 @@
         "frame_background": "",
         "min_height": 600,
         "padding_top": 76,
-        "padding_bottom": 112,
+        "padding_bottom": 100,
         "padding_top_mobile": 48,
-        "padding_bottom_mobile": 72,
+        "padding_bottom_mobile": 52,
         "anchor_id": "contact-hero"
       }
     },
@@ -206,10 +206,10 @@
         "card_background": "",
         "field_background": "",
         "column_gap": 50,
-        "padding_top": 136,
-        "padding_bottom": 136,
-        "padding_top_mobile": 72,
-        "padding_bottom_mobile": 72,
+        "padding_top": 100,
+        "padding_bottom": 100,
+        "padding_top_mobile": 52,
+        "padding_bottom_mobile": 52,
         "anchor_id": "contact-content"
       }
     },

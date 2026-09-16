@@ -589,7 +589,7 @@ Prototype `.section` = `clamp(4.5rem, 9vw, 8.5rem)`. Standardise on three steps:
 These three remain the defaults a new section starts from. Since sections must
 be tunable without touching code, each one also exposes **Padding top**,
 **Padding bottom** and their mobile counterparts as `range` settings, seeded
-with the prototype's values (136px desktop, 72px mobile). The token is the
+with the prototype's values (100px desktop, 50px mobile). The token is the
 starting point; the setting is what ships.
 
 ### Full-bleed breakout
