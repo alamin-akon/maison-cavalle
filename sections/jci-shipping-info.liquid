@@ -1,0 +1,433 @@
+{% comment %}
+  Maison Cavallé — shipping info
+
+  Prototype source: maison-cavalle-main/app.js      → renderShippingPage,
+                                                      section.shipping-info
+                    maison-cavalle-main/styles.css  → .info-layout (719-727),
+                                                      .shipping-info (828-975),
+                                                      @900 (272-274), @680 (271-275)
+  Reference: MAISON-CAVALLE-SPEC.md §0, §1, §3, §5, §7
+
+  A sticky sidebar beside a list of accordion rows. The rows are native
+  <details>, so they open without JS and the animation is CSS only — the same
+  approach the FAQ takes.
+
+  The prototype writes the sidebar's "03 / 03" index as a ::before content
+  string. It is a setting here, because §7 does not allow copy in CSS.
+
+  The prototype caps .info-layout at 1120px; it takes the shared container
+  instead (§0).
+
+  No letter-spacing or line-height is authored (§0).
+{% endcomment %}
+
+{%- liquid
+  assign s = section.settings
+  assign rows = section.blocks | where: 'type', 'row'
+-%}
+
+<section
+  class="jci-shipping-info"
+  {% if s.anchor_id != blank %}id="{{ s.anchor_id | handleize }}"{% endif %}
+  {{ section.shopify_attributes }}
+  style="
+    --jci-shipping-info-bg: {{ s.background_color | default: settings.color_palette.background }};
+    --jci-shipping-info-text: {{ s.text_color | default: settings.color_palette.foreground }};
+    --jci-shipping-info-text-rgb: {{ s.text_color.rgb | default: settings.color_palette.foreground.rgb }};
+    --jci-shipping-info-accent: {{ s.accent_color | default: settings.color_palette.color5 }};
+    --jci-shipping-info-index: {{ s.index_color | default: settings.color_palette.color6 }};
+    --jci-shipping-info-index-rgb: {{ s.index_color.rgb | default: settings.color_palette.color6.rgb }};
+    --jci-shipping-info-panel-bg: {{ s.panel_background | default: settings.color_palette.color3 }};
+    --jci-shipping-info-row-bg: {{ s.row_background | default: settings.color_palette.background }};
+    --jci-shipping-info-accent-rgb: {{ s.accent_color.rgb | default: settings.color_palette.color5.rgb }};
+    --jci-shipping-info-sidebar-width: {{ s.sidebar_width | divided_by: 100.0 }}fr;
+    --jci-shipping-info-column-gap: clamp(2rem, 7vw, {{ s.column_gap | divided_by: 10.0 }}rem);
+    --jci-shipping-info-sticky-top: {{ s.sticky_top }}px;
+    --jci-shipping-info-row-gap: {{ s.row_gap | divided_by: 100.0 }}rem;
+    --jci-shipping-info-answer-max: {{ s.answer_max_height }}rem;
+    --jci-shipping-info-pad-top: {% render 'jci-fluid-space', max: s.padding_top, min: s.padding_top_mobile %};
+    --jci-shipping-info-pad-bottom: {% render 'jci-fluid-space', max: s.padding_bottom, min: s.padding_bottom_mobile %};
+    --jci-shipping-info-pad-top-mobile: {{ s.padding_top_mobile }}px;
+    --jci-shipping-info-pad-bottom-mobile: {{ s.padding_bottom_mobile }}px;
+  "
+>
+  <div class="jci-shipping-info-container">
+    <div class="jci-shipping-info-sidebar">
+      {%- if s.sidebar_index != blank -%}
+        <span class="jci-shipping-info-sidebar-index">{{ s.sidebar_index }}</span>
+      {%- endif -%}
+
+      {%- if s.eyebrow != blank -%}
+        <p class="jci-eyebrow jci-shipping-info-eyebrow">{{ s.eyebrow }}</p>
+      {%- endif -%}
+
+      {%- if s.title != blank -%}
+        <h2 class="jci-shipping-info-title">{{ s.title }}</h2>
+      {%- endif -%}
+
+      {%- if s.intro != blank -%}
+        <p class="jci-shipping-info-intro">{{ s.intro }}</p>
+      {%- endif -%}
+
+      {%- if s.link_label != blank -%}
+        <a class="jci-shipping-info-link jci-text-link" href="{{ s.link | default: '#' }}">
+          {{- s.link_label -}}
+          {%- render 'jci-action-arrow', class: 'jci-shipping-info-link-arrow' -%}
+        </a>
+      {%- endif -%}
+
+      {%- if s.mark != blank -%}
+        <span class="jci-shipping-info-mark">{{ s.mark }}</span>
+      {%- endif -%}
+    </div>
+
+    {%- if rows.size > 0 -%}
+      <div class="jci-shipping-info-list">
+        {%- for block in rows -%}
+          <details
+            class="jci-shipping-info-row"
+            {% if forloop.first and s.open_first %}open{% endif %}
+            {{ block.shopify_attributes }}
+          >
+            <summary class="jci-shipping-info-row-summary">
+              {%- if block.settings.number != blank -%}
+                <span class="jci-shipping-info-row-index">{{ block.settings.number }}</span>
+              {%- endif -%}
+              <h3 class="jci-shipping-info-row-title">{{ block.settings.title }}</h3>
+            </summary>
+            <p class="jci-shipping-info-row-text">{{ block.settings.text }}</p>
+          </details>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+
+{% stylesheet %}
+  .jci-shipping-info {
+    display: block;
+    padding-block: var(--jci-shipping-info-pad-top) var(--jci-shipping-info-pad-bottom);
+    color: var(--jci-shipping-info-text);
+    background: var(--jci-shipping-info-bg);
+  }
+
+  /* styles.css:719 with .shipping-info's align-items from :832 */
+  .jci-shipping-info-container {
+    display: grid;
+    grid-template-columns: minmax(0, var(--jci-shipping-info-sidebar-width)) minmax(0, 1.3fr);
+    align-items: start;
+    gap: var(--jci-shipping-info-column-gap);
+  }
+
+  /* styles.css:837-845 */
+  .jci-shipping-info-sidebar {
+    position: sticky;
+    top: var(--jci-shipping-info-sticky-top);
+    padding: clamp(1.25rem, 2vw, 1.8rem);
+    border: 1px solid var(--jci-line);
+    background: var(--jci-shipping-info-panel-bg);
+    box-shadow: 8px 10px 0 rgb(var(--jci-shipping-info-text-rgb) / 0.07);
+  }
+
+  /* styles.css:846-854 — a ::before content string in the prototype. */
+  .jci-shipping-info-sidebar-index {
+    display: block;
+    margin-block-end: 2.2rem;
+    color: var(--jci-shipping-info-index);
+    font-family: var(--jci-font-label);
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  .jci-shipping-info-eyebrow {
+    margin-block-end: 0.8rem;
+    color: var(--jci-shipping-info-accent);
+  }
+
+  /* styles.css:720 + :860 */
+  .jci-shipping-info-title {
+    max-width: 340px;
+    margin: 0 0 1rem;
+    font-family: var(--jci-font-display);
+    font-size: var(--jci-section-title-size);
+    font-weight: 500;
+  }
+
+  /* styles.css:865-871 — #666b60 is ink at 66% on cream. */
+  .jci-shipping-info-intro {
+    max-width: 280px;
+    margin: 0 0 1.7rem;
+    color: rgb(var(--jci-shipping-info-text-rgb) / 0.66);
+    font-family: var(--jci-font-sans);
+    font-size: var(--jci-subtitle-size);
+  }
+
+  /* styles.css:872 */
+  .jci-shipping-info-link {
+    color: var(--jci-shipping-info-text);
+  }
+
+  .jci-shipping-info-link-arrow {
+    width: 13px;
+    height: 13px;
+  }
+
+  /* styles.css:874-883 */
+  .jci-shipping-info-mark {
+    display: block;
+    margin-block-start: 2.8rem;
+    padding-block-start: 0.8rem;
+    border-block-start: 1px solid var(--jci-line);
+    color: var(--jci-shipping-info-accent);
+    font-family: var(--jci-font-label);
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+  }
+
+  /* styles.css:884-889 */
+  .jci-shipping-info-list {
+    display: grid;
+    gap: var(--jci-shipping-info-row-gap);
+  }
+
+  /* styles.css:890-897 */
+  .jci-shipping-info-row {
+    position: relative;
+    padding: 0;
+    border: 1px solid var(--jci-line);
+    background: var(--jci-shipping-info-row-bg);
+    transition:
+      border-color 0.3s var(--jci-ease),
+      background 0.3s var(--jci-ease),
+      transform 0.35s var(--jci-ease),
+      box-shadow 0.35s var(--jci-ease);
+  }
+
+  /* styles.css:898-902 */
+  .jci-shipping-info-row:hover {
+    border-color: rgb(var(--jci-shipping-info-index-rgb) / 0.45);
+    transform: translateX(4px);
+  }
+
+  /* styles.css:903-908 */
+  .jci-shipping-info-row[open] {
+    border-color: rgb(var(--jci-shipping-info-accent-rgb) / 0.55);
+    background: var(--jci-shipping-info-panel-bg);
+    box-shadow: 8px 8px 0 rgb(var(--jci-shipping-info-text-rgb) / 0.06);
+  }
+
+  /* styles.css:909-916 — the rust spine on an open row. */
+  .jci-shipping-info-row[open]::before {
+    content: '';
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 3px;
+    background: var(--jci-shipping-info-index);
+  }
+
+  /* styles.css:917-927 */
+  .jci-shipping-info-row-summary {
+    display: grid;
+    grid-template-columns: 36px minmax(0, 1fr);
+    align-items: center;
+    gap: 1rem;
+    padding: 1.4rem 1.5rem;
+    list-style: none;
+    cursor: pointer;
+  }
+
+  .jci-shipping-info-row-summary::-webkit-details-marker {
+    display: none;
+  }
+
+  /* styles.css:928 */
+  .jci-shipping-info-row-summary:focus-visible {
+    outline: 2px solid var(--jci-shipping-info-index);
+    outline-offset: -4px;
+  }
+
+  /* styles.css:930-937 */
+  .jci-shipping-info-row-index {
+    align-self: start;
+    padding-block-start: 0.15rem;
+    color: var(--jci-shipping-info-index);
+    font-family: var(--jci-font-label);
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  /* styles.css:938-945 */
+  .jci-shipping-info-row-title {
+    position: relative;
+    display: block;
+    margin: 0;
+    padding-inline-end: 2.5rem;
+    font-family: var(--jci-font-display);
+    font-size: clamp(21px, 2.2vw, 30px);
+    font-weight: 500;
+  }
+
+  /* styles.css:946-957 — the + / − sign. */
+  .jci-shipping-info-row-title::after {
+    content: '＋';
+    position: absolute;
+    top: 50%;
+    right: 0;
+    color: var(--jci-shipping-info-accent);
+    font-family: var(--jci-font-sans);
+    font-size: 20px;
+    transform: translateY(-50%) scale(0.88);
+    transition: transform 0.45s var(--jci-ease), color 0.25s ease;
+  }
+
+  .jci-shipping-info-row[open] .jci-shipping-info-row-title::after {
+    content: '−';
+    transform: translateY(-50%) scale(1);
+  }
+
+  /* styles.css:959-975 — the answer opens on max-height, so a row animates
+     without JS measuring it. */
+  .jci-shipping-info-row-text {
+    max-width: 620px;
+    max-height: 0;
+    margin: 0;
+    padding: 0 1.5rem 0 calc(1.5rem + 36px + 1rem);
+    overflow: hidden;
+    color: rgb(var(--jci-shipping-info-text-rgb) / 0.66);
+    font-family: var(--jci-font-sans);
+    font-size: var(--jci-subtitle-size);
+    opacity: 0;
+    transform: translateY(-0.4rem);
+    transition:
+      max-height 0.55s var(--jci-ease),
+      opacity 0.3s ease,
+      transform 0.55s var(--jci-ease),
+      padding 0.55s var(--jci-ease);
+  }
+
+  .jci-shipping-info-row[open] .jci-shipping-info-row-text {
+    max-height: var(--jci-shipping-info-answer-max);
+    padding-block-end: 1.5rem;
+    opacity: 1;
+    transform: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .jci-shipping-info-row,
+    .jci-shipping-info-row-text,
+    .jci-shipping-info-row-title::after {
+      transition: none;
+    }
+
+    .jci-shipping-info-row:hover {
+      transform: none;
+    }
+  }
+
+  /* -- Breakpoints (§5 — 900 and 680 only) ------------------------------- */
+
+  /* styles.css:@900 272-274 — the sidebar stops being a column. */
+  @media screen and (max-width: 900px) {
+    .jci-shipping-info-container {
+      display: block;
+    }
+
+    .jci-shipping-info-sidebar {
+      position: static;
+      margin-block-end: 2.8rem;
+    }
+
+    .jci-shipping-info-sidebar-index {
+      margin-block-end: 1.5rem;
+    }
+  }
+
+  /* styles.css:@680 274-275 */
+  @media screen and (max-width: 680px) {
+    .jci-shipping-info {
+      padding-block: var(--jci-shipping-info-pad-top-mobile) var(--jci-shipping-info-pad-bottom-mobile);
+    }
+
+    .jci-shipping-info-intro {
+      max-width: none;
+    }
+
+    .jci-shipping-info-list {
+      gap: 0.55rem;
+    }
+
+    .jci-shipping-info-row-summary {
+      padding: 1.2rem 1.15rem;
+    }
+
+    .jci-shipping-info-row-text {
+      padding-inline: calc(1.15rem + 36px + 1rem) 1.15rem;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Shipping info",
+  "tag": "div",
+  "class": "jci-shipping-info-section",
+  "max_blocks": 12,
+  "blocks": [
+    {
+      "type": "row",
+      "name": "Row",
+      "settings": [
+        { "type": "text", "id": "number", "label": "Number", "default": "01" },
+        { "type": "text", "id": "title", "label": "Title", "default": "Delivery Addresses" },
+        { "type": "textarea", "id": "text", "label": "Text", "default": "Please ensure your delivery information is complete and correct before placing your order." }
+      ]
+    }
+  ],
+  "settings": [
+    { "type": "header", "content": "Sidebar" },
+    { "type": "text", "id": "sidebar_index", "label": "Index", "default": "03 / 03" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Shipping & returns" },
+    { "type": "text", "id": "title", "label": "Title", "default": "Clear next steps for every order." },
+    { "type": "textarea", "id": "intro", "label": "Intro", "default": "From dispatch and delivery to returns and exchanges, we are always happy to assist." },
+    { "type": "text", "id": "link_label", "label": "Link label", "default": "Need a hand? Ask the Maison" },
+    { "type": "url", "id": "link", "label": "Link" },
+    { "type": "text", "id": "mark", "label": "Sign-off mark", "default": "MC / Care" },
+
+    { "type": "header", "content": "Rows" },
+    { "type": "checkbox", "id": "open_first", "label": "Open the first row", "default": true },
+    { "type": "range", "id": "row_gap", "label": "Row gap", "min": 0, "max": 200, "step": 5, "unit": "%", "default": 70, "info": "Hundredths of a rem — 70 is the prototype's 0.7rem." },
+    { "type": "range", "id": "answer_max_height", "label": "Answer height cap", "min": 10, "max": 60, "step": 1, "unit": "rem", "default": 28, "info": "A long answer needs a taller cap to open fully." },
+
+    { "type": "header", "content": "Colors", "info": "Left empty, each of these follows the theme colour palette." },
+    { "type": "color", "id": "background_color", "label": "Background" },
+    { "type": "color", "id": "text_color", "label": "Text" },
+    { "type": "color", "id": "accent_color", "label": "Accent" },
+    { "type": "color", "id": "index_color", "label": "Numbers and spine" },
+    { "type": "color", "id": "panel_background", "label": "Sidebar and open row" },
+    { "type": "color", "id": "row_background", "label": "Closed row" },
+
+    { "type": "header", "content": "Layout" },
+    { "type": "range", "id": "sidebar_width", "label": "Sidebar width", "min": 40, "max": 120, "step": 5, "unit": "%", "default": 70, "info": "Hundredths of a grid fraction against the list's 1.3 — 70 is the prototype's 0.7." },
+    { "type": "range", "id": "column_gap", "label": "Column gap", "min": 20, "max": 140, "step": 2, "unit": "%", "default": 70, "info": "Tenths of a rem, the widest step of clamp(2rem, 7vw, X) — 70 is the prototype's 7rem." },
+    { "type": "range", "id": "sticky_top", "label": "Sidebar sticky offset", "min": 0, "max": 220, "step": 4, "unit": "px", "default": 112 },
+    { "type": "range", "id": "padding_top", "label": "Padding top", "min": 0, "max": 240, "step": 4, "unit": "px", "default": 100 },
+    { "type": "range", "id": "padding_bottom", "label": "Padding bottom", "min": 0, "max": 240, "step": 4, "unit": "px", "default": 100 },
+    { "type": "range", "id": "padding_top_mobile", "label": "Padding top on mobile", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 52 },
+    { "type": "range", "id": "padding_bottom_mobile", "label": "Padding bottom on mobile", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 52 },
+
+    { "type": "header", "content": "Anchor" },
+    { "type": "text", "id": "anchor_id", "label": "Anchor ID", "default": "shipping-info" }
+  ],
+  "presets": [
+    {
+      "name": "Shipping info",
+      "blocks": [
+        { "type": "row", "settings": { "number": "01", "title": "Delivery Addresses" } },
+        { "type": "row", "settings": { "number": "02", "title": "Lost or Delayed Parcels" } },
+        { "type": "row", "settings": { "number": "03", "title": "International Orders" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,482 @@
+{% comment %}
+  Maison Cavallé — shipping returns policy
+
+  Prototype source: maison-cavalle-main/app.js      → renderShippingPage,
+                                                      section.shipping-returns-policy
+                    maison-cavalle-main/styles.css  → .shipping-returns-policy (1442-1472)
+  Reference: MAISON-CAVALLE-SPEC.md §0, §1, §3, §5, §7
+
+  A head over four staggered policy blocks. The prototype styles those blocks
+  with :nth-child — the second and fourth drop by 2rem, the third inverts to
+  olive, the fourth takes a warmer paper. §1 does not allow structural
+  selectors, so the loop writes `is-offset`, `is-inverted` and `is-tinted`
+  instead and the CSS reads those.
+
+  The block index is also a CSS counter in the prototype; here it is a block
+  setting, because §7 does not allow copy in CSS. Same for the head's
+  "14 days from delivery" note.
+
+  The prototype gives the heading its own clamp(3.5rem, 7vw, 7.5rem). §0 keeps
+  every section heading on --jci-section-title-size, so that is what is used.
+
+  No letter-spacing or line-height is authored (§0).
+{% endcomment %}
+
+{%- liquid
+  assign s = section.settings
+  assign blocks = section.blocks | where: 'type', 'block'
+-%}
+
+<section
+  class="jci-shipping-policy"
+  {% if s.anchor_id != blank %}id="{{ s.anchor_id | handleize }}"{% endif %}
+  {{ section.shopify_attributes }}
+  style="
+    --jci-shipping-policy-bg: {{ s.background_color | default: settings.color_palette.color3 }};
+    --jci-shipping-policy-text: {{ s.text_color | default: settings.color_palette.foreground }};
+    --jci-shipping-policy-text-rgb: {{ s.text_color.rgb | default: settings.color_palette.foreground.rgb }};
+    --jci-shipping-policy-accent: {{ s.accent_color | default: settings.color_palette.color5 }};
+    --jci-shipping-policy-accent-rgb: {{ s.accent_color.rgb | default: settings.color_palette.color5.rgb }};
+    --jci-shipping-policy-index: {{ s.index_color | default: settings.color_palette.color6 }};
+    --jci-shipping-policy-block-bg: {{ s.block_background | default: settings.color_palette.background }};
+    --jci-shipping-policy-block-bg-rgb: {{ s.block_background.rgb | default: settings.color_palette.background.rgb }};
+    --jci-shipping-policy-tinted-bg: {{ s.tinted_background | default: settings.color_palette.color2 }};
+    --jci-shipping-policy-block-height: {{ s.block_min_height }}px;
+    --jci-shipping-policy-offset: {{ s.block_offset | divided_by: 10.0 }}rem;
+    --jci-shipping-policy-watermark-opacity: {{ s.watermark_opacity | divided_by: 1000.0 }};
+    --jci-shipping-policy-pad-top: {% render 'jci-fluid-space', max: s.padding_top, min: s.padding_top_mobile %};
+    --jci-shipping-policy-pad-bottom: {% render 'jci-fluid-space', max: s.padding_bottom, min: s.padding_bottom_mobile %};
+    --jci-shipping-policy-pad-top-mobile: {{ s.padding_top_mobile }}px;
+    --jci-shipping-policy-pad-bottom-mobile: {{ s.padding_bottom_mobile }}px;
+  "
+  {% if s.watermark != blank %}data-jci-shipping-policy-watermark="{{ s.watermark | escape }}"{% endif %}
+>
+  <div class="jci-shipping-policy-container">
+    <div class="jci-shipping-policy-head">
+      <div class="jci-shipping-policy-headline">
+        {%- if s.eyebrow != blank -%}
+          <p class="jci-eyebrow jci-shipping-policy-eyebrow">{{ s.eyebrow }}</p>
+        {%- endif -%}
+
+        {%- if s.title_line_one != blank or s.title_line_two != blank -%}
+          <h2 class="jci-shipping-policy-title">
+            {{- s.title_line_one -}}
+            {%- if s.title_line_one != blank and s.title_line_two != blank -%}<br>{%- endif -%}
+            {%- if s.title_line_two != blank -%}
+              <em class="jci-shipping-policy-title-accent">{{ s.title_line_two }}</em>
+            {%- endif -%}
+          </h2>
+        {%- endif -%}
+      </div>
+
+      {%- if s.intro != blank -%}
+        <p class="jci-shipping-policy-intro">{{ s.intro }}</p>
+      {%- endif -%}
+
+      {%- if s.note != blank -%}
+        <span class="jci-shipping-policy-note">{{ s.note }}</span>
+      {%- endif -%}
+    </div>
+
+    {%- if blocks.size > 0 -%}
+      <div class="jci-shipping-policy-columns">
+        {%- for block in blocks -%}
+          {%- liquid
+            assign b = block.settings
+
+            assign state = ''
+            if b.offset
+              assign state = state | append: ' is-offset'
+            endif
+            if b.tone == 'inverted'
+              assign state = state | append: ' is-inverted'
+            elsif b.tone == 'tinted'
+              assign state = state | append: ' is-tinted'
+            endif
+          -%}
+          <article class="jci-shipping-policy-block{{ state }}" {{ block.shopify_attributes }}>
+            {%- if b.number != blank -%}
+              <span class="jci-shipping-policy-block-index">{{ b.number }}</span>
+            {%- endif -%}
+
+            {%- if b.eyebrow != blank -%}
+              <p class="jci-eyebrow jci-shipping-policy-block-eyebrow">{{ b.eyebrow }}</p>
+            {%- endif -%}
+
+            {%- if b.text != blank -%}
+              <p class="jci-shipping-policy-block-text">{{ b.text }}</p>
+            {%- endif -%}
+
+            {%- if b.list_title != blank -%}
+              <h3 class="jci-shipping-policy-block-title">{{ b.list_title }}</h3>
+            {%- endif -%}
+
+            {%- if b.list != blank -%}
+              <ul class="jci-shipping-policy-list">
+                {%- assign items = b.list | newline_to_br | split: '<br />' -%}
+                {%- for item in items -%}
+                  {%- assign entry = item | strip_html | strip -%}
+                  {%- if entry != blank -%}
+                    <li class="jci-shipping-policy-list-item">{{ entry }}</li>
+                  {%- endif -%}
+                {%- endfor -%}
+              </ul>
+            {%- endif -%}
+
+            {%- if b.kicker != blank -%}
+              <p class="jci-eyebrow jci-shipping-policy-block-kicker">{{ b.kicker }}</p>
+            {%- endif -%}
+
+            {%- if b.kicker_text != blank -%}
+              <p class="jci-shipping-policy-block-text">{{ b.kicker_text }}</p>
+            {%- endif -%}
+
+            {%- render 'jci-action-arrow', class: 'jci-shipping-policy-block-arrow' -%}
+          </article>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+
+{% stylesheet %}
+  /* styles.css:1442 */
+  .jci-shipping-policy {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    padding-block: var(--jci-shipping-policy-pad-top) var(--jci-shipping-policy-pad-bottom);
+    color: var(--jci-shipping-policy-text);
+    background: var(--jci-shipping-policy-bg);
+  }
+
+  /* styles.css:1443 — the oversized MC watermark. */
+  .jci-shipping-policy::before {
+    content: attr(data-jci-shipping-policy-watermark);
+    position: absolute;
+    right: -2%;
+    bottom: -12%;
+    color: rgb(var(--jci-shipping-policy-accent-rgb) / var(--jci-shipping-policy-watermark-opacity));
+    font-family: var(--jci-font-display);
+    font-size: clamp(220px, 38vw, 620px);
+    font-weight: 600;
+    pointer-events: none;
+  }
+
+  /* styles.css:1444 */
+  .jci-shipping-policy-head {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.72fr);
+    align-items: end;
+    gap: clamp(2rem, 8vw, 9rem);
+    padding-block-end: clamp(2.5rem, 5vw, 4.5rem);
+    border-block-end: 1px solid var(--jci-line);
+  }
+
+  .jci-shipping-policy-eyebrow {
+    margin-block-end: 1.1rem;
+    color: var(--jci-shipping-policy-accent);
+  }
+
+  /* styles.css:1447 — the prototype's own clamp is dropped for the shared
+     section token (§0). */
+  .jci-shipping-policy-title {
+    max-width: 700px;
+    margin: 0;
+    font-family: var(--jci-font-display);
+    font-size: var(--jci-section-title-size);
+    font-weight: 500;
+  }
+
+  .jci-shipping-policy-title-accent {
+    color: var(--jci-shipping-policy-accent);
+    font-style: italic;
+  }
+
+  /* styles.css:1449 — #65695f is ink at 68% on cream. */
+  .jci-shipping-policy-intro {
+    max-width: 430px;
+    margin: 0;
+    padding-block-end: 2.2rem;
+    justify-self: end;
+    color: rgb(var(--jci-shipping-policy-text-rgb) / 0.68);
+    font-family: var(--jci-font-sans);
+    font-size: var(--jci-subtitle-size);
+  }
+
+  /* styles.css:1445 — a ::after content string in the prototype. */
+  .jci-shipping-policy-note {
+    position: absolute;
+    right: 0;
+    bottom: 0.8rem;
+    color: var(--jci-shipping-policy-index);
+    font-family: var(--jci-font-label);
+    font-size: 12px;
+    font-weight: 600;
+    text-align: end;
+    text-transform: uppercase;
+  }
+
+  /* styles.css:1450 */
+  .jci-shipping-policy-columns {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+    margin-block-start: clamp(3rem, 6vw, 6rem);
+  }
+
+  /* styles.css:1451 */
+  .jci-shipping-policy-block {
+    position: relative;
+    display: flex;
+    min-height: var(--jci-shipping-policy-block-height);
+    flex-direction: column;
+    padding: clamp(1.35rem, 2.4vw, 2.2rem);
+    border: 1px solid var(--jci-line);
+    background: var(--jci-shipping-policy-block-bg);
+    box-shadow: 8px 10px 0 rgb(var(--jci-shipping-policy-text-rgb) / 0.055);
+  }
+
+  /* styles.css:1454 — the prototype staggers these with :nth-child. */
+  .jci-shipping-policy-block.is-offset {
+    transform: translateY(var(--jci-shipping-policy-offset));
+  }
+
+  /* styles.css:1455 */
+  .jci-shipping-policy-block.is-inverted {
+    color: var(--jci-shipping-policy-block-bg);
+    background: var(--jci-shipping-policy-accent);
+  }
+
+  /* styles.css:1456 */
+  .jci-shipping-policy-block.is-tinted {
+    background: var(--jci-shipping-policy-tinted-bg);
+  }
+
+  /* styles.css:1452 — a CSS counter in the prototype. */
+  .jci-shipping-policy-block-index {
+    position: absolute;
+    top: clamp(1.35rem, 2.4vw, 2.2rem);
+    right: clamp(1.35rem, 2.4vw, 2.2rem);
+    color: var(--jci-shipping-policy-index);
+    font-family: var(--jci-font-label);
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  /* styles.css:1460 */
+  .jci-shipping-policy-block-eyebrow {
+    max-width: 75%;
+    margin-block-end: 1.35rem;
+    color: var(--jci-shipping-policy-accent);
+  }
+
+  /* styles.css:1461 — #d9dfbb is the accent lifted towards paper. */
+  .jci-shipping-policy-block.is-inverted .jci-shipping-policy-block-eyebrow {
+    color: rgb(var(--jci-shipping-policy-block-bg-rgb) / 0.82);
+  }
+
+  /* styles.css:1462 */
+  .jci-shipping-policy-block-text {
+    max-width: 520px;
+    margin: 0 0 1.1rem;
+    color: rgb(var(--jci-shipping-policy-text-rgb) / 0.68);
+    font-family: var(--jci-font-sans);
+    font-size: var(--jci-subtitle-size);
+  }
+
+  /* styles.css:1463 — #e1e4db is paper at 88% on olive. */
+  .jci-shipping-policy-block.is-inverted .jci-shipping-policy-block-text {
+    color: rgb(var(--jci-shipping-policy-block-bg-rgb) / 0.88);
+  }
+
+  /* styles.css:1464 */
+  .jci-shipping-policy-block-title {
+    margin: 0.3rem 0 0;
+    color: var(--jci-shipping-policy-text);
+    font-family: var(--jci-font-display);
+    font-size: clamp(1.55rem, 2.6vw, 2.7rem);
+    font-weight: 500;
+  }
+
+  /* styles.css:1465 */
+  .jci-shipping-policy-block.is-inverted .jci-shipping-policy-block-title {
+    color: var(--jci-shipping-policy-block-bg);
+  }
+
+  /* styles.css:1468 */
+  .jci-shipping-policy-list {
+    display: grid;
+    gap: 0.42rem;
+    margin: 0.7rem 2rem 0 0;
+    padding: 1rem 0 0 1.1rem;
+    border-block-start: 1px solid var(--jci-line);
+    color: rgb(var(--jci-shipping-policy-text-rgb) / 0.68);
+    font-family: var(--jci-font-sans);
+    font-size: 12px;
+  }
+
+  /* styles.css:1470 */
+  .jci-shipping-policy-block.is-inverted .jci-shipping-policy-list {
+    border-color: rgb(var(--jci-shipping-policy-block-bg-rgb) / 0.25);
+    color: rgb(var(--jci-shipping-policy-block-bg-rgb) / 0.88);
+  }
+
+  /* styles.css:1469 */
+  .jci-shipping-policy-list-item::marker {
+    color: var(--jci-shipping-policy-index);
+  }
+
+  .jci-shipping-policy-block.is-inverted .jci-shipping-policy-list-item::marker {
+    color: rgb(var(--jci-shipping-policy-block-bg-rgb) / 0.82);
+  }
+
+  /* styles.css:1466 — pinned to the foot of the block. */
+  .jci-shipping-policy-block-kicker {
+    margin-block-start: auto;
+    padding-block-start: 1.2rem;
+    border-block-start: 1px solid var(--jci-line);
+    color: var(--jci-shipping-policy-accent);
+  }
+
+  /* styles.css:1467 */
+  .jci-shipping-policy-block.is-inverted .jci-shipping-policy-block-kicker {
+    border-color: rgb(var(--jci-shipping-policy-block-bg-rgb) / 0.25);
+    color: rgb(var(--jci-shipping-policy-block-bg-rgb) / 0.82);
+  }
+
+  /* styles.css:1453 */
+  .jci-shipping-policy-block-arrow {
+    position: absolute;
+    right: clamp(1.35rem, 2.4vw, 2.2rem);
+    bottom: clamp(1.35rem, 2.4vw, 2.2rem);
+    width: 22px;
+    height: 22px;
+    color: rgb(var(--jci-shipping-policy-text-rgb) / 0.28);
+  }
+
+  .jci-shipping-policy-block.is-inverted .jci-shipping-policy-block-arrow {
+    color: rgb(var(--jci-shipping-policy-block-bg-rgb) / 0.45);
+  }
+
+  /* -- Breakpoints (§5 — 900 and 680 only) ------------------------------- */
+
+  @media screen and (max-width: 900px) {
+    .jci-shipping-policy-head {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 1.75rem;
+    }
+
+    .jci-shipping-policy-intro {
+      justify-self: start;
+      padding-block-end: 0;
+    }
+
+    .jci-shipping-policy-note {
+      position: static;
+      display: block;
+      margin-block-start: 1.25rem;
+      text-align: start;
+    }
+
+    .jci-shipping-policy-block.is-offset {
+      transform: none;
+    }
+  }
+
+  @media screen and (max-width: 680px) {
+    .jci-shipping-policy {
+      padding-block: var(--jci-shipping-policy-pad-top-mobile) var(--jci-shipping-policy-pad-bottom-mobile);
+    }
+
+    .jci-shipping-policy-columns {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .jci-shipping-policy-intro {
+      max-width: none;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Shipping policy",
+  "tag": "div",
+  "class": "jci-shipping-policy-section",
+  "max_blocks": 8,
+  "blocks": [
+    {
+      "type": "block",
+      "name": "Policy block",
+      "settings": [
+        { "type": "text", "id": "number", "label": "Index", "default": "01 / 04" },
+        { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Change of Mind & Sizing" },
+        { "type": "textarea", "id": "text", "label": "Text", "default": "If you would like to return an eligible item, please contact Maison Cavallé within 14 days of receiving your order." },
+        { "type": "text", "id": "list_title", "label": "List heading", "info": "Optional heading above the list." },
+        { "type": "textarea", "id": "list", "label": "List", "info": "One item per line." },
+        { "type": "text", "id": "kicker", "label": "Kicker", "info": "A second eyebrow, pinned to the foot of the block." },
+        { "type": "textarea", "id": "kicker_text", "label": "Kicker text" },
+        {
+          "type": "select",
+          "id": "tone",
+          "label": "Tone",
+          "options": [
+            { "value": "default", "label": "Paper" },
+            { "value": "inverted", "label": "Accent — paper text on the accent colour" },
+            { "value": "tinted", "label": "Tinted — a warmer paper" }
+          ],
+          "default": "default"
+        },
+        { "type": "checkbox", "id": "offset", "label": "Drop this block", "default": false, "info": "The prototype drops the second and fourth so the four read as a stagger." }
+      ]
+    }
+  ],
+  "settings": [
+    { "type": "header", "content": "Copy" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Maison Cavallé — Returns & Exchanges" },
+    { "type": "text", "id": "title_line_one", "label": "Title first line", "default": "Choose with" },
+    { "type": "text", "id": "title_line_two", "label": "Title second line (italic)", "default": "confidence." },
+    { "type": "textarea", "id": "intro", "label": "Intro", "default": "We hope every Maison Cavallé piece becomes something you genuinely love wearing. We also understand that when purchasing clothing online, sometimes the fit or style simply isn't quite right." },
+    { "type": "text", "id": "note", "label": "Corner note", "default": "14 days from delivery" },
+    { "type": "text", "id": "watermark", "label": "Watermark", "default": "MC", "info": "The oversized letters behind the blocks." },
+
+    { "type": "header", "content": "Blocks" },
+    { "type": "range", "id": "block_min_height", "label": "Block height", "min": 200, "max": 600, "step": 10, "unit": "px", "default": 370 },
+    { "type": "range", "id": "block_offset", "label": "Drop distance", "min": 0, "max": 60, "step": 2, "unit": "%", "default": 20, "info": "Tenths of a rem — 20 is the prototype's 2rem." },
+    { "type": "range", "id": "watermark_opacity", "label": "Watermark strength", "min": 0, "max": 120, "step": 5, "unit": "%", "default": 60, "info": "Thousandths — 60 is the prototype's 0.06." },
+
+    { "type": "header", "content": "Colors", "info": "Left empty, each of these follows the theme colour palette." },
+    { "type": "color", "id": "background_color", "label": "Background" },
+    { "type": "color", "id": "text_color", "label": "Text" },
+    { "type": "color", "id": "accent_color", "label": "Accent" },
+    { "type": "color", "id": "index_color", "label": "Index and markers" },
+    { "type": "color", "id": "block_background", "label": "Block background" },
+    { "type": "color", "id": "tinted_background", "label": "Tinted block background" },
+
+    { "type": "header", "content": "Layout" },
+    { "type": "range", "id": "padding_top", "label": "Padding top", "min": 0, "max": 240, "step": 4, "unit": "px", "default": 100 },
+    { "type": "range", "id": "padding_bottom", "label": "Padding bottom", "min": 0, "max": 240, "step": 4, "unit": "px", "default": 100 },
+    { "type": "range", "id": "padding_top_mobile", "label": "Padding top on mobile", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 52 },
+    { "type": "range", "id": "padding_bottom_mobile", "label": "Padding bottom on mobile", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 52 },
+
+    { "type": "header", "content": "Anchor" },
+    { "type": "text", "id": "anchor_id", "label": "Anchor ID", "default": "returns-policy" }
+  ],
+  "presets": [
+    {
+      "name": "Shipping policy",
+      "blocks": [
+        { "type": "block", "settings": { "number": "01 / 04", "eyebrow": "Change of Mind & Sizing" } },
+        { "type": "block", "settings": { "number": "02 / 04", "eyebrow": "Exchanges", "offset": true } },
+        { "type": "block", "settings": { "number": "03 / 04", "eyebrow": "Faulty or Incorrect Items", "tone": "inverted" } },
+        { "type": "block", "settings": { "number": "04 / 04", "eyebrow": "Final Sale Items", "tone": "tinted", "offset": true } }
+      ]
+    }
+  ]
+}
+{% endschema %}

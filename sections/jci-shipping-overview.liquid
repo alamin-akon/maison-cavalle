@@ -1,0 +1,359 @@
+{% comment %}
+  Maison Cavallé — shipping overview
+
+  Prototype source: maison-cavalle-main/app.js      → renderShippingPage,
+                                                      section.shipping-overview
+                    maison-cavalle-main/styles.css  → .shipping-overview-head (776-779),
+                                                      .shipping-cards (1264),
+                                                      .shipping-card (805-827),
+                                                      @900 (32), @680 (251, 260, 269)
+  Reference: MAISON-CAVALLE-SPEC.md §0, §1, §3, §5, §7
+
+  A two-column head over a row of numbered cards. Each card inverts to ink on
+  hover and lifts, which is the only place on the page that happens.
+
+  The prototype caps this section at .page-content's 1180px; it takes the
+  shared container instead (§0).
+
+  No letter-spacing or line-height is authored (§0).
+{% endcomment %}
+
+{%- liquid
+  assign s = section.settings
+  assign cards = section.blocks | where: 'type', 'card'
+-%}
+
+<section
+  class="jci-shipping-overview"
+  {% if s.anchor_id != blank %}id="{{ s.anchor_id | handleize }}"{% endif %}
+  {{ section.shopify_attributes }}
+  style="
+    --jci-shipping-overview-bg: {{ s.background_color | default: settings.color_palette.background }};
+    --jci-shipping-overview-text: {{ s.text_color | default: settings.color_palette.foreground }};
+    --jci-shipping-overview-text-rgb: {{ s.text_color.rgb | default: settings.color_palette.foreground.rgb }};
+    --jci-shipping-overview-accent: {{ s.accent_color | default: settings.color_palette.color5 }};
+    --jci-shipping-overview-index: {{ s.index_color | default: settings.color_palette.color6 }};
+    --jci-shipping-overview-card-bg: {{ s.card_background | default: settings.color_palette.color3 }};
+    --jci-shipping-overview-card-hover-bg: {{ s.card_hover_background | default: settings.color_palette.foreground }};
+    --jci-shipping-overview-card-hover-text: {{ s.card_hover_text | default: settings.color_palette.background }};
+    --jci-shipping-overview-card-hover-text-rgb: {{ s.card_hover_text.rgb | default: settings.color_palette.background.rgb }};
+    --jci-shipping-overview-card-height: {{ s.card_min_height }}px;
+    --jci-shipping-overview-card-height-mobile: {{ s.card_min_height_mobile }}px;
+    --jci-shipping-overview-card-gap: {{ s.card_gap | divided_by: 10.0 }}rem;
+    --jci-shipping-overview-lift: -{{ s.hover_lift }}px;
+    --jci-shipping-overview-pad-top: {% render 'jci-fluid-space', max: s.padding_top, min: s.padding_top_mobile %};
+    --jci-shipping-overview-pad-bottom: {% render 'jci-fluid-space', max: s.padding_bottom, min: s.padding_bottom_mobile %};
+    --jci-shipping-overview-pad-top-mobile: {{ s.padding_top_mobile }}px;
+    --jci-shipping-overview-pad-bottom-mobile: {{ s.padding_bottom_mobile }}px;
+  "
+>
+  <div class="jci-shipping-overview-container">
+    <div class="jci-shipping-overview-head">
+      <div class="jci-shipping-overview-headline">
+        {%- if s.eyebrow != blank -%}
+          <p class="jci-eyebrow jci-shipping-overview-eyebrow">{{ s.eyebrow }}</p>
+        {%- endif -%}
+
+        {%- if s.title_line_one != blank or s.title_line_two != blank -%}
+          <h2 class="jci-shipping-overview-title">
+            {{- s.title_line_one -}}
+            {%- if s.title_line_one != blank and s.title_line_two != blank -%}<br>{%- endif -%}
+            {%- if s.title_line_two != blank -%}
+              <em class="jci-shipping-overview-title-accent">{{ s.title_line_two }}</em>
+            {%- endif -%}
+          </h2>
+        {%- endif -%}
+      </div>
+
+      {%- if s.intro != blank -%}
+        <p class="jci-shipping-overview-intro">{{ s.intro }}</p>
+      {%- endif -%}
+    </div>
+
+    {%- if cards.size > 0 -%}
+      <div class="jci-shipping-overview-cards">
+        {%- for block in cards -%}
+          {%- liquid
+            assign b = block.settings
+            assign tag = 'div'
+            if b.link != blank
+              assign tag = 'a'
+            endif
+          -%}
+          <{{ tag }}
+            class="jci-shipping-overview-card"
+            {% if b.link != blank %}href="{{ b.link }}"{% endif %}
+            {{ block.shopify_attributes }}
+          >
+            {%- if b.number != blank -%}
+              <span class="jci-shipping-overview-card-index">{{ b.number }}</span>
+            {%- endif -%}
+
+            {%- if b.eyebrow != blank -%}
+              <p class="jci-eyebrow jci-shipping-overview-card-eyebrow">{{ b.eyebrow }}</p>
+            {%- endif -%}
+
+            {%- if b.title != blank -%}
+              <h3 class="jci-shipping-overview-card-title">{{ b.title }}</h3>
+            {%- endif -%}
+
+            {%- if b.text != blank -%}
+              <p class="jci-shipping-overview-card-text">{{ b.text }}</p>
+            {%- endif -%}
+
+            {%- if b.link != blank -%}
+              {%- render 'jci-action-arrow', class: 'jci-shipping-overview-card-arrow' -%}
+            {%- endif -%}
+          </{{ tag }}>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+
+{% stylesheet %}
+  .jci-shipping-overview {
+    display: block;
+    padding-block: var(--jci-shipping-overview-pad-top) var(--jci-shipping-overview-pad-bottom);
+    color: var(--jci-shipping-overview-text);
+    background: var(--jci-shipping-overview-bg);
+  }
+
+  /* styles.css:776 */
+  .jci-shipping-overview-head {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.7fr);
+    align-items: end;
+    gap: clamp(2rem, 8vw, 9rem);
+  }
+
+  .jci-shipping-overview-eyebrow {
+    margin-block-end: 1.1rem;
+    color: var(--jci-shipping-overview-accent);
+  }
+
+  /* styles.css:777 */
+  .jci-shipping-overview-title {
+    margin: 0;
+    font-family: var(--jci-font-display);
+    font-size: var(--jci-section-title-size);
+    font-weight: 500;
+  }
+
+  .jci-shipping-overview-title-accent {
+    color: var(--jci-shipping-overview-accent);
+    font-style: italic;
+  }
+
+  /* styles.css:779 — #65695f is ink at 68% on paper. */
+  .jci-shipping-overview-intro {
+    max-width: 370px;
+    margin: 0;
+    color: rgb(var(--jci-shipping-overview-text-rgb) / 0.68);
+    font-family: var(--jci-font-sans);
+    font-size: var(--jci-subtitle-size);
+  }
+
+  /* styles.css:1264 */
+  .jci-shipping-overview-cards {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--jci-shipping-overview-card-gap);
+    margin-block-start: 3rem;
+  }
+
+  /* styles.css:805-813 */
+  .jci-shipping-overview-card {
+    position: relative;
+    min-height: var(--jci-shipping-overview-card-height);
+    padding: 1.5rem;
+    border: 1px solid var(--jci-line);
+    color: inherit;
+    background: var(--jci-shipping-overview-card-bg);
+    text-decoration: none;
+    transition:
+      color 0.35s var(--jci-ease),
+      background 0.35s var(--jci-ease),
+      transform 0.4s var(--jci-ease),
+      box-shadow 0.4s var(--jci-ease);
+  }
+
+  /* styles.css:814-819 — the card inverts to ink and lifts. */
+  .jci-shipping-overview-card:hover,
+  .jci-shipping-overview-card:focus-visible {
+    color: var(--jci-shipping-overview-card-hover-text);
+    background: var(--jci-shipping-overview-card-hover-bg);
+    outline: 0;
+    transform: translateY(var(--jci-shipping-overview-lift));
+    box-shadow: 8px 10px 0 rgb(var(--jci-shipping-overview-text-rgb) / 0.12);
+  }
+
+  /* styles.css:821 */
+  .jci-shipping-overview-card-index {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    color: var(--jci-shipping-overview-index);
+    font-family: var(--jci-font-label);
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  /* styles.css:822 */
+  .jci-shipping-overview-card-eyebrow {
+    margin-block-end: 2.2rem;
+    color: var(--jci-shipping-overview-accent);
+  }
+
+  /* styles.css:823 */
+  .jci-shipping-overview-card-title {
+    max-width: 220px;
+    margin: 0 0 0.6rem;
+    font-family: var(--jci-font-display);
+    font-size: 24px;
+    font-weight: 500;
+  }
+
+  /* styles.css:824 */
+  .jci-shipping-overview-card-text {
+    max-width: 260px;
+    margin: 0;
+    color: rgb(var(--jci-shipping-overview-text-rgb) / 0.68);
+    font-family: var(--jci-font-sans);
+    font-size: var(--jci-subtitle-size);
+    transition: color 0.35s var(--jci-ease);
+  }
+
+  /* styles.css:825 — #c4c8bd is paper at 75% on ink. */
+  .jci-shipping-overview-card:hover .jci-shipping-overview-card-text,
+  .jci-shipping-overview-card:focus-visible .jci-shipping-overview-card-text {
+    color: rgb(var(--jci-shipping-overview-card-hover-text-rgb) / 0.75);
+  }
+
+  /* styles.css:826-827 */
+  .jci-shipping-overview-card-arrow {
+    position: absolute;
+    right: 1.5rem;
+    bottom: 1.4rem;
+    width: 16px;
+    height: 16px;
+    transition: transform 0.3s var(--jci-ease);
+  }
+
+  .jci-shipping-overview-card:hover .jci-shipping-overview-card-arrow,
+  .jci-shipping-overview-card:focus-visible .jci-shipping-overview-card-arrow {
+    transform: translate(3px, -3px);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .jci-shipping-overview-card,
+    .jci-shipping-overview-card-text,
+    .jci-shipping-overview-card-arrow {
+      transition: none;
+    }
+
+    .jci-shipping-overview-card:hover {
+      transform: none;
+    }
+  }
+
+  /* -- Breakpoints (§5 — 900 and 680 only) ------------------------------- */
+
+  /* styles.css:@900 32 */
+  @media screen and (max-width: 900px) {
+    .jci-shipping-overview-cards {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  /* styles.css:@680 251, 260-261, 269-270 */
+  @media screen and (max-width: 680px) {
+    .jci-shipping-overview {
+      padding-block: var(--jci-shipping-overview-pad-top-mobile) var(--jci-shipping-overview-pad-bottom-mobile);
+    }
+
+    .jci-shipping-overview-head {
+      display: block;
+    }
+
+    .jci-shipping-overview-intro {
+      max-width: none;
+      margin-block-start: 1.8rem;
+    }
+
+    .jci-shipping-overview-cards {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .jci-shipping-overview-card {
+      min-height: var(--jci-shipping-overview-card-height-mobile);
+    }
+
+    .jci-shipping-overview-card-eyebrow {
+      margin-block-end: 1.8rem;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Shipping overview",
+  "tag": "div",
+  "class": "jci-shipping-overview-section",
+  "max_blocks": 6,
+  "blocks": [
+    {
+      "type": "card",
+      "name": "Card",
+      "settings": [
+        { "type": "text", "id": "number", "label": "Number", "default": "01" },
+        { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Australian Orders" },
+        { "type": "text", "id": "title", "label": "Title", "default": "Processed in 1–2 days." },
+        { "type": "textarea", "id": "text", "label": "Text", "default": "Orders are generally processed within 1–2 business days, excluding weekends and public holidays." },
+        { "type": "url", "id": "link", "label": "Link", "info": "Left empty, the card is not clickable and shows no arrow." }
+      ]
+    }
+  ],
+  "settings": [
+    { "type": "header", "content": "Copy" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "Maison Cavallé — Shipping Policy" },
+    { "type": "text", "id": "title_line_one", "label": "Title first line", "default": "From our house" },
+    { "type": "text", "id": "title_line_two", "label": "Title second line (italic)", "default": "to yours." },
+    { "type": "textarea", "id": "intro", "label": "Intro", "default": "At Maison Cavallé, every order is prepared with the same care and attention we bring to our collections. We currently ship throughout Australia, with international shipping availability and destinations displayed at checkout." },
+
+    { "type": "header", "content": "Cards" },
+    { "type": "range", "id": "card_min_height", "label": "Card height", "min": 140, "max": 400, "step": 5, "unit": "px", "default": 205 },
+    { "type": "range", "id": "card_min_height_mobile", "label": "Card height on mobile", "min": 120, "max": 320, "step": 5, "unit": "px", "default": 180 },
+    { "type": "range", "id": "card_gap", "label": "Card gap", "min": 0, "max": 60, "step": 1, "unit": "%", "default": 10, "info": "Tenths of a rem — 10 is the prototype's 1rem." },
+    { "type": "range", "id": "hover_lift", "label": "Hover lift", "min": 0, "max": 20, "step": 1, "unit": "px", "default": 5 },
+
+    { "type": "header", "content": "Colors", "info": "Left empty, each of these follows the theme colour palette." },
+    { "type": "color", "id": "background_color", "label": "Background" },
+    { "type": "color", "id": "text_color", "label": "Text" },
+    { "type": "color", "id": "accent_color", "label": "Accent" },
+    { "type": "color", "id": "index_color", "label": "Card number" },
+    { "type": "color", "id": "card_background", "label": "Card background" },
+    { "type": "color", "id": "card_hover_background", "label": "Card background on hover" },
+    { "type": "color", "id": "card_hover_text", "label": "Card text on hover" },
+
+    { "type": "header", "content": "Layout" },
+    { "type": "range", "id": "padding_top", "label": "Padding top", "min": 0, "max": 240, "step": 4, "unit": "px", "default": 100 },
+    { "type": "range", "id": "padding_bottom", "label": "Padding bottom", "min": 0, "max": 240, "step": 4, "unit": "px", "default": 100 },
+    { "type": "range", "id": "padding_top_mobile", "label": "Padding top on mobile", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 52 },
+    { "type": "range", "id": "padding_bottom_mobile", "label": "Padding bottom on mobile", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 52 },
+
+    { "type": "header", "content": "Anchor" },
+    { "type": "text", "id": "anchor_id", "label": "Anchor ID", "default": "shipping-details" }
+  ],
+  "presets": [
+    {
+      "name": "Shipping overview",
+      "blocks": [
+        { "type": "card", "settings": { "number": "01", "eyebrow": "Australian Orders", "title": "Processed in 1–2 days." } },
+        { "type": "card", "settings": { "number": "02", "eyebrow": "Shipping Costs", "title": "Calculated at checkout." } },
+        { "type": "card", "settings": { "number": "03", "eyebrow": "Order Tracking", "title": "Updates by email." } }
+      ]
+    }
+  ]
+}
+{% endschema %}
