@@ -1,0 +1,432 @@
+{% comment %}
+  Maison Cavallé — journal index
+
+  Prototype source: maison-cavalle-main/app.js      → renderJournalPage,
+                                                      section.journal-index-section
+                    maison-cavalle-main/styles.css  → .journal-index-head (1294-1297),
+                                                      .journal-grid (1305), .journal-card (1306-1318),
+                                                      .journal-side (1319-1320),
+                                                      @680 (281-283)
+  Reference: MAISON-CAVALLE-SPEC.md §0, §1, §3, §5, §7
+
+  One large note beside a stack of smaller ones. The first note block is the
+  large card; every block after it stacks in the side column, so the merchant
+  controls the split by ordering blocks rather than by picking a size per card.
+
+  The head is the same two-column shape the story chapters use (§0 keeps them
+  on one heading token), and the cards share the tilt behaviour with the page
+  heroes through assets/jci-tilt.js.
+
+  No letter-spacing or line-height is authored (§0).
+{% endcomment %}
+
+{%- liquid
+  assign s = section.settings
+  assign notes = section.blocks | where: 'type', 'note'
+-%}
+
+<section
+  class="jci-journal-index"
+  {% if s.anchor_id != blank %}id="{{ s.anchor_id | handleize }}"{% endif %}
+  {{ section.shopify_attributes }}
+  style="
+    --jci-journal-index-bg: {{ s.background_color | default: settings.color_palette.background }};
+    --jci-journal-index-text: {{ s.text_color | default: settings.color_palette.foreground }};
+    --jci-journal-index-text-rgb: {{ s.text_color.rgb | default: settings.color_palette.foreground.rgb }};
+    --jci-journal-index-accent: {{ s.accent_color | default: settings.color_palette.color5 }};
+    --jci-journal-index-card-bg: {{ s.card_background | default: settings.color_palette.foreground }};
+    --jci-journal-index-card-text: {{ s.card_text_color | default: settings.color_palette.background }};
+    --jci-journal-index-card-text-rgb: {{ s.card_text_color.rgb | default: settings.color_palette.background.rgb }};
+    --jci-journal-index-gap: {{ s.grid_gap | divided_by: 10.0 }}rem;
+    --jci-journal-index-card-height: {{ s.card_min_height }}px;
+    --jci-journal-index-card-height-large: {{ s.card_min_height_large }}px;
+    --jci-journal-index-card-height-mobile: {{ s.card_min_height_mobile }}px;
+    --jci-journal-index-image-saturate: {{ s.image_saturate | divided_by: 100.0 }};
+    --jci-journal-index-image-brightness: {{ s.image_brightness | divided_by: 100.0 }};
+    --jci-journal-index-hover-lift: -{{ s.hover_lift }}px;
+    --jci-journal-index-pad-top: {% render 'jci-fluid-space', max: s.padding_top, min: s.padding_top_mobile %};
+    --jci-journal-index-pad-bottom: {% render 'jci-fluid-space', max: s.padding_bottom, min: s.padding_bottom_mobile %};
+    --jci-journal-index-pad-top-mobile: {{ s.padding_top_mobile }}px;
+    --jci-journal-index-pad-bottom-mobile: {{ s.padding_bottom_mobile }}px;
+    --jci-journal-index-tilt-strength: {{ s.tilt_strength }};
+  "
+>
+  <div class="jci-journal-index-container">
+    <div class="jci-journal-index-head">
+      <div class="jci-journal-index-headline">
+        {%- if s.eyebrow != blank -%}
+          <p class="jci-eyebrow jci-journal-index-eyebrow">{{ s.eyebrow }}</p>
+        {%- endif -%}
+
+        {%- if s.title_line_one != blank or s.title_line_two != blank -%}
+          <h2 class="jci-journal-index-title">
+            {{- s.title_line_one -}}
+            {%- if s.title_line_one != blank and s.title_line_two != blank -%}<br>{%- endif -%}
+            {%- if s.title_line_two != blank -%}
+              <em class="jci-journal-index-title-accent">{{ s.title_line_two }}</em>
+            {%- endif -%}
+          </h2>
+        {%- endif -%}
+      </div>
+
+      {%- if s.intro != blank -%}
+        <p class="jci-journal-index-intro">{{ s.intro }}</p>
+      {%- endif -%}
+    </div>
+
+    {%- if notes.size > 0 -%}
+      <div class="jci-journal-index-grid">
+        {%- for block in notes limit: 1 -%}
+          {%- render 'jci-journal-note', block: block, s: s, large: true -%}
+        {%- endfor -%}
+
+        {%- if notes.size > 1 -%}
+          <div class="jci-journal-index-side">
+            {%- for block in notes offset: 1 -%}
+              {%- render 'jci-journal-note', block: block, s: s -%}
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+  </div>
+</section>
+
+<script src="{{ 'jci-tilt.js' | asset_url }}" type="module"></script>
+
+{% stylesheet %}
+  .jci-journal-index {
+    position: relative;
+    display: block;
+    padding-block: var(--jci-journal-index-pad-top) var(--jci-journal-index-pad-bottom);
+    color: var(--jci-journal-index-text);
+    background: var(--jci-journal-index-bg);
+  }
+
+  /* styles.css:1294-1297 — the same head the story chapters use. */
+  .jci-journal-index-head {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.75fr);
+    align-items: end;
+    gap: 3rem;
+    margin-block-end: 2.7rem;
+  }
+
+  .jci-journal-index-eyebrow {
+    margin-block-end: 0.9rem;
+    color: var(--jci-journal-index-text);
+  }
+
+  .jci-journal-index-title {
+    margin: 0;
+    font-family: var(--jci-font-display);
+    font-size: var(--jci-section-title-size);
+    font-weight: 500;
+  }
+
+  .jci-journal-index-title-accent {
+    color: var(--jci-journal-index-accent);
+    font-style: italic;
+  }
+
+  /* #62665d is ink at 70% on paper. */
+  .jci-journal-index-intro {
+    max-width: 350px;
+    margin: 0;
+    color: rgb(var(--jci-journal-index-text-rgb) / 0.7);
+    font-family: var(--jci-font-sans);
+    font-size: var(--jci-subtitle-size);
+  }
+
+  /* styles.css:1305 */
+  .jci-journal-index-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.75fr);
+    gap: var(--jci-journal-index-gap);
+  }
+
+  /* styles.css:1319 */
+  .jci-journal-index-side {
+    display: grid;
+    grid-template-rows: 1fr 1fr;
+    gap: var(--jci-journal-index-gap);
+  }
+
+  /* styles.css:1306-1312 */
+  .jci-journal-index-card {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    min-height: var(--jci-journal-index-card-height);
+    overflow: hidden;
+    color: var(--jci-journal-index-card-text);
+    background: var(--jci-journal-index-card-bg);
+    /* The whole card is the link, so Horizon's hover underline would run
+       under every line of the copy. The link's own rule carries the line. */
+    text-decoration: none;
+    box-shadow: 0 12px 35px rgb(var(--jci-journal-index-text-rgb) / 0.08);
+    transform:
+      perspective(1100px)
+      rotateX(var(--jci-tilt-x, 0deg))
+      rotateY(var(--jci-tilt-y, 0deg))
+      translateY(var(--jci-tilt-lift, 0px));
+    transition: transform 0.55s var(--jci-ease), box-shadow 0.55s var(--jci-ease);
+  }
+
+  /* styles.css:1307 */
+  .jci-journal-index-card.is-large {
+    min-height: var(--jci-journal-index-card-height-large);
+  }
+
+  /* styles.css:1308 — the inset hairline frame. */
+  .jci-journal-index-card::before {
+    content: '';
+    position: absolute;
+    inset: 12px;
+    z-index: 2;
+    border: 1px solid rgb(var(--jci-journal-index-card-text-rgb) / 0.28);
+    pointer-events: none;
+  }
+
+  /* styles.css:1309 — the scrim that carries the copy. */
+  .jci-journal-index-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: linear-gradient(
+      180deg,
+      rgb(var(--jci-ink-rgb) / 0.05) 26%,
+      rgb(var(--jci-ink-rgb) / 0.82)
+    );
+    pointer-events: none;
+  }
+
+  /* styles.css:1310 */
+  .jci-journal-index-image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter:
+      saturate(var(--jci-journal-index-image-saturate))
+      brightness(var(--jci-journal-index-image-brightness));
+    transition: transform 0.85s var(--jci-ease), filter 0.6s var(--jci-ease);
+  }
+
+  .jci-journal-index-card:hover {
+    --jci-tilt-lift: var(--jci-journal-index-hover-lift);
+
+    box-shadow: 0 22px 42px rgb(var(--jci-journal-index-text-rgb) / 0.15);
+  }
+
+  .jci-journal-index-card:hover .jci-journal-index-image {
+    transform: scale(1.06);
+    filter:
+      saturate(calc(var(--jci-journal-index-image-saturate) + 0.12))
+      brightness(calc(var(--jci-journal-index-image-brightness) + 0.04));
+  }
+
+  /* styles.css:1313 — the numbered disc. */
+  .jci-journal-index-card-number {
+    position: absolute;
+    top: 1.4rem;
+    right: 1.4rem;
+    z-index: 3;
+    display: grid;
+    place-items: center;
+    width: 37px;
+    height: 37px;
+    border: 1px solid rgb(var(--jci-journal-index-card-text-rgb) / 0.6);
+    border-radius: 50%;
+    color: var(--jci-journal-index-card-text);
+    font-family: var(--jci-font-label);
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  /* styles.css:1314 */
+  .jci-journal-index-card-copy {
+    position: relative;
+    z-index: 3;
+    padding: 1.7rem;
+  }
+
+  /* #d5dcc0 is the hero accent lifted towards paper. */
+  .jci-journal-index-card-eyebrow {
+    margin-block-end: 0.75rem;
+    color: rgb(var(--jci-hero-accent-rgb) / 0.85);
+  }
+
+  /* styles.css:1316 */
+  .jci-journal-index-card-title {
+    max-width: 470px;
+    margin: 0;
+    font-family: var(--jci-font-display);
+    font-size: clamp(27px, 3vw, 43px);
+    font-weight: 500;
+  }
+
+  /* styles.css:1320 — the side cards take a fixed, smaller title. */
+  .jci-journal-index-side .jci-journal-index-card-title {
+    font-size: 29px;
+  }
+
+  /* #d2d4ca is paper at 82% on ink. */
+  .jci-journal-index-card-text {
+    max-width: 360px;
+    margin-block-start: 0.7rem;
+    margin-block-end: 0;
+    color: rgb(var(--jci-journal-index-card-text-rgb) / 0.82);
+    font-family: var(--jci-font-sans);
+    font-size: var(--jci-subtitle-size);
+  }
+
+  /* styles.css:1318 */
+  .jci-journal-index-card-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin-block-start: 1.25rem;
+    padding-block-end: 0.35rem;
+    border-block-end: 1px solid rgb(var(--jci-journal-index-card-text-rgb) / 0.45);
+    font-family: var(--jci-font-label);
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+  }
+
+  .jci-journal-index-card-arrow {
+    width: 13px;
+    height: 13px;
+    transition: transform 0.3s var(--jci-ease);
+  }
+
+  .jci-journal-index-card:hover .jci-journal-index-card-arrow {
+    transform: translate(3px, -3px);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .jci-journal-index-card,
+    .jci-journal-index-image,
+    .jci-journal-index-card-arrow {
+      transition: none;
+    }
+
+    .jci-journal-index-card:hover .jci-journal-index-image {
+      transform: none;
+    }
+  }
+
+  /* -- Breakpoints (§5 — 900 and 680 only) ------------------------------- */
+
+  /* styles.css:@900 — the head stacks; the grid keeps its split. */
+  @media screen and (max-width: 900px) {
+    .jci-journal-index-head {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 1.2rem;
+    }
+
+    .jci-journal-index-intro {
+      max-width: 540px;
+    }
+  }
+
+  /* styles.css:@680 281-283 — the grid and the side stack both become blocks. */
+  @media screen and (max-width: 680px) {
+    .jci-journal-index {
+      padding-block: var(--jci-journal-index-pad-top-mobile) var(--jci-journal-index-pad-bottom-mobile);
+    }
+
+    .jci-journal-index-grid,
+    .jci-journal-index-side {
+      display: block;
+    }
+
+    .jci-journal-index-card,
+    .jci-journal-index-card.is-large {
+      min-height: var(--jci-journal-index-card-height-mobile);
+      margin-block-end: 1rem;
+    }
+
+    .jci-journal-index-side .jci-journal-index-card-title {
+      font-size: 27px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Journal index",
+  "tag": "div",
+  "class": "jci-journal-index-section",
+  "max_blocks": 9,
+  "blocks": [
+    {
+      "type": "note",
+      "name": "Note",
+      "settings": [
+        { "type": "text", "id": "number", "label": "Number", "default": "02" },
+        { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "The field note" },
+        { "type": "text", "id": "title", "label": "Title", "default": "Made for the moments between." },
+        { "type": "textarea", "id": "text", "label": "Text", "info": "The prototype only writes one on the large note." },
+        { "type": "text", "id": "link_label", "label": "Link label", "default": "Read note" },
+        { "type": "url", "id": "link", "label": "Link" },
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "text", "id": "image_asset", "label": "Image file in theme assets", "info": "A file in assets/. Used only when no image is chosen." },
+        { "type": "text", "id": "image_alt", "label": "Image description" }
+      ]
+    }
+  ],
+  "settings": [
+    { "type": "paragraph", "content": "The first note is the large card. Every note after it stacks in the side column." },
+
+    { "type": "header", "content": "Copy" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "From the journal" },
+    { "type": "text", "id": "title_line_one", "label": "Title first line", "default": "Considered notes" },
+    { "type": "text", "id": "title_line_two", "label": "Title second line (italic)", "default": "from our world." },
+    { "type": "textarea", "id": "intro", "label": "Intro", "default": "Keep close to the Maison — a growing collection of stories about horses, movement, making and the rituals around the ride." },
+
+    { "type": "header", "content": "Cards" },
+    { "type": "range", "id": "card_min_height_large", "label": "Large card height", "min": 320, "max": 800, "step": 10, "unit": "px", "default": 560 },
+    { "type": "range", "id": "card_min_height", "label": "Side card height", "min": 200, "max": 600, "step": 10, "unit": "px", "default": 350 },
+    { "type": "range", "id": "card_min_height_mobile", "label": "Card height on mobile", "min": 200, "max": 560, "step": 10, "unit": "px", "default": 390 },
+    { "type": "range", "id": "grid_gap", "label": "Grid gap", "min": 0, "max": 60, "step": 1, "unit": "%", "default": 11, "info": "Tenths of a rem — 11 is the prototype's 1.1rem." },
+    { "type": "range", "id": "image_saturate", "label": "Image saturation", "min": 0, "max": 140, "step": 2, "unit": "%", "default": 60 },
+    { "type": "range", "id": "image_brightness", "label": "Image brightness", "min": 20, "max": 140, "step": 2, "unit": "%", "default": 72 },
+    { "type": "range", "id": "hover_lift", "label": "Hover lift", "min": 0, "max": 20, "step": 1, "unit": "px", "default": 6 },
+
+    { "type": "header", "content": "Motion" },
+    { "type": "checkbox", "id": "enable_tilt", "label": "Tilt the cards on hover", "default": true },
+    { "type": "range", "id": "tilt_strength", "label": "Tilt strength", "min": 0, "max": 14, "step": 1, "unit": "deg", "default": 6 },
+
+    { "type": "header", "content": "Colors", "info": "Left empty, each of these follows the theme colour palette." },
+    { "type": "color", "id": "background_color", "label": "Background" },
+    { "type": "color", "id": "text_color", "label": "Text" },
+    { "type": "color", "id": "accent_color", "label": "Accent" },
+    { "type": "color", "id": "card_background", "label": "Card background" },
+    { "type": "color", "id": "card_text_color", "label": "Card text" },
+
+    { "type": "header", "content": "Layout" },
+    { "type": "range", "id": "padding_top", "label": "Padding top", "min": 0, "max": 240, "step": 4, "unit": "px", "default": 100 },
+    { "type": "range", "id": "padding_bottom", "label": "Padding bottom", "min": 0, "max": 240, "step": 4, "unit": "px", "default": 100 },
+    { "type": "range", "id": "padding_top_mobile", "label": "Padding top on mobile", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 52 },
+    { "type": "range", "id": "padding_bottom_mobile", "label": "Padding bottom on mobile", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 52 },
+
+    { "type": "header", "content": "Anchor" },
+    { "type": "text", "id": "anchor_id", "label": "Anchor ID", "default": "journal-notes" }
+  ],
+  "presets": [
+    {
+      "name": "Journal index",
+      "blocks": [
+        { "type": "note", "settings": { "number": "02", "eyebrow": "The field note", "title": "Made for the moments between.", "text": "What we wear is only one part of a life shaped by horses.", "link_label": "Read note" } },
+        { "type": "note", "settings": { "number": "03", "eyebrow": "The ritual", "title": "Before the ride.", "link_label": "Explore the edit" } },
+        { "type": "note", "settings": { "number": "04", "eyebrow": "The edit", "title": "Fewer, better pieces.", "link_label": "Shop the Maison" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

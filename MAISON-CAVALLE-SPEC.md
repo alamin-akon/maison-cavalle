@@ -825,7 +825,7 @@ Other border widths:
 | 10a | FAQ page — `jci-faq-hero`, `jci-faq`, `jci-faq-assurance` | done |
 | 10b | Contact page — `jci-contact-hero`, `jci-contact` | done |
 | 10c | Story page | not started |
-| 10d | Journal page — `jci-journal-hero` done; note index and cards still to build | in progress |
+| 10d | Journal page — `jci-journal-hero`, `jci-journal-index` (+ `jci-journal-note` snippet) | done |
 | 10e | Shipping & returns page | not started |
 | 10f | Size guide page | not started |
 | 11 | `sections/header.liquid` — Horizon's header carrying the prototype's design | done |

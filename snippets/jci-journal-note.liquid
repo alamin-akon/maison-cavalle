@@ -1,0 +1,84 @@
+{% doc %}
+  One journal note card — the large lead note and the smaller side notes are
+  the same card, so they render from here and differ only by the `is-large`
+  class the index section passes in.
+
+  Reference: MAISON-CAVALLE-SPEC.md §1
+  Prototype: maison-cavalle-main/styles.css → .journal-card (1306-1318)
+
+  @param {object} block - The `note` block
+  @param {object} s - The section's settings, for the shared tilt options
+  @param {boolean} [large] - Render as the lead card
+{% enddoc %}
+
+{%- liquid
+  assign b = block.settings
+  assign note_asset = b.image_asset | strip
+
+  assign card_class = 'jci-journal-index-card'
+  if large
+    assign card_class = 'jci-journal-index-card is-large'
+    assign image_sizes = '(max-width: 680px) 100vw, 55vw'
+  else
+    assign image_sizes = '(max-width: 680px) 100vw, 33vw'
+  endif
+-%}
+
+<a
+  class="{{ card_class }}"
+  href="{{ b.link | default: '#' }}"
+  {% if s.enable_tilt %}data-jci-tilt{% endif %}
+  data-jci-tilt-strength="{{ s.tilt_strength }}"
+  {{ block.shopify_attributes }}
+>
+  {%- if b.image != blank -%}
+    <img
+      class="jci-journal-index-image"
+      src="{{ b.image | image_url: width: 1200 }}"
+      srcset="
+        {{ b.image | image_url: width: 600 }} 600w,
+        {{ b.image | image_url: width: 900 }} 900w,
+        {{ b.image | image_url: width: 1200 }} 1200w
+      "
+      sizes="{{ image_sizes }}"
+      alt="{{ b.image.alt | escape | default: b.image_alt | escape }}"
+      width="{{ b.image.width }}"
+      height="{{ b.image.height }}"
+      loading="lazy"
+    >
+  {%- elsif note_asset != blank -%}
+    <img
+      class="jci-journal-index-image"
+      src="{{ note_asset | asset_url }}"
+      alt="{{ b.image_alt | escape }}"
+      width="1200"
+      height="900"
+      loading="lazy"
+    >
+  {%- endif -%}
+
+  {%- if b.number != blank -%}
+    <span class="jci-journal-index-card-number">{{ b.number }}</span>
+  {%- endif -%}
+
+  <div class="jci-journal-index-card-copy">
+    {%- if b.eyebrow != blank -%}
+      <p class="jci-eyebrow jci-journal-index-card-eyebrow">{{ b.eyebrow }}</p>
+    {%- endif -%}
+
+    {%- if b.title != blank -%}
+      <h3 class="jci-journal-index-card-title">{{ b.title }}</h3>
+    {%- endif -%}
+
+    {%- if b.text != blank -%}
+      <p class="jci-journal-index-card-text">{{ b.text }}</p>
+    {%- endif -%}
+
+    {%- if b.link_label != blank -%}
+      <span class="jci-journal-index-card-link">
+        {{- b.link_label -}}
+        {%- render 'jci-action-arrow', class: 'jci-journal-index-card-arrow' -%}
+      </span>
+    {%- endif -%}
+  </div>
+</a>
