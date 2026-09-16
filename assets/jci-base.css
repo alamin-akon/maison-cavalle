@@ -244,3 +244,109 @@
     --jci-section-title-size: clamp(2.4rem, 10vw, 4rem); /* 38.4 → 64px */
   }
 }
+
+/* --------------------------------------------------------------------------
+   Shop policies (§7 exception)
+
+   Shopify renders /policies/* from its own built-in template — the `policy`
+   template type cannot be JSON, and a `policy.liquid` of ours did not take on
+   this store, so there is no jci- markup to hook onto. These are Shopify's
+   platform classes, not Horizon component classes, and every selector below is
+   scoped under .shopify-policy__container and used nowhere else.
+
+   Left unstyled the page inherits Horizon's h1, which jci-base points at the
+   144px hero token — which is why "Privacy policy" renders three lines tall.
+   -------------------------------------------------------------------------- */
+.shopify-policy__container {
+  --jci-policy-measure: 45rem; /* 720px */
+
+  width: min(100%, var(--jci-content-max));
+  max-width: none;
+  margin-inline: auto;
+  padding-block: clamp(3.25rem, 6vw, 6.25rem);
+  padding-inline: var(--jci-page-pad);
+}
+
+.shopify-policy__title {
+  max-width: var(--jci-policy-measure);
+  margin-block-end: clamp(2rem, 4vw, 3.25rem);
+  padding-block-end: clamp(1.5rem, 3vw, 2.25rem);
+  border-block-end: 1px solid var(--jci-line);
+  text-align: start;
+}
+
+/* The section title token, not the hero one. */
+.shopify-policy__title h1 {
+  margin: 0;
+  font-family: var(--jci-font-display);
+  font-size: var(--jci-section-title-size);
+  font-weight: 500;
+}
+
+.shopify-policy__body {
+  max-width: var(--jci-policy-measure);
+  color: rgb(var(--jci-ink-rgb) / 0.78);
+  font-family: var(--jci-font-sans);
+  font-size: var(--jci-subtitle-size);
+}
+
+.shopify-policy__body h1,
+.shopify-policy__body h2 {
+  margin-block: clamp(2.25rem, 4vw, 3rem) 1rem;
+  color: var(--jci-ink);
+  font-family: var(--jci-font-display);
+  font-size: clamp(1.5rem, 2.4vw, 2rem);
+  font-weight: 500;
+}
+
+.shopify-policy__body h3,
+.shopify-policy__body h4 {
+  margin-block: 2rem 0.75rem;
+  color: var(--jci-ink);
+  font-family: var(--jci-font-display);
+  font-size: 21px;
+  font-weight: 500;
+}
+
+.shopify-policy__body p,
+.shopify-policy__body ul,
+.shopify-policy__body ol {
+  margin-block: 0 1.1rem;
+}
+
+.shopify-policy__body ul,
+.shopify-policy__body ol {
+  padding-inline-start: 1.25rem;
+}
+
+.shopify-policy__body li {
+  margin-block-end: 0.5rem;
+}
+
+.shopify-policy__body strong {
+  color: var(--jci-ink);
+  font-weight: 500;
+}
+
+.shopify-policy__body a {
+  color: var(--jci-ink);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  transition: color 0.25s var(--jci-ease);
+}
+
+.shopify-policy__body a:hover {
+  color: var(--jci-olive);
+}
+
+.shopify-policy__body table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.shopify-policy__body td,
+.shopify-policy__body th {
+  padding: 0.7rem 0.9rem 0.7rem 0;
+  border-block-end: 1px solid var(--jci-line);
+  text-align: start;
+}
