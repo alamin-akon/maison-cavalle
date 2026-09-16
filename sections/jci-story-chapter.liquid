@@ -11,8 +11,16 @@
   Reference: MAISON-CAVALLE-SPEC.md §0, §1, §3, §5, §7
 
   One section for both text chapters of the story page. Chapter 01 is the
-  Origin layout - three columns of copy; chapter 03 is Continuing - two
-  columns and a timeline. Paragraphs and timeline steps are blocks.
+  Origin layout - three columns of copy; chapter 03 is Continuing - an
+  asymmetric two-column composition with a landscape film on the right and a
+  ruled timeline underneath. Paragraphs and timeline steps are blocks.
+
+  The Continuing composition only takes its grid when the layout is
+  `continuing` AND an image is set - the section root then carries
+  `has-media`, and `jci-story-chapter-composition` becomes the two-column
+  grid holding head, copy and media. Without an image, and for every Origin
+  instance, that wrapper is an unstyled div and the stacked layout below is
+  unchanged.
 
   The prototype's .page-content caps these at 1180px; they take the shared
   container instead (§0).
@@ -37,10 +45,27 @@
   if s.layout == 'continuing'
     assign layout_class = 'is-continuing'
   endif
+
+  assign image_asset = s.image_asset | strip
+  assign picked_image = s.image
+
+  assign has_media = false
+  if s.layout == 'continuing' and image_asset != blank
+    assign has_media = true
+  elsif s.layout == 'continuing' and picked_image != blank
+    assign has_media = true
+  endif
+
+  assign media_focal = '50% 50%'
+  if picked_image != blank and picked_image.presentation.focal_point != blank
+    assign media_focal = picked_image.presentation.focal_point
+  endif
+
+  assign overlay_lines = s.overlay_text | newline_to_br | split: '<br />'
 -%}
 
 <section
-  class="jci-story-chapter {{ layout_class }}"
+  class="jci-story-chapter {{ layout_class }}{% if has_media %} has-media{% endif %}"
   {% if s.anchor_id != blank %}id="{{ s.anchor_id | handleize }}"{% endif %}
   {{ section.shopify_attributes }}
   style="
@@ -53,49 +78,122 @@
     --jci-story-chapter-pad-bottom: {% render 'jci-fluid-space', max: s.padding_bottom, min: s.padding_bottom_mobile %};
     --jci-story-chapter-pad-top-mobile: {{ s.padding_top_mobile }}px;
     --jci-story-chapter-pad-bottom-mobile: {{ s.padding_bottom_mobile }}px;
+    --jci-story-chapter-media-width: {{ s.media_width }}%;
+    --jci-story-chapter-media-min-height: {{ s.media_min_height }}px;
+    --jci-story-chapter-media-focal: {{ media_focal }};
+    --jci-story-chapter-overlay-text: {{ s.overlay_color | default: settings.color_palette.background }};
+    --jci-story-chapter-scrim: {{ s.overlay_scrim | divided_by: 100.0 }};
   "
   {% if s.number != blank %}data-jci-story-chapter-number="{{ s.number | escape }}"{% endif %}
 >
   <div class="jci-story-chapter-container">
-    <div class="jci-story-chapter-head">
-      <div class="jci-story-chapter-headline">
-        {%- if s.eyebrow != blank -%}
-          <p class="jci-eyebrow jci-story-chapter-eyebrow">{{ s.eyebrow }}</p>
-        {%- endif -%}
+    <div class="jci-story-chapter-composition">
+      <div class="jci-story-chapter-head">
+        <div class="jci-story-chapter-headline">
+          {%- if s.eyebrow != blank -%}
+            <p class="jci-eyebrow jci-story-chapter-eyebrow">{{ s.eyebrow }}</p>
+          {%- endif -%}
 
-        {%- if s.title_line_one != blank or s.title_line_two != blank -%}
-          <h2 class="jci-story-chapter-title">
-            {{- s.title_line_one -}}
-            {%- if s.title_line_one != blank and s.title_line_two != blank -%}<br>{%- endif -%}
-            {%- if s.title_line_two != blank -%}
-              <em class="jci-story-chapter-title-accent">{{ s.title_line_two }}</em>
-            {%- endif -%}
-          </h2>
+          {%- if s.title_line_one != blank or s.title_line_two != blank -%}
+            <h2 class="jci-story-chapter-title">
+              {{- s.title_line_one -}}
+              {%- if s.title_line_one != blank and s.title_line_two != blank -%}<br>{%- endif -%}
+              {%- if s.title_line_two != blank -%}
+                <em class="jci-story-chapter-title-accent">{{ s.title_line_two }}</em>
+              {%- endif -%}
+            </h2>
+          {%- endif -%}
+        </div>
+
+        {%- if s.intro != blank -%}
+          <p class="jci-story-chapter-intro">{{ s.intro }}</p>
         {%- endif -%}
       </div>
 
-      {%- if s.intro != blank -%}
-        <p class="jci-story-chapter-intro">{{ s.intro }}</p>
+      {%- if paragraphs.size > 0 -%}
+        <div class="jci-story-chapter-copy">
+          {%- for block in paragraphs -%}
+            <div
+              class="jci-story-chapter-item{% if forloop.first %} is-first{% endif %}{% if forloop.last %} is-last{% endif %}{% if block.settings.number != blank %} is-stage{% endif %}"
+              {{ block.shopify_attributes }}
+            >
+              {%- if block.settings.number != blank -%}
+                <div class="jci-story-chapter-stage">
+                  <span class="jci-story-chapter-stage-number">{{ block.settings.number }}</span>
+                  <span class="jci-story-chapter-stage-rule"></span>
+                </div>
+              {%- endif -%}
+
+              {%- if block.settings.label != blank -%}
+                <span class="jci-story-chapter-stage-label">{{ block.settings.label }}</span>
+              {%- endif -%}
+
+              {%- if block.settings.text != blank -%}
+                <p class="jci-story-chapter-paragraph is-{{ block.settings.tone }}">{{ block.settings.text }}</p>
+              {%- endif -%}
+            </div>
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+
+      {%- if has_media -%}
+        <div class="jci-story-chapter-media">
+          {%- if image_asset != blank -%}
+            <img
+              class="jci-story-chapter-image"
+              src="{{ image_asset | asset_url }}"
+              alt="{{ s.image_alt | escape }}"
+              width="1200"
+              height="800"
+              loading="lazy"
+            >
+          {%- else -%}
+            <img
+              class="jci-story-chapter-image"
+              src="{{ picked_image | image_url: width: 1400 }}"
+              srcset="
+                {{ picked_image | image_url: width: 700 }} 700w,
+                {{ picked_image | image_url: width: 1000 }} 1000w,
+                {{ picked_image | image_url: width: 1400 }} 1400w,
+                {{ picked_image | image_url: width: 1800 }} 1800w
+              "
+              sizes="(max-width: 680px) 100vw, {{ s.media_width }}vw"
+              alt="{{ picked_image.alt | escape | default: s.image_alt | escape }}"
+              width="{{ picked_image.width }}"
+              height="{{ picked_image.height }}"
+              loading="lazy"
+            >
+          {%- endif -%}
+
+          {%- if s.overlay_scrim > 0 -%}
+            <span class="jci-story-chapter-media-scrim"></span>
+          {%- endif -%}
+
+          {%- if overlay_lines.size > 0 -%}
+            <div class="jci-story-chapter-overlay">
+              {%- for line in overlay_lines -%}
+                {%- assign overlay_line = line | strip_html | strip -%}
+                {%- if overlay_line != blank -%}
+                  <p class="jci-story-chapter-overlay-line">{{ overlay_line }}</p>
+                {%- endif -%}
+              {%- endfor -%}
+              <span class="jci-story-chapter-overlay-rule"></span>
+            </div>
+          {%- endif -%}
+        </div>
       {%- endif -%}
     </div>
-
-    {%- if paragraphs.size > 0 -%}
-      <div class="jci-story-chapter-copy">
-        {%- for block in paragraphs -%}
-          <p
-            class="jci-story-chapter-paragraph is-{{ block.settings.tone }}{% if forloop.last %} is-last{% endif %}"
-            {{ block.shopify_attributes }}
-          >
-            {{- block.settings.text -}}
-          </p>
-        {%- endfor -%}
-      </div>
-    {%- endif -%}
 
     {%- if steps.size > 0 -%}
       <div class="jci-story-chapter-timeline">
         {%- for block in steps -%}
-          <div class="jci-story-chapter-step{% if forloop.first %} is-first{% endif %}" {{ block.shopify_attributes }}>
+          <div
+            class="jci-story-chapter-step{% if forloop.first %} is-first{% endif %}{% if forloop.last %} is-last{% endif %}"
+            {{ block.shopify_attributes }}
+          >
+            {%- if s.layout == 'continuing' -%}
+              <span class="jci-story-chapter-step-marker"></span>
+            {%- endif -%}
             {%- if block.settings.label != blank -%}
               <span class="jci-story-chapter-step-label">{{ block.settings.label }}</span>
             {%- endif -%}
@@ -109,17 +207,67 @@
         {%- endfor -%}
       </div>
     {%- endif -%}
+
+    {%- if s.signoff != blank or s.signoff_mark != blank -%}
+      <div class="jci-story-chapter-signoff">
+        {%- if s.signoff != blank -%}
+          <p class="jci-story-chapter-signoff-line">{{ s.signoff }}</p>
+        {%- endif -%}
+        <span class="jci-story-chapter-signoff-rule"></span>
+        {%- if s.signoff_mark != blank -%}
+          <span class="jci-story-chapter-signoff-mark">{{ s.signoff_mark }}</span>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
   </div>
 </section>
 
 {% stylesheet %}
   .jci-story-chapter {
+    --jci-story-chapter-timeline-gap: 1.5rem;
+
     position: relative;
     display: block;
     overflow: hidden;
     padding-block: var(--jci-story-chapter-pad-top) var(--jci-story-chapter-pad-bottom);
     color: var(--jci-story-chapter-text);
     background: var(--jci-story-chapter-bg);
+  }
+
+  /* The Continuing composition. Without `has-media` this wrapper is inert and
+     head / copy stay the stacked Origin layout. */
+  .is-continuing.has-media .jci-story-chapter-composition {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, var(--jci-story-chapter-media-width));
+    /* The film spans both rows, so any height it has over the left column has
+       to land in row two - otherwise it pushes the rule away from the
+       headline. `1fr` sends the slack there and `start` keeps the copy at the
+       top of it. */
+    grid-template-rows: max-content 1fr;
+    align-items: start;
+    column-gap: clamp(2rem, 5vw, 4.5rem);
+  }
+
+  .is-continuing.has-media .jci-story-chapter-head {
+    grid-column: 1;
+    grid-row: 1;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.4rem;
+    margin-bottom: 0;
+  }
+
+  .is-continuing.has-media .jci-story-chapter-copy {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .is-continuing.has-media .jci-story-chapter-media {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    align-self: stretch;
+    margin-top: clamp(1.25rem, 2.5vw, 2.25rem);
   }
 
   /* styles.css:1294-1297 */
@@ -131,6 +279,19 @@
     align-items: end;
     gap: 3rem;
     margin-bottom: 2.7rem;
+  }
+
+  /* Origin leads with the headline and sets the intro against its top, rather
+     than hanging both off a shared baseline. */
+  .is-origin .jci-story-chapter-head {
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 0.8fr);
+    align-items: start;
+    gap: clamp(2rem, 6vw, 5rem);
+    margin-bottom: 0;
+  }
+
+  .is-origin .jci-story-chapter-intro {
+    max-width: 430px;
   }
 
   .jci-story-chapter-eyebrow {
@@ -177,6 +338,25 @@
     margin-top: 2.4rem;
   }
 
+  /* With the film alongside, the statement and its paragraph stack down the
+     left column instead, under the rule the copy block already draws. */
+  .is-continuing.has-media .jci-story-chapter-copy {
+    grid-template-columns: minmax(0, 1fr);
+    max-width: none;
+    gap: 1.3rem;
+    margin-top: clamp(1.75rem, 3vw, 2.6rem);
+    padding-top: clamp(1.5rem, 2.5vw, 2rem);
+  }
+
+  .is-continuing.has-media .jci-story-chapter-paragraph {
+    max-width: 440px;
+  }
+
+  .is-continuing.has-media .jci-story-chapter-paragraph.is-statement {
+    max-width: 520px;
+    font-size: clamp(1.5rem, 2.6vw, 2.15rem);
+  }
+
   .jci-story-chapter-paragraph {
     max-width: 360px;
     margin: 0;
@@ -196,6 +376,141 @@
     font-weight: 500;
   }
 
+  /* -- Origin stages ------------------------------------------------------ */
+
+  .is-origin .jci-story-chapter-copy {
+    gap: clamp(1.5rem, 5vw, 4.5rem);
+    margin-top: clamp(2.25rem, 4vw, 3.4rem);
+    padding-top: clamp(2.25rem, 4vw, 3.4rem);
+  }
+
+  .jci-story-chapter-item {
+    min-width: 0;
+  }
+
+  /* The number and the rule beside it read as one line, so the rule takes
+     whatever width the number leaves. */
+  .jci-story-chapter-stage {
+    display: flex;
+    align-items: center;
+    gap: clamp(0.75rem, 1.5vw, 1.35rem);
+  }
+
+  .jci-story-chapter-stage-number {
+    color: var(--jci-story-chapter-accent);
+    font-family: var(--jci-font-display);
+    font-size: clamp(2.6rem, 4.5vw, 3.9rem);
+    font-style: italic;
+    font-weight: 500;
+  }
+
+  .jci-story-chapter-stage-rule {
+    flex: 1 1 auto;
+    height: 1px;
+    background: var(--jci-line);
+  }
+
+  .jci-story-chapter-stage-label {
+    display: block;
+    margin-top: clamp(0.9rem, 1.8vw, 1.4rem);
+    margin-bottom: 0.85rem;
+    color: var(--jci-story-chapter-text);
+    font-family: var(--jci-font-label);
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+  }
+
+  /* -- Sign-off ----------------------------------------------------------- */
+
+  .jci-story-chapter-signoff {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    gap: clamp(1.25rem, 3vw, 2.5rem);
+    margin-top: clamp(3rem, 6vw, 5rem);
+  }
+
+  .jci-story-chapter-signoff-line {
+    margin: 0;
+    color: var(--jci-story-chapter-accent);
+    font-family: var(--jci-font-display);
+    font-size: clamp(1.35rem, 2.4vw, 1.95rem);
+    font-style: italic;
+    font-weight: 500;
+  }
+
+  .jci-story-chapter-signoff-rule {
+    flex: 1 1 auto;
+    height: 1px;
+    background: var(--jci-line);
+  }
+
+  /* #65695f is ink at 68% on cream. */
+  .jci-story-chapter-signoff-mark {
+    color: rgb(var(--jci-story-chapter-text-rgb) / 0.68);
+    font-family: var(--jci-font-label);
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  /* -- Continuing film ---------------------------------------------------- */
+
+  .jci-story-chapter-media {
+    position: relative;
+    overflow: hidden;
+    min-height: var(--jci-story-chapter-media-min-height);
+  }
+
+  .jci-story-chapter-image {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: var(--jci-story-chapter-media-focal);
+  }
+
+  /* Keeps the overlay legible whatever the crop shows; 0 turns it off. */
+  .jci-story-chapter-media-scrim {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to top,
+      rgb(var(--jci-ink-rgb) / var(--jci-story-chapter-scrim)),
+      transparent 52%
+    );
+    pointer-events: none;
+  }
+
+  .jci-story-chapter-overlay {
+    position: absolute;
+    bottom: clamp(1.25rem, 3vw, 2.5rem);
+    left: clamp(1.25rem, 3vw, 2.75rem);
+    z-index: 1;
+  }
+
+  .jci-story-chapter-overlay-line {
+    margin: 0;
+    color: var(--jci-story-chapter-overlay-text);
+    font-family: var(--jci-font-label);
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+  }
+
+  .jci-story-chapter-overlay-rule {
+    display: block;
+    width: 34px;
+    height: 1px;
+    margin-top: 0.85rem;
+    background: var(--jci-story-chapter-overlay-text);
+  }
+
   /* styles.css:711-714 */
   .jci-story-chapter-timeline {
     position: relative;
@@ -204,8 +519,24 @@
     grid-template-columns: repeat(3, 1fr);
     gap: 2rem;
     margin-top: 4rem;
-    padding-top: 1.5rem;
+    padding-top: var(--jci-story-chapter-timeline-gap);
     border-top: 1px solid var(--jci-line);
+  }
+
+  .jci-story-chapter-step {
+    position: relative;
+  }
+
+  /* Sits on the timeline rule itself, so the three markers read as one line. */
+  .jci-story-chapter-step-marker {
+    position: absolute;
+    top: calc(var(--jci-story-chapter-timeline-gap) * -1);
+    left: 0;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--jci-story-chapter-accent);
+    transform: translateY(-50%);
   }
 
   .jci-story-chapter-step-label {
@@ -280,11 +611,18 @@
       max-width: none;
     }
 
-    .is-origin .jci-story-chapter-paragraph.is-last {
+    /* Two stages, then the third across the full width. Each stage draws its
+       own rule, so the old divider above the last one is dropped. */
+    .is-origin .jci-story-chapter-item.is-last {
       grid-column: 1 / -1;
       max-width: 720px;
-      padding-top: 2rem;
-      border-top: 1px solid var(--jci-line);
+    }
+
+    /* The head carries the divider and its own padding here, so the copy does
+       not add a second gap on top of it. */
+    .is-origin .jci-story-chapter-copy {
+      row-gap: clamp(2rem, 5vw, 3rem);
+      margin-top: 0;
     }
 
     .is-continuing .jci-story-chapter-copy {
@@ -311,6 +649,56 @@
     .jci-story-chapter-step:not(.is-first) {
       padding-left: clamp(1.2rem, 3vw, 2rem);
       border-left: 1px solid var(--jci-line);
+    }
+
+    /* Continuing keeps its own composition here: the film narrows so the
+       headline keeps its measure, and the timeline stays one ruled line with
+       markers rather than taking the Origin dividers above. */
+    .is-continuing.has-media .jci-story-chapter-composition {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 48%);
+      column-gap: clamp(1.5rem, 4vw, 3rem);
+    }
+
+    /* Origin's desktop ratio is set on `.is-origin`, so the tablet one has to
+       be too - otherwise it outranks the rule above. */
+    .is-origin .jci-story-chapter-head {
+      grid-template-columns: minmax(0, 1.08fr) minmax(260px, 0.72fr);
+      gap: clamp(2rem, 5vw, 4rem);
+    }
+
+    .is-continuing.has-media .jci-story-chapter-head {
+      padding-bottom: 0;
+      border-bottom: 0;
+    }
+
+    /* The Origin rules above drop the copy rule and pad it out; Continuing
+       keeps its divider directly under the headline. */
+    .is-continuing.has-media .jci-story-chapter-copy {
+      margin-top: clamp(1.5rem, 3vw, 2.25rem);
+      padding: clamp(1.25rem, 2.5vw, 1.75rem) 0 0;
+      border-top: 1px solid var(--jci-line);
+    }
+
+    /* The prototype's big faded chapter number sat in the top-right corner,
+       which both redesigned chapters now occupy - Origin with the intro,
+       Continuing with the film. It would show through them, so it is dropped
+       wherever the corner is taken. */
+    .is-continuing.has-media.jci-story-chapter::after,
+    .is-origin.jci-story-chapter::after {
+      content: none;
+    }
+
+    .is-continuing .jci-story-chapter-timeline {
+      gap: clamp(1.25rem, 3vw, 2rem);
+      margin-top: clamp(2.5rem, 6vw, 4rem);
+      padding-top: var(--jci-story-chapter-timeline-gap);
+      border-top: 1px solid var(--jci-line);
+    }
+
+    .is-continuing .jci-story-chapter-step,
+    .is-continuing .jci-story-chapter-step:not(.is-first) {
+      padding: 0;
+      border-left: 0;
     }
   }
 
@@ -352,10 +740,30 @@
       max-width: none;
     }
 
-    .is-origin .jci-story-chapter-paragraph.is-last {
+    .is-origin .jci-story-chapter-item.is-last {
       grid-column: auto;
       max-width: none;
-      padding-top: 1.65rem;
+    }
+
+    .is-origin .jci-story-chapter-head {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 1.75rem;
+    }
+
+    .is-origin .jci-story-chapter-copy {
+      gap: clamp(2rem, 7vw, 2.75rem);
+      margin-top: 0;
+    }
+
+    .jci-story-chapter-signoff {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1.1rem;
+    }
+
+    .jci-story-chapter-signoff-rule {
+      width: 100%;
+      flex: 0 0 auto;
     }
 
     .jci-story-chapter-timeline {
@@ -368,6 +776,62 @@
       padding: 1.4rem 0;
       border-left: 0;
       border-bottom: 1px solid var(--jci-line);
+    }
+
+    /* Stacks eyebrow + heading, film, statement, paragraph, timeline. */
+    .is-continuing.has-media .jci-story-chapter-composition {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .is-continuing.has-media .jci-story-chapter-head {
+      grid-column: 1;
+      grid-row: 1;
+    }
+
+    .is-continuing.has-media .jci-story-chapter-media {
+      grid-column: 1;
+      grid-row: 2;
+      min-height: 0;
+      margin-top: 1.75rem;
+      aspect-ratio: 4 / 3;
+    }
+
+    .is-continuing.has-media .jci-story-chapter-copy {
+      grid-column: 1;
+      grid-row: 3;
+      margin-top: 1.75rem;
+      padding-top: 1.75rem;
+    }
+
+    .is-continuing.has-media .jci-story-chapter-paragraph,
+    .is-continuing.has-media .jci-story-chapter-paragraph.is-statement {
+      max-width: none;
+    }
+
+    /* The timeline turns vertical: one rail down the left, markers on it. */
+    .is-continuing .jci-story-chapter-timeline {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 0;
+      margin-top: clamp(2.25rem, 8vw, 3rem);
+      padding-top: 0;
+      border-top: 0;
+    }
+
+    .is-continuing .jci-story-chapter-step,
+    .is-continuing .jci-story-chapter-step:not(.is-first) {
+      padding: 0 0 1.9rem 1.6rem;
+      border-bottom: 0;
+      border-left: 1px solid var(--jci-line);
+    }
+
+    .is-continuing .jci-story-chapter-step.is-last {
+      padding-bottom: 0;
+    }
+
+    .is-continuing .jci-story-chapter-step-marker {
+      top: 0.4rem;
+      left: 0;
+      transform: translateX(-50%);
     }
   }
 {% endstylesheet %}
@@ -383,6 +847,8 @@
       "type": "paragraph",
       "name": "Paragraph",
       "settings": [
+        { "type": "text", "id": "number", "label": "Stage number", "info": "Origin layout. Set it and the paragraph becomes a numbered stage, with the rule and label above it. Leave empty for a plain paragraph." },
+        { "type": "text", "id": "label", "label": "Stage label" },
         { "type": "textarea", "id": "text", "label": "Text", "default": "Maison Cavallé is the next chapter of that story." },
         {
           "type": "select",
@@ -426,12 +892,26 @@
     { "type": "text", "id": "title_line_two", "label": "Title second line (italic)", "default": "A way of life." },
     { "type": "textarea", "id": "intro", "label": "Intro" },
 
+    { "type": "header", "content": "Sign-off", "info": "The closing line under the chapter. Leave both empty to drop the row." },
+    { "type": "text", "id": "signoff", "label": "Closing statement" },
+    { "type": "text", "id": "signoff_mark", "label": "Sign-off mark" },
+
+    { "type": "header", "content": "Image", "info": "The Continuing layout only. Set an image here and the chapter takes its two-column composition, with the film on the right." },
+    { "type": "text", "id": "image_asset", "label": "Image file in theme assets", "info": "Filename only, e.g. jci-editorial-field-note.webp. Takes priority over the picker below." },
+    { "type": "image_picker", "id": "image", "label": "Image", "info": "Drag the focal point in the image editor to choose the crop." },
+    { "type": "text", "id": "image_alt", "label": "Image description", "default": "A horse standing in an open field" },
+    { "type": "textarea", "id": "overlay_text", "label": "Image overlay", "info": "One line per line of text.", "default": "Horses\nPeople\nA brighter\ntomorrow" },
+
     { "type": "header", "content": "Colors", "info": "Left empty, each of these follows the theme colour palette." },
     { "type": "color", "id": "background_color", "label": "Background" },
     { "type": "color", "id": "text_color", "label": "Text" },
     { "type": "color", "id": "accent_color", "label": "Accent" },
+    { "type": "color", "id": "overlay_color", "label": "Image overlay text" },
 
     { "type": "header", "content": "Layout" },
+    { "type": "range", "id": "media_width", "label": "Image width", "min": 40, "max": 70, "step": 1, "unit": "%", "default": 57, "info": "Share of the content width the film takes on desktop." },
+    { "type": "range", "id": "media_min_height", "label": "Image minimum height", "min": 320, "max": 760, "step": 10, "unit": "px", "default": 520 },
+    { "type": "range", "id": "overlay_scrim", "label": "Overlay shading", "min": 0, "max": 60, "step": 5, "unit": "%", "default": 25, "info": "Darkens the foot of the image so the overlay stays readable. 0 turns it off." },
     { "type": "range", "id": "padding_top", "label": "Padding top", "min": 0, "max": 240, "step": 4, "unit": "px", "default": 136 },
     { "type": "range", "id": "padding_bottom", "label": "Padding bottom", "min": 0, "max": 240, "step": 4, "unit": "px", "default": 136 },
     { "type": "range", "id": "padding_top_mobile", "label": "Padding top on mobile", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 72 },

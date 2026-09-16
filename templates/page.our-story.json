@@ -97,21 +97,27 @@
           "type": "paragraph",
           "settings": {
             "text": "She began competing herself as a child, and the equestrian world became not simply an interest, but a way of life.",
-            "tone": "lead"
+            "tone": "body",
+            "number": "01",
+            "label": "Childhood"
           }
         },
         "paragraph_2": {
           "type": "paragraph",
           "settings": {
             "text": "That connection continued through adulthood. Miriam married a National Hunt jockey before eventually making a new home in Australia, where horses remained an enduring part of family life.",
-            "tone": "body"
+            "tone": "body",
+            "number": "02",
+            "label": "Adulthood"
           }
         },
         "paragraph_3": {
           "type": "paragraph",
           "settings": {
             "text": "Today, more than fifty years after that journey began, Miriam still owns horses and remains immersed in the equestrian world. Now another generation continues the story, with her granddaughter competing successfully in Equestrian Australia show jumping at national level.",
-            "tone": "body"
+            "tone": "body",
+            "number": "03",
+            "label": "Legacy"
           }
         }
       },
@@ -134,7 +140,9 @@
         "padding_bottom": 136,
         "padding_top_mobile": 72,
         "padding_bottom_mobile": 72,
-        "anchor_id": "story-origin"
+        "anchor_id": "story-origin",
+        "signoff": "A story shaped by horses, heritage and generations.",
+        "signoff_mark": "Maison Cavallé"
       }
     },
     "jci_story_heritage": {
@@ -205,8 +213,8 @@
         }
       },
       "block_order": [
-        "paragraph_1",
         "paragraph_2",
+        "paragraph_1",
         "step_1",
         "step_2",
         "step_3"
@@ -217,7 +225,7 @@
         "eyebrow": "Chapter 03 · Continuing",
         "title_line_one": "From one generation",
         "title_line_two": "to the next.",
-        "intro": "Maison Cavallé isn't an interpretation of the equestrian lifestyle from the outside. It comes from a life lived within it.",
+        "intro": "",
         "background_color": "{{ settings.color_palette.background }}",
         "text_color": "",
         "accent_color": "",
@@ -225,7 +233,14 @@
         "padding_bottom": 136,
         "padding_top_mobile": 72,
         "padding_bottom_mobile": 72,
-        "anchor_id": "story-continuing"
+        "anchor_id": "story-continuing",
+        "image_asset": "jci-editorial-field-note.webp",
+        "image_alt": "A horse standing in an open field at dusk",
+        "overlay_text": "Horses\nPeople\nA brighter\ntomorrow",
+        "overlay_color": "",
+        "media_width": 57,
+        "media_min_height": 520,
+        "overlay_scrim": 25
       }
     },
     "jci_story_quote": {
