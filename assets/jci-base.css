@@ -236,12 +236,13 @@
 }
 
 /* The prototype drops both headlines at the mobile breakpoint.
-   styles.css:1554-1557 — `--hero-title-size: clamp(3rem, 12vw, 4.5rem)`,
-   `--section-title-size: clamp(2.4rem, 10vw, 4rem)`. */
+   styles.css:1554-1557 — `--hero-title-size: clamp(3rem, 12vw, 4.5rem)`.
+   Section headings follow the developer's 11vw instead of the prototype's
+   `clamp(2.4rem, 10vw, 4rem)`, so every section title scales the same. */
 @media screen and (max-width: 680px) {
   :root {
     --jci-hero-title-size: clamp(3rem, 12vw, 4.5rem); /* 48 → 72px */
-    --jci-section-title-size: clamp(2.4rem, 10vw, 4rem); /* 38.4 → 64px */
+    --jci-section-title-size: 11vw;
   }
 }
 

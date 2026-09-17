@@ -228,7 +228,7 @@
         "padding_top": 100,
         "padding_bottom": 100,
         "padding_top_mobile": 52,
-        "padding_bottom_mobile": 52,
+        "padding_bottom_mobile": 0,
         "anchor_id": "faq-content"
       }
     },

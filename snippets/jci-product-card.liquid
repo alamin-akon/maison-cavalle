@@ -146,6 +146,13 @@
           height="{{ card_image.height }}"
           loading="{% if lazy == false %}eager{% else %}lazy{% endif %}"
         >
+      {%- else -%}
+        {%- comment -%}
+          A product with no image yet still shows a garment outline rather
+          than an empty block, the same placeholder the section uses when no
+          collection is chosen.
+        {%- endcomment -%}
+        {{ 'product-apparel-1' | placeholder_svg_tag: 'jci-product-card-image jci-product-card-placeholder' }}
       {%- endif -%}
     </a>
 
