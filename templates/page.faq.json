@@ -241,7 +241,7 @@
             "index": "01",
             "title": "Shipping & returns",
             "text": "Simple delivery, clear next steps.",
-            "link": "/pages/shipping"
+            "link": "shopify://pages/shipping-returns"
           }
         },
         "c2": {
@@ -250,7 +250,7 @@
             "index": "02",
             "title": "Find your fit",
             "text": "Measurements and guidance, made easy.",
-            "link": "/pages/size-guide"
+            "link": "shopify://pages/size-guide"
           }
         },
         "c3": {
@@ -259,7 +259,7 @@
             "index": "03",
             "title": "Ask the Maison",
             "text": "Personal help when you need it.",
-            "link": "/pages/contact"
+            "link": "shopify://pages/contact-1"
           }
         }
       },

@@ -706,20 +706,16 @@
       gap: 2rem;
     }
 
-    /* The scroll cue is hidden here but keeps its column, so the two side
-       columns are made equal and the moment nav sits in the centre. */
+    /* The scroll cue is removed here, so the moment nav starts at the left
+       edge and the index keeps the right. */
     .jci-hero-bottomline {
-      grid-template-columns: minmax(0, 1fr) minmax(0, 4fr) minmax(0, 1fr);
+      grid-template-columns: minmax(0, 1fr) auto;
       gap: 1rem;
-    }
-
-    .jci-hero-index {
-      justify-self: end;
     }
 
     /* styles.css:1494 — declared at 966px, folded into 900px per §5. */
     .jci-hero-scroll {
-      visibility: hidden;
+      display: none;
     }
   }
 
