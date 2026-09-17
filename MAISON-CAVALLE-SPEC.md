@@ -102,8 +102,18 @@ set it, and nothing else does:
 **The homepage hero (`jci-hero`) is excluded** and keeps normal leading.
 
 The exception is this list and nothing more: not the feature/overlay titles
-inside those heroes, not section headings, not body copy. `letter-spacing`
-stays banned everywhere, with no exception.
+inside those heroes, not section headings. `letter-spacing` stays banned
+everywhere, with no exception.
+
+#### The second exception: paragraphs
+
+Standing developer instruction, later again and outranking the rule above:
+**every `<p>` on every page carries `line-height: 130%`.**
+
+It is declared once, in `assets/jci-base.css` ("Paragraph leading"), and
+nowhere else. That rule also outranks Horizon's `.paragraph` and
+`.custom-typography` leading, so text blocks and rich text follow it too. No
+section re-declares paragraph leading.
 
 ### A section ships complete, or not at all
 
