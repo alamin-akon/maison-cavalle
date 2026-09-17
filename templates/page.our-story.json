@@ -106,7 +106,7 @@
         "media_min_height": 520,
         "overlay_scrim": 25,
         "padding_top": 100,
-        "padding_bottom": 0,
+        "padding_bottom": 32,
         "padding_top_mobile": 52,
         "padding_bottom_mobile": 0,
         "anchor_id": "story-origin"
@@ -131,7 +131,7 @@
         "text_color": "",
         "frame_background": "",
         "padding_top": 100,
-        "padding_bottom": 0,
+        "padding_bottom": 20,
         "padding_top_mobile": 52,
         "padding_bottom_mobile": 32,
         "anchor_id": "story-name"
