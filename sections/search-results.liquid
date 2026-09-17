@@ -46,36 +46,96 @@
         {% assign products = collection.products %}
       {% endif %}
 
-      {% capture children %}
-        {% for product in products %}
-          <li
-            id="{{ section.id }}-{{ product.id }}"
-            class="product-grid__item product-grid__item--{{ forloop.index0 }}"
-            data-page="{{ paginate.current_page }}"
-            data-product-id="{{ product.id }}"
-            ref="cards[]"
-          >
-            {% content_for 'block',
-              type: '_product-card',
-              id: 'product-card',
-              closest.product: product,
-              product_view_context: 'search'
-            %}
-          </li>
-        {% endfor %}
-      {% endcapture %}
+      {%- comment -%}
+        Maison Cavalle: the results use the home product section's card and
+        grid (snippets/jci-product-card.liquid) with the card settings from
+        templates/index.json. `ref="grid"`, `ref="cards[]"` and the view-more
+        markers stay, so results-list.js still loads the next page on scroll.
+      {%- endcomment -%}
+      <div
+        id="ResultsList"
+        class="main-collection-grid jci-search-results"
+        style="
+          --grid--margin--mobile: 0 var(--margin-lg);
+          --grid-column--desktop: var(--centered);
+          --grid-column--mobile: var(--centered);
+          --padding-inline-start: 0px;
+          --padding-inline-end: 0px;
+          --jci-product-section-bg: {{ settings.color_palette.background }};
+          --jci-product-section-heading: {{ settings.color_palette.foreground }};
+          --jci-product-section-heading-rgb: {{ settings.color_palette.foreground.rgb }};
+          --jci-product-card-subtitle-color: rgb({{ settings.color_palette.foreground.rgb }} / 0.68);
+          --jci-product-card-media-bg: {{ settings.color_palette.color2 }};
+          --jci-product-card-ratio: 0.78;
+          --jci-product-card-zoom: 1.035;
+          --jci-product-grid-columns: 4;
+          --jci-product-grid-columns-tablet: 2;
+          --jci-product-grid-columns-mobile: 2;
+          --jci-product-grid-columns-small: 1;
+          --jci-product-grid-gap: 28px;
+          --jci-product-grid-row-gap-mobile: 36px;
+        "
+      >
+        {%- if title != blank -%}
+          <p class="jci-eyebrow jci-search-results-title">{{ title }}</p>
+        {%- endif -%}
 
-      {% render 'product-grid',
-        section: section,
-        children: children,
-        products: products,
-        paginate: paginate,
-        enable_infinite_scroll: section.settings.enable_infinite_scroll,
-        title: title
-      %}
+        {%- if section.settings.enable_infinite_scroll -%}
+          <span ref="viewMorePrevious"></span>
+        {%- endif -%}
+
+        <div class="jci-product-grid" ref="grid" data-last-page="{{ paginate.pages }}">
+          {%- for product in products -%}
+            <div
+              id="{{ section.id }}-{{ product.id }}"
+              class="jci-search-results-item"
+              data-page="{{ paginate.current_page }}"
+              data-product-id="{{ product.id }}"
+              ref="cards[]"
+            >
+              {%- liquid
+                assign lazy = true
+                if forloop.index <= 4
+                  assign lazy = false
+                endif
+              -%}
+              {% render 'jci-product-card',
+                product: product,
+                section_id: section.id,
+                subtitle_key: 'custom.subtitle',
+                badge_source: 'sale',
+                badge_text: 'Sale',
+                swatch_option: 'Color',
+                swatch_metafield: 'custom.colour_swatches',
+                show_quick_add: true,
+                quick_add_label: 'Quick add',
+                image_index: 0,
+                lazy: lazy
+              %}
+            </div>
+          {%- endfor -%}
+        </div>
+
+        {%- if section.settings.enable_infinite_scroll -%}
+          <span ref="viewMoreNext"></span>
+        {%- elsif paginate.pages > 1 -%}
+          {% render 'pagination-controls', paginate: paginate %}
+        {%- endif -%}
+      </div>
     {% endpaginate %}
   </div>
 </results-list>
+
+{% stylesheet %}
+  .jci-search-results-title {
+    margin: 0 0 var(--jci-product-section-header-gap, 40px);
+    color: var(--jci-product-section-heading);
+  }
+
+  .jci-search-results-item {
+    min-width: 0;
+  }
+{% endstylesheet %}
 
 {% schema %}
 {

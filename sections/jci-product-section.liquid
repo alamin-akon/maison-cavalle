@@ -14,6 +14,16 @@
   assign s = section.settings
   assign products = s.collection.products
 
+  # Random order: the list starts from a different product on each render and
+  # wraps round, so the cards change between visits instead of always showing
+  # the collection's first few. The seed is the render time in seconds.
+  if s.random_order and products.size > 1
+    assign random_start = 'now' | date: '%s' | modulo: products.size
+    assign products_head = products | slice: random_start, products.size
+    assign products_tail = products | slice: 0, random_start
+    assign products = products_head | concat: products_tail
+  endif
+
   # On a product page the piece being viewed is left out of its own list
   # (app.js:654 — `products.filter((item) => item.id !== product.id)`).
   # Elsewhere there is no current product and nothing is skipped.
@@ -458,7 +468,9 @@
     .jci-product-section {
       padding-block: var(--jci-product-section-pad-top-mobile) var(--jci-product-section-pad-bottom-mobile);
     }
-
+.jci-product-section-title{
+  font-size: 11vw;
+}
     .jci-product-grid {
       --jci-product-grid-count: var(--jci-product-grid-columns-mobile);
       /* styles.css:@680 — `gap: 2.3rem .7rem`. The column gap tightens on
@@ -535,6 +547,7 @@
 
     { "type": "header", "content": "Products" },
     { "type": "collection", "id": "collection", "label": "Collection" },
+    { "type": "checkbox", "id": "random_order", "label": "Show products in random order", "default": false, "info": "Starts from a different product in the collection on each visit." },
     { "type": "select", "id": "layout", "label": "Layout", "options": [{ "value": "grid", "label": "Grid" }, { "value": "slider", "label": "Slider" }], "default": "grid", "info": "Slider keeps every product on one row, with the column counts below in view." },
     { "type": "range", "id": "products_to_show", "label": "Products to show", "min": 2, "max": 12, "step": 1, "default": 4 },
     { "type": "range", "id": "columns", "label": "Columns on desktop", "min": 2, "max": 5, "step": 1, "default": 4 },
