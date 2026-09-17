@@ -353,6 +353,22 @@
     }
   }
 
+  /* Maison Cavalle: below 750px the "Bag" label is hidden (`mobile:hidden`),
+     so an inline count would trail the bare icon. There it goes back over the
+     bag's top-right corner, the usual icon badge. */
+  @media screen and (max-width: 749px) {
+    .header-actions__cart-icon {
+      position: relative;
+    }
+
+    .header-actions__cart-icon .cart-bubble {
+      position: absolute;
+      top: -7px;
+      right: -9px;
+      margin-inline-start: 0;
+    }
+  }
+
   .header-actions__cart-icon .cart-bubble__text {
     font-family: var(--font-paragraph--family);
     font-weight: var(--font-paragraph--weight);

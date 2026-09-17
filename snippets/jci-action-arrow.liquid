@@ -39,10 +39,16 @@
       assign turn = 0
   endcase
 %}
+{%- comment -%}
+  The path is a diagonal that fills the square. Turned to right, left, up or
+  down its point reaches past the viewBox and the tip was clipped, so the SVG
+  lets it overflow — the arrow keeps the diagonal's size and weight.
+{%- endcomment -%}
 <svg
   class="jci-action-arrow{% if class != blank %} {{ class }}{% endif %}"
   xmlns="http://www.w3.org/2000/svg"
   viewBox="0 0 512 512"
+  overflow="visible"
   aria-hidden="true"
   focusable="false"
 >
