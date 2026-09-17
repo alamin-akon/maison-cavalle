@@ -88,7 +88,7 @@
         "title_accessories": {
           "type": "title",
           "settings": {
-            "collection": "accessories",
+            "collection": "caps-accessories",
             "title_line_one": "Caps &",
             "title_line_two": "accessories."
           }
@@ -182,7 +182,7 @@
         "f_accessories": {
           "type": "filter",
           "settings": {
-            "collection": "accessories",
+            "collection": "caps-accessories",
             "label": "Caps & accessories"
           }
         }

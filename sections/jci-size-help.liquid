@@ -68,6 +68,13 @@
 
 {% stylesheet %}
   .jci-size-help {
+    /* The ink card fills the page column edge to edge, like the footer below
+       it. The shared container gutter moves inside the card instead, so the
+       copy still lines up with every other section (§1, §5). */
+    --jci-container-pad: 0;
+    --jci-container-width: var(--jci-page-column);
+    --jci-container-offset: calc(50% - var(--jci-page-column) / 2);
+
     display: block;
     padding-block: var(--jci-size-help-pad-top) var(--jci-size-help-pad-bottom);
     background: var(--jci-size-help-bg);
@@ -79,7 +86,7 @@
     grid-template-columns: minmax(0, 0.9fr) minmax(0, 0.7fr);
     gap: clamp(2rem, 8vw, 8rem);
     align-items: end;
-    padding: clamp(2rem, 4vw, 4rem);
+    padding: clamp(2rem, 4vw, 4rem) var(--jci-page-pad);
     color: var(--jci-size-help-text);
     background: var(--jci-size-help-card-bg);
   }
