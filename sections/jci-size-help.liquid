@@ -110,14 +110,20 @@
     font-style: italic;
   }
 
+  /* The copy sits against the card's right gutter, lining up with the
+     footer's last column below it. */
+  .jci-size-help-body {
+    justify-self: end;
+  }
+
   /* styles.css:802 — #c4c8bd is paper at 75% on ink. */
-  .jci-size-help-text {
-    max-width: 360px;
+.jci-size-help-text {
+    max-width: 430px;
     margin: 0 0 1.7rem;
-    color: rgb(var(--jci-paper-rgb) / 0.75);
+    color: rgb(var(--jci-paper-rgb) / .75);
     font-family: var(--jci-font-sans);
     font-size: var(--jci-subtitle-size);
-  }
+}
 
   /* styles.css:803 */
   .jci-size-help-link {

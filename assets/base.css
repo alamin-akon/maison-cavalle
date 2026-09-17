@@ -64,6 +64,17 @@ html[scroll-lock] .page-wrapper {
   min-height: 100dvh;
 }
 
+/* Maison Cavalle: no scroll anchoring on either scroller. The sticky header
+   shrinks (86px to 72px) the moment the announcement bar scrolls away, which
+   pulls the page up 14px. Scroll anchoring answered that by scrolling back
+   14px, which un-stuck the header, which grew it again - so right at the
+   announcement bar's edge the header bounced between its two heights. */
+html,
+body,
+.page-wrapper {
+  overflow-anchor: none;
+}
+
 @media (min-width: 990px) {
   .page-wrapper {
     height: 100dvh;
