@@ -689,6 +689,13 @@
     }
   }
 
+  /* Below 1450px the container stops short of the hero's full height. */
+  @media screen and (max-width: 1450px) {
+    .jci-hero-container {
+      height: 95%;
+    }
+  }
+
   @media screen and (max-width: 900px) {
     .jci-hero {
       --jci-hero-title-size: clamp(3.4rem, 8vw, 6.5rem);
@@ -699,9 +706,15 @@
       gap: 2rem;
     }
 
+    /* The scroll cue is hidden here but keeps its column, so the two side
+       columns are made equal and the moment nav sits in the centre. */
     .jci-hero-bottomline {
-      grid-template-columns: minmax(100px, 0.38fr) minmax(0, 2fr) auto;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 4fr) minmax(0, 1fr);
       gap: 1rem;
+    }
+
+    .jci-hero-index {
+      justify-self: end;
     }
 
     /* styles.css:1494 — declared at 966px, folded into 900px per §5. */

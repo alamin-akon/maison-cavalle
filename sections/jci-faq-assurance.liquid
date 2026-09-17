@@ -148,6 +148,13 @@
     font-size: 12px;
   }
 
+  /* The arrow is pinned to the bottom-right corner, so the title and text
+     keep its width plus a gap clear on the right and never run under it. */
+  .jci-faq-assurance-card-title,
+  .jci-faq-assurance-card-text {
+    padding-inline-end: calc(18px + 0.75rem);
+  }
+
   /* styles.css:1050 */
   .jci-faq-assurance-card-title {
     margin-block-start: auto;
