@@ -81,7 +81,7 @@
         {%- if s.cta_label != blank -%}
           <a class="jci-text-link jci-journal-hero-cta" href="{{ s.cta_link | default: '#' }}">
             {{- s.cta_label }}
-            {%- render 'jci-action-arrow', class: 'jci-journal-hero-cta-arrow' -%}
+            {%- render 'jci-action-arrow', direction: 'down', class: 'jci-journal-hero-cta-arrow' -%}
           </a>
         {%- endif -%}
 

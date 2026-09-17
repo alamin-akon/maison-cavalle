@@ -239,11 +239,23 @@
     border: 1px solid var(--jci-line);
     background: var(--jci-shipping-policy-block-bg);
     box-shadow: 8px 10px 0 rgb(var(--jci-shipping-policy-text-rgb) / 0.055);
+    transform: translateY(var(--jci-shipping-policy-block-shift, 0px));
+    transition: border-color 0.35s var(--jci-ease), transform 0.35s var(--jci-ease), box-shadow 0.35s var(--jci-ease);
   }
 
   /* styles.css:1454 — the prototype staggers these with :nth-child. */
   .jci-shipping-policy-block.is-offset {
-    transform: translateY(var(--jci-shipping-policy-offset));
+    --jci-shipping-policy-block-shift: var(--jci-shipping-policy-offset);
+  }
+
+  /* styles.css:1457-1458 — every block rises 0.35rem from wherever it rests,
+     so an offset block lifts from its own drop rather than jumping up. */
+  .jci-shipping-policy-block:hover,
+  .jci-shipping-policy-block:focus-within {
+    z-index: 2;
+    border-color: var(--jci-shipping-policy-index);
+    box-shadow: 12px 14px 0 rgb(var(--jci-shipping-policy-text-rgb) / 0.1);
+    transform: translateY(calc(var(--jci-shipping-policy-block-shift, 0px) - 0.35rem));
   }
 
   /* styles.css:1455 */
@@ -362,6 +374,13 @@
     width: 22px;
     height: 22px;
     color: rgb(var(--jci-shipping-policy-text-rgb) / 0.28);
+    transition: transform 0.3s var(--jci-ease);
+  }
+
+  /* styles.css:1459 */
+  .jci-shipping-policy-block:hover .jci-shipping-policy-block-arrow,
+  .jci-shipping-policy-block:focus-within .jci-shipping-policy-block-arrow {
+    transform: translate(3px, -3px);
   }
 
   .jci-shipping-policy-block.is-inverted .jci-shipping-policy-block-arrow {
@@ -389,7 +408,7 @@
     }
 
     .jci-shipping-policy-block.is-offset {
-      transform: none;
+      --jci-shipping-policy-block-shift: 0px;
     }
   }
 
@@ -404,6 +423,23 @@
 
     .jci-shipping-policy-intro {
       max-width: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .jci-shipping-policy-block,
+    .jci-shipping-policy-block-arrow {
+      transition: none;
+    }
+
+    .jci-shipping-policy-block:hover,
+    .jci-shipping-policy-block:focus-within {
+      transform: translateY(var(--jci-shipping-policy-block-shift, 0px));
+    }
+
+    .jci-shipping-policy-block:hover .jci-shipping-policy-block-arrow,
+    .jci-shipping-policy-block:focus-within .jci-shipping-policy-block-arrow {
+      transform: none;
     }
   }
 {% endstylesheet %}
