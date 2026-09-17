@@ -1,330 +1,350 @@
+{% comment %}
+  Maison Cavallé — collection list (/collections)
+  Reference: MAISON-CAVALLE-SPEC.md §0, §1, §3, §5, §7
 
+  Horizon's collection list, restyled in place to match the rest of the
+  theme: the home product section's header (eyebrow, section title with an
+  italic accent, intro) over a grid of collection cards. The cards follow
+  snippets/jci-product-card.liquid — one image ratio, the sand media
+  background, the same hover zoom — so every collection sits on one row
+  height instead of each photo's own shape.
 
-{% liquid
-  assign section_collections = collections
-  assign max_items = 20
-  if section.settings.background_color != blank
-    render 'contrast-override', background_color: section.settings.background_color, section_id: section.id
-  endif
-%}
+  Collections named in "Hidden collections" (the home page collection by
+  default) are left out, as they are storefront plumbing rather than
+  categories.
 
-<div
-  class="section-background{% if section.settings.background_color != blank %} color-custom-{{ section.id }}{% endif %}"
-></div>
+  Shared container, section title size and body size come from jci-base.css
+  (§0). No letter-spacing or line-height is authored.
+{% endcomment %}
 
-<div
-  class="
-    section
-    section--{{ section.settings.section_width }}
-    {% if section.settings.background_color != blank %}color-custom-{{ section.id }}{% endif %}
-    section-resource-list
-    spacing-style
-    gap-style
-  "
+{%- liquid
+  assign s = section.settings
+  assign hidden_handles = s.hidden_handles | remove: ' ' | split: ','
+  assign shown = 0
+-%}
+
+<section
+  class="jci-collection-list"
+  {% if s.anchor_id != blank %}id="{{ s.anchor_id | handleize }}"{% endif %}
   style="
-    {% render 'spacing-style', settings: section.settings %}
-    {% render 'gap-style', value: section.settings.gap %}
+    --jci-collection-list-bg: {{ s.background_color | default: settings.color_palette.background }};
+    --jci-collection-list-text: {{ s.text_color | default: settings.color_palette.foreground }};
+    --jci-collection-list-text-rgb: {{ s.text_color.rgb | default: settings.color_palette.foreground.rgb }};
+    --jci-collection-list-accent: {{ s.accent_color | default: settings.color_palette.color5 }};
+    --jci-collection-list-media-bg: {{ s.media_background | default: settings.color_palette.color2 }};
+    --jci-collection-list-ratio: {{ s.image_ratio | divided_by: 100.0 }};
+    --jci-collection-list-zoom: {{ s.image_zoom | divided_by: 1000.0 | plus: 1 }};
+    --jci-collection-list-columns: {{ s.columns }};
+    --jci-collection-list-columns-tablet: {{ s.columns_tablet }};
+    --jci-collection-list-columns-mobile: {{ s.columns_mobile }};
+    --jci-collection-list-gap: {{ s.grid_gap }}px;
+    --jci-collection-list-row-gap-mobile: {{ s.grid_row_gap_mobile }}px;
+    --jci-collection-list-header-gap: {{ s.header_gap }}px;
+    --jci-collection-list-pad-top: {% render 'jci-fluid-space', max: s.padding_top, min: s.padding_top_mobile %};
+    --jci-collection-list-pad-bottom: {% render 'jci-fluid-space', max: s.padding_bottom, min: s.padding_bottom_mobile %};
+    --jci-collection-list-pad-top-mobile: {{ s.padding_top_mobile }}px;
+    --jci-collection-list-pad-bottom-mobile: {{ s.padding_bottom_mobile }}px;
   "
+  {{ section.shopify_attributes }}
 >
-  <div class="section-resource-list__content">
-    {%- content_for 'blocks' -%}
-  </div>
+  <div class="jci-collection-list-container">
+    {%- if s.eyebrow != blank or s.title_line_one != blank or s.title_line_two != blank or s.intro != blank -%}
+      <div class="jci-collection-list-header">
+        <div class="jci-collection-list-header-copy">
+          {%- if s.eyebrow != blank -%}
+            <p class="jci-eyebrow jci-collection-list-eyebrow">{{ s.eyebrow }}</p>
+          {%- endif -%}
 
-  {% if section_collections == null %}
-    {% for i in (1..max_items) %}
-      {% assign section_collections = section_collections | append: ', ' %}
-    {% endfor %}
+          {%- if s.title_line_one != blank or s.title_line_two != blank -%}
+            <h1 class="jci-collection-list-title">
+              {{- s.title_line_one -}}
+              {%- if s.title_line_one != blank and s.title_line_two != blank -%}{{ ' ' }}{%- endif -%}
+              {%- if s.title_line_two != blank -%}
+                <em class="jci-collection-list-title-accent">{{ s.title_line_two }}</em>
+              {%- endif -%}
+            </h1>
+          {%- endif -%}
+        </div>
 
-    {% assign section_collections = section_collections | split: ',' %}
-  {% endif %}
-
-  {% capture list_items %}
-    {% for collection in section_collections limit: max_items %}
-      <div class="resource-list__item">
-        {% content_for 'block', type: '_collection-card', id: 'static-collection-card', closest.collection: collection %}
+        {%- if s.intro != blank -%}
+          <p class="jci-collection-list-intro">{{ s.intro }}</p>
+        {%- endif -%}
       </div>
-      {% unless forloop.last %}
-        <!--@list/split-->
-      {% endunless %}
-    {% endfor %}
-  {% endcapture %}
+    {%- endif -%}
 
-  {% liquid
-    # Create an array from the list items to be used for different layout types
-    assign list_items_array = list_items | strip | split: '<!--@list/split-->'
-  %}
+    <div class="jci-collection-list-grid">
+      {%- for collection in collections -%}
+        {%- liquid
+          if hidden_handles contains collection.handle
+            continue
+          endif
+          if shown >= s.max_collections
+            break
+          endif
+          assign shown = shown | plus: 1
 
-  {% render 'resource-list',
-    list_items: list_items,
-    list_items_array: list_items_array,
-    settings: section.settings,
-    carousel_ref: 'mainCollectionList',
-    slide_count: max_items,
-    content_type: 'collections',
-    test_id: 'collections-list-grid'
-  %}
-</div>
+          assign card_image = collection.featured_image | default: collection.products.first.featured_image
+          assign lazy = true
+          if shown <= s.columns
+            assign lazy = false
+          endif
+        -%}
+        <a class="jci-collection-list-card" href="{{ collection.url }}">
+          <span class="jci-collection-list-card-media">
+            {%- if card_image != blank -%}
+              <img
+                class="jci-collection-list-card-image"
+                src="{{ card_image | image_url: width: 900 }}"
+                srcset="
+                  {{ card_image | image_url: width: 450 }} 450w,
+                  {{ card_image | image_url: width: 700 }} 700w,
+                  {{ card_image | image_url: width: 900 }} 900w
+                "
+                sizes="(max-width: 680px) 50vw, 33vw"
+                alt="{{ card_image.alt | escape | default: collection.title | escape }}"
+                width="{{ card_image.width }}"
+                height="{{ card_image.height }}"
+                loading="{% if lazy %}lazy{% else %}eager{% endif %}"
+              >
+            {%- else -%}
+              {{ 'collection-apparel-1' | placeholder_svg_tag: 'jci-collection-list-card-image' }}
+            {%- endif -%}
+          </span>
+
+          <span class="jci-collection-list-card-info">
+            <span class="jci-collection-list-card-details">
+              <span class="jci-collection-list-card-title">{{ collection.title }}</span>
+              {%- if s.show_count -%}
+                <span class="jci-collection-list-card-count">
+                  {{- collection.products_count }} {{ s.count_label -}}
+                </span>
+              {%- endif -%}
+            </span>
+            {% render 'jci-action-arrow', class: 'jci-collection-list-card-arrow' %}
+          </span>
+        </a>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+  .jci-collection-list {
+    display: block;
+    padding-block: var(--jci-collection-list-pad-top) var(--jci-collection-list-pad-bottom);
+    color: var(--jci-collection-list-text);
+    background: var(--jci-collection-list-bg);
+  }
+
+  /* -- Header: the home product section's, so the page reads as one set --- */
+
+  .jci-collection-list-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 2rem;
+    margin-bottom: var(--jci-collection-list-header-gap);
+  }
+
+  .jci-collection-list-eyebrow {
+    margin-bottom: 1rem;
+    color: var(--jci-collection-list-accent);
+  }
+
+  .jci-collection-list-title {
+    margin: 0;
+    color: var(--jci-collection-list-text);
+    font-family: var(--jci-font-display);
+    font-size: var(--jci-section-title-size);
+    font-weight: 500;
+  }
+
+  .jci-collection-list-title-accent {
+    color: var(--jci-collection-list-accent);
+    font-style: italic;
+  }
+
+  .jci-collection-list-intro {
+    max-width: 280px;
+    margin: 0;
+    color: rgb(var(--jci-collection-list-text-rgb) / 0.68);
+    font-family: var(--jci-font-sans);
+    font-size: var(--jci-subtitle-size);
+  }
+
+  /* -- Grid -------------------------------------------------------------- */
+
+  .jci-collection-list-grid {
+    --jci-collection-list-count: var(--jci-collection-list-columns);
+    --jci-collection-list-column-gap: var(--jci-collection-list-gap);
+    display: grid;
+    grid-template-columns: repeat(var(--jci-collection-list-count), minmax(0, 1fr));
+    gap: var(--jci-collection-list-gap) var(--jci-collection-list-column-gap);
+  }
+
+  /* -- Card -------------------------------------------------------------- */
+
+  .jci-collection-list-card {
+    display: block;
+    min-width: 0;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .jci-collection-list-card-media {
+    display: block;
+    margin-bottom: 1rem;
+    overflow: hidden;
+    aspect-ratio: var(--jci-collection-list-ratio);
+    background: var(--jci-collection-list-media-bg);
+  }
+
+  .jci-collection-list-card-image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.7s var(--jci-ease);
+  }
+
+  .jci-collection-list-card:hover .jci-collection-list-card-image,
+  .jci-collection-list-card:focus-visible .jci-collection-list-card-image {
+    transform: scale(var(--jci-collection-list-zoom));
+  }
+
+  .jci-collection-list-card-info {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.8rem;
+  }
+
+  .jci-collection-list-card-details {
+    display: block;
+    min-width: 0;
+  }
+
+  .jci-collection-list-card-title {
+    display: block;
+    font-family: var(--jci-font-display);
+    font-size: 22px;
+    font-weight: 400;
+  }
+
+  .jci-collection-list-card-count {
+    display: block;
+    margin-top: 0.35rem;
+    color: var(--jci-collection-list-accent);
+    font-family: var(--jci-font-label);
+    font-size: 12px;
+    text-transform: uppercase;
+  }
+
+  .jci-collection-list-card-arrow {
+    flex: 0 0 16px;
+    width: 16px;
+    height: 16px;
+    margin-top: 0.3rem;
+  }
+
+  .jci-collection-list-card:hover .jci-collection-list-card-arrow,
+  .jci-collection-list-card:focus-visible .jci-collection-list-card-arrow {
+    transform: translate(3px, -3px);
+  }
+
+  /* -- Breakpoints (§5 — 900 and 680, plus 1200 for the grid, as the home
+     product grid) ------------------------------------------------------- */
+
+  @media screen and (max-width: 1200px) {
+    .jci-collection-list-grid {
+      --jci-collection-list-count: var(--jci-collection-list-columns-tablet);
+    }
+  }
+
+  @media screen and (max-width: 900px) {
+    .jci-collection-list-header {
+      display: block;
+      margin-bottom: 1.8rem;
+    }
+
+    .jci-collection-list-intro {
+      max-width: none;
+      margin-top: 1rem;
+    }
+  }
+
+  @media screen and (max-width: 680px) {
+    .jci-collection-list {
+      padding-block: var(--jci-collection-list-pad-top-mobile) var(--jci-collection-list-pad-bottom-mobile);
+    }
+
+    .jci-collection-list-grid {
+      --jci-collection-list-count: var(--jci-collection-list-columns-mobile);
+      --jci-collection-list-column-gap: 0.7rem;
+      row-gap: var(--jci-collection-list-row-gap-mobile);
+    }
+
+    .jci-collection-list-card-title {
+      font-size: 17px;
+    }
+
+    .jci-collection-list-card-arrow {
+      display: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .jci-collection-list-card-image,
+    .jci-collection-list-card-arrow {
+      transition: none;
+    }
+
+    .jci-collection-list-card:hover .jci-collection-list-card-image,
+    .jci-collection-list-card:focus-visible .jci-collection-list-card-image {
+      transform: none;
+    }
+  }
+{% endstylesheet %}
 
 {% schema %}
 {
   "name": "t:names.collection_list",
   "class": "ui-test-collection-list",
-  "blocks": [
-    {
-      "type": "@theme"
-    },
-    {
-      "type": "@app"
-    },
-    {
-      "type": "text"
-    },
-    {
-      "type": "icon"
-    },
-    {
-      "type": "image"
-    },
-    {
-      "type": "button"
-    },
-    {
-      "type": "video"
-    },
-    {
-      "type": "group"
-    },
-    {
-      "type": "spacer"
-    },
-    {
-      "type": "_divider"
-    }
-  ],
-  "disabled_on": {
-    "groups": ["header", "footer"]
-  },
   "settings": [
-    {
-      "type": "header",
-      "content": "t:content.cards_layout"
-    },
-    {
-      "type": "select",
-      "id": "layout_type",
-      "label": "t:settings.layout_type",
-      "options": [
-        {
-          "value": "grid",
-          "label": "t:options.grid"
-        },
-        {
-          "value": "carousel",
-          "label": "t:options.carousel"
-        },
-        {
-          "value": "bento",
-          "label": "t:options.bento"
-        },
-        {
-          "value": "editorial",
-          "label": "t:options.editorial"
-        }
-      ],
-      "default": "grid"
-    },
-    {
-      "type": "checkbox",
-      "id": "carousel_on_mobile",
-      "label": "t:settings.carousel_on_mobile",
-      "default": false,
-      "visible_if": "{{ section.settings.layout_type != 'carousel' }}"
-    },
-    {
-      "type": "range",
-      "id": "columns",
-      "label": "t:settings.columns",
-      "min": 1,
-      "max": 8,
-      "step": 1,
-      "default": 4,
-      "visible_if": "{{ section.settings.layout_type == 'grid' or section.settings.layout_type == 'carousel' }}"
-    },
-    {
-      "type": "select",
-      "id": "mobile_columns",
-      "label": "t:settings.mobile_columns",
-      "options": [
-        {
-          "value": "1",
-          "label": "t:options.one_number"
-        },
-        {
-          "value": "2",
-          "label": "t:options.two_number"
-        }
-      ],
-      "default": "2",
-      "visible_if": "{{ section.settings.layout_type == 'grid' and section.settings.carousel_on_mobile == false }}"
-    },
-    {
-      "type": "range",
-      "id": "columns_gap",
-      "label": "t:settings.horizontal_gap",
-      "min": 0,
-      "max": 100,
-      "step": 1,
-      "unit": "px",
-      "default": 8,
-      "visible_if": "{{ section.settings.layout_type == 'grid' or section.settings.layout_type == 'carousel' }}"
-    },
-    {
-      "type": "range",
-      "id": "bento_gap",
-      "label": "t:settings.gap",
-      "min": 0,
-      "max": 100,
-      "step": 1,
-      "unit": "px",
-      "default": 8,
-      "visible_if": "{{ section.settings.layout_type == 'bento' }}"
-    },
-    {
-      "type": "range",
-      "id": "rows_gap",
-      "label": "t:settings.vertical_gap",
-      "min": 0,
-      "max": 100,
-      "step": 1,
-      "unit": "px",
-      "default": 8,
-      "visible_if": "{{ section.settings.layout_type == 'grid'}}"
-    },
-    {
-      "type": "range",
-      "id": "max_collections",
-      "label": "t:settings.collection_count",
-      "min": 1,
-      "max": 16,
-      "step": 1,
-      "default": 4,
-      "visible_if": "{{ section.settings.layout_type == 'editorial' }}"
-    },
-    {
-      "type": "header",
-      "content": "t:content.carousel_navigation",
-      "visible_if": "{{ section.settings.layout_type == 'carousel' or section.settings.carousel_on_mobile == true }}"
-    },
-    {
-      "type": "select",
-      "id": "icons_style",
-      "label": "t:settings.icon",
-      "options": [
-        {
-          "value": "arrow",
-          "label": "t:options.arrows"
-        },
-        {
-          "value": "chevron",
-          "label": "t:options.chevrons"
-        },
-        {
-          "value": "arrows_large",
-          "label": "t:options.arrows_large"
-        },
-        {
-          "value": "chevron_large",
-          "label": "t:options.chevron_large"
-        },
-        {
-          "value": "none",
-          "label": "t:options.none"
-        }
-      ],
-      "default": "arrow",
-      "visible_if": "{{ section.settings.layout_type == 'carousel' or section.settings.carousel_on_mobile == true }}"
-    },
-    {
-      "type": "select",
-      "id": "icons_shape",
-      "label": "t:settings.icon_background",
-      "options": [
-        {
-          "value": "none",
-          "label": "t:options.none"
-        },
-        {
-          "value": "circle",
-          "label": "t:options.circle"
-        },
-        {
-          "value": "square",
-          "label": "t:options.square"
-        }
-      ],
-      "default": "none",
-      "visible_if": "{{ section.settings.icons_style != 'none' and section.settings.layout_type == 'carousel' or section.settings.carousel_on_mobile == true }}"
-    },
-    {
-      "type": "header",
-      "content": "t:content.section_layout"
-    },
-    {
-      "type": "select",
-      "id": "section_width",
-      "label": "t:settings.width",
-      "options": [
-        {
-          "value": "page-width",
-          "label": "t:options.page"
-        },
-        {
-          "value": "full-width",
-          "label": "t:options.full"
-        }
-      ],
-      "default": "page-width"
-    },
-    {
-      "type": "range",
-      "id": "gap",
-      "label": "t:settings.gap",
-      "min": 0,
-      "max": 100,
-      "step": 1,
-      "unit": "px",
-      "default": 12
-    },
-    {
-      "type": "color",
-      "id": "background_color",
-      "label": "t:settings.background_color",
-      "placeholder": "t:settings.default"
-    },
-    {
-      "type": "header",
-      "content": "t:content.padding"
-    },
-    {
-      "type": "range",
-      "id": "padding-block-start",
-      "label": "t:settings.top",
-      "min": 0,
-      "max": 100,
-      "step": 1,
-      "unit": "px",
-      "default": 0
-    },
-    {
-      "type": "range",
-      "id": "padding-block-end",
-      "label": "t:settings.bottom",
-      "min": 0,
-      "max": 100,
-      "step": 1,
-      "unit": "px",
-      "default": 0
-    }
+    { "type": "header", "content": "Header" },
+    { "type": "text", "id": "eyebrow", "label": "Eyebrow", "default": "The Maison edit" },
+    { "type": "text", "id": "title_line_one", "label": "Title", "default": "Browse by" },
+    { "type": "text", "id": "title_line_two", "label": "Title accent (italic)", "default": "collection." },
+    { "type": "textarea", "id": "intro", "label": "Intro", "default": "Every piece, grouped the way you ride — from base layers to the finishing touches." },
+
+    { "type": "header", "content": "Collections" },
+    { "type": "text", "id": "hidden_handles", "label": "Hidden collections", "default": "frontpage", "info": "Collection handles to leave out, separated by commas." },
+    { "type": "range", "id": "max_collections", "label": "Collections to show", "min": 1, "max": 50, "step": 1, "default": 20 },
+    { "type": "checkbox", "id": "show_count", "label": "Show product count", "default": true },
+    { "type": "text", "id": "count_label", "label": "Count label", "default": "pieces" },
+
+    { "type": "header", "content": "Grid" },
+    { "type": "range", "id": "columns", "label": "Columns on desktop", "min": 2, "max": 5, "step": 1, "default": 3 },
+    { "type": "range", "id": "columns_tablet", "label": "Columns below 1200px", "min": 1, "max": 4, "step": 1, "default": 2 },
+    { "type": "range", "id": "columns_mobile", "label": "Columns on mobile", "min": 1, "max": 3, "step": 1, "default": 2 },
+    { "type": "range", "id": "image_ratio", "label": "Image width to height", "min": 50, "max": 150, "step": 1, "unit": "%", "default": 78, "info": "78 matches the home product cards." },
+    { "type": "range", "id": "image_zoom", "label": "Image zoom on hover", "min": 0, "max": 100, "step": 5, "unit": "%", "default": 35, "info": "Thousandths — 35 is a 3.5% zoom." },
+    { "type": "range", "id": "grid_gap", "label": "Grid gap", "min": 0, "max": 80, "step": 2, "unit": "px", "default": 28 },
+    { "type": "range", "id": "grid_row_gap_mobile", "label": "Row gap on mobile", "min": 0, "max": 80, "step": 2, "unit": "px", "default": 36 },
+    { "type": "range", "id": "header_gap", "label": "Space under header", "min": 0, "max": 120, "step": 2, "unit": "px", "default": 40 },
+
+    { "type": "header", "content": "Colors" },
+    { "type": "color", "id": "background_color", "label": "Background" },
+    { "type": "color", "id": "text_color", "label": "Text" },
+    { "type": "color", "id": "accent_color", "label": "Accent" },
+    { "type": "color", "id": "media_background", "label": "Image placeholder" },
+
+    { "type": "header", "content": "Spacing" },
+    { "type": "range", "id": "padding_top", "label": "Padding top", "min": 0, "max": 240, "step": 4, "unit": "px", "default": 100 },
+    { "type": "range", "id": "padding_bottom", "label": "Padding bottom", "min": 0, "max": 240, "step": 4, "unit": "px", "default": 100 },
+    { "type": "range", "id": "padding_top_mobile", "label": "Padding top on mobile", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 52 },
+    { "type": "range", "id": "padding_bottom_mobile", "label": "Padding bottom on mobile", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 52 },
+    { "type": "text", "id": "anchor_id", "label": "Anchor ID" }
   ]
 }
 {% endschema %}
