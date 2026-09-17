@@ -81,7 +81,7 @@
         {%- if s.cta_label != blank -%}
           <a class="jci-text-link jci-journal-hero-cta" href="{{ s.cta_link | default: '#' }}">
             {{- s.cta_label }}
-            {%- render 'jci-action-arrow', direction: 'down', class: 'jci-journal-hero-cta-arrow' -%}
+            {%- render 'jci-action-arrow', class: 'jci-journal-hero-cta-arrow' -%}
           </a>
         {%- endif -%}
 
@@ -151,7 +151,7 @@
           {%- if s.feature_link_label != blank -%}
             <span class="jci-journal-hero-feature-link">
               {{- s.feature_link_label }}
-              {%- render 'jci-action-arrow', direction: 'down-right', class: 'jci-journal-hero-feature-arrow' -%}
+              {%- render 'jci-action-arrow', class: 'jci-journal-hero-feature-arrow' -%}
             </span>
           {%- endif -%}
         </div>
@@ -264,10 +264,10 @@
     color: var(--jci-journal-hero-text);
   }
 
-.jci-journal-hero-cta-arrow {
+  .jci-journal-hero-cta-arrow {
     width: 13px;
-    height: 17px;
-}
+    height: 13px;
+  }
 
   /* styles.css:1071-1102 */
   .jci-journal-hero-meta {
@@ -426,7 +426,7 @@
   /* styles.css:1291 */
   .jci-journal-hero-feature:hover .jci-journal-hero-feature-arrow,
   .jci-journal-hero-feature:focus-visible .jci-journal-hero-feature-arrow {
-    transform: translate(3px, 3px);
+    transform: translate(3px, -3px);
   }
 
   /* styles.css:1239 */

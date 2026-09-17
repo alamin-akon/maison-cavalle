@@ -68,6 +68,11 @@ html[scroll-lock] .page-wrapper {
   .page-wrapper {
     height: 100dvh;
     overflow-y: auto;
+    /* Maison Cavalle: `overflow-y: auto` turns overflow-x to auto as well, so
+       the full-bleed sections' `100vw` - which counts this wrapper's own
+       scrollbar - overflowed by the scrollbar width and drew a horizontal
+       scrollbar at the bottom of the page. The wrapper never scrolls sideways. */
+    overflow-x: hidden;
     /* Maison Cavalle: keeps the scrollbar's room when a drawer or modal locks
        scrolling, so the page does not shift sideways as it opens and closes. */
     scrollbar-gutter: stable;
