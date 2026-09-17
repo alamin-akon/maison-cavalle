@@ -91,7 +91,7 @@
         {%- if s.cta_label != blank -%}
           <a class="jci-text-link jci-story-hero-cta" href="{{ s.cta_link | default: '#' }}">
             {{- s.cta_label }}
-            {%- render 'jci-action-arrow', class: 'jci-story-hero-cta-arrow' -%}
+            {%- render 'jci-action-arrow', direction: 'down', class: 'jci-story-hero-cta-arrow' -%}
           </a>
         {%- endif -%}
       </div>
@@ -164,7 +164,7 @@
           {%- if s.feature_link_label != blank -%}
             <span class="jci-story-hero-feature-link">
               {{- s.feature_link_label }}
-              {%- render 'jci-action-arrow', class: 'jci-story-hero-feature-arrow' -%}
+              {%- render 'jci-action-arrow', direction: 'down', class: 'jci-story-hero-feature-arrow' -%}
             </span>
           {%- endif -%}
         </div>
@@ -278,6 +278,12 @@
   .jci-story-hero-cta-arrow {
     width: 13px;
     height: 13px;
+  }
+
+  /* The arrow points down here, so the hover nudge follows it down instead
+     of the shared text link's up-right one. */
+  .jci-story-hero-cta:hover .jci-story-hero-cta-arrow {
+    transform: translateY(3px);
   }
 
   /* styles.css:1277-1278 */
@@ -423,7 +429,7 @@
 
   .jci-story-hero-feature:hover .jci-story-hero-feature-arrow,
   .jci-story-hero-feature:focus-visible .jci-story-hero-feature-arrow {
-    transform: translate(3px, -3px);
+    transform: translateY(3px);
   }
 
   .jci-story-hero-feature:focus-visible {
